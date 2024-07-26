@@ -2,6 +2,7 @@ package com.sj.Petory.domain.member.controller;
 
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<Boolean> signUp(@RequestBody SignUp.Request request) {
+    public ResponseEntity<Boolean> signUp(
+            @RequestBody @Valid SignUp.Request request) {
 
         return ResponseEntity.ok(memberService.signUp(request));
     }
