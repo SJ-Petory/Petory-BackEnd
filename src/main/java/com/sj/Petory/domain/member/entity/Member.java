@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Member {
 
     @Id
@@ -31,7 +33,7 @@ public class Member {
     private String image;
 
     @CreatedDate
-    @Column
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
