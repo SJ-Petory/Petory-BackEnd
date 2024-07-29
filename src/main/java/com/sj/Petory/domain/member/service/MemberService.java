@@ -23,4 +23,11 @@ public class MemberService {
         }
         return true;
     }
+
+    public boolean checkNameDuplicate(String name) {
+        if (memberRepository.existsByName(name)) {
+            throw new MemberException(ErrorCode.NAME_DUPLICATED);
+        }
+        return true;
+    }
 }

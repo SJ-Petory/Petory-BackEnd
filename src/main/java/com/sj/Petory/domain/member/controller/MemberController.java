@@ -30,4 +30,13 @@ public class MemberController {
                 memberService.checkEmailDuplicate(email)
         );
     }
+
+    @GetMapping("/check-name")
+    public ResponseEntity<Boolean> checkNameDuplicate(
+            @RequestParam("name") String name) {
+
+        return ResponseEntity.ok(
+                memberService.checkNameDuplicate(name)
+        );
+    }
 }
