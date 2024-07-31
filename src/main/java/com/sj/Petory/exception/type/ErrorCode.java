@@ -3,7 +3,6 @@ package com.sj.Petory.exception.type;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 
 @Getter
 @AllArgsConstructor
