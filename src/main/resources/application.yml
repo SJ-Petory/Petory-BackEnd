@@ -11,3 +11,10 @@ spring:
   h2:
     console:
       enabled: true
+
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /docs/swagger
+    url: /docs/open-api-3.0.1.json
+  default-consumes-media-type: application/json;charset=UTF-8
