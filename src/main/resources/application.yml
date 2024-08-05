@@ -11,7 +11,8 @@ spring:
   h2:
     console:
       enabled: true
-
+      settings:
+        web-allow-others: true
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
