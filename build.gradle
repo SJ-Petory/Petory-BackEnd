@@ -53,6 +53,8 @@ task copySecret(type: Copy) {
     into 'src/main/resources'
 }
 
+build.dependsOn copySecret
+
 tasks.named('test') {
     useJUnitPlatform()
 }
