@@ -54,6 +54,7 @@ task copySecret(type: Copy) {
 }
 
 build.dependsOn copySecret
+processResources.dependsOn copySecret
 
 tasks.named('test') {
     useJUnitPlatform()
