@@ -2,6 +2,12 @@ spring:
   application:
     name: Petory
 
+  profiles:
+    default: local
+  config:
+    import: classpath:/config/application-prod.yml
+---
+spring:
   datasource:
     url: jdbc:h2:mem:test
     username: sa
