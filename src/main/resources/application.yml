@@ -3,7 +3,7 @@ spring:
     name: Petory
 
   profiles:
-    default: local
+    active: prod
   config:
     import: classpath:/config/application-prod.yml
 ---
