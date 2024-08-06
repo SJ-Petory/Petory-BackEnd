@@ -6,6 +6,7 @@ import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.service.MemberService;
+import com.sj.Petory.exception.MemberException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.sj.Petory.exception.type.ErrorCode.EMAIL_DUPLICATED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -115,13 +118,8 @@ class MemberControllerTest {
                                         .tag("Member API")
                                         .description("Member request Error")
                                         .summary("회원가입 API")
-//                                        .responseSchema(Schema.schema("SignUp.Response"))
-//                                        .responseFields(
-//                                                fieldWithPath("")
-//                                        )
                                         .build()
                         )
-
                 ));
     }
 
@@ -153,25 +151,33 @@ class MemberControllerTest {
                 );
     }
 
-//
-//} @Test
-//     @DisplayName("이메일 중복체크 실패 테스트 - 이메일 중복")
-//     void checkEmailFailTest() throws Exception{
-//         //given
-//         String email = "test@naver.com";
-//
-//         //when
-//         given(memberService.checkEmailDuplicate(email))
-//                 .willReturn(false);
-//
-//         //then
-//         mockMvc.perform(get("/members/check-email")
-//                 .queryParam("email", email))
-//                 .andExpect(
-//                 status().isOk())
-//                 .andDo(print())
-//                 .andExpect(content().string(String.valueOf(true)))
-//                 .andDo(MockMvcRestDocumentationWrapper.document("/members/check-email")
-//                         .tag("Member API")
-//                         .)
+
+    @Test
+    @DisplayName("이메일 중복체크 실패 테스트 - 이메일 중복")
+    void checkEmailFailTest() throws Exception {
+        //given
+        String email = "test@naver.com";
+
+        //when
+        doThrow(new MemberException(EMAIL_DUPLICATED))
+                .when(memberService).checkEmailDuplicate(email);
+
+        //then
+        mockMvc.perform(get("/members/check-email")
+                        .queryParam("email", email))
+                .andExpect(
+                        status().isBadRequest())
+                .andDo(print())
+                .andDo(MockMvcRestDocumentationWrapper.document("/members/check-email",
+                        ResourceSnippetParameters.builder()
+                                .tag("Member")
+                                .summary("Member API")
+                                .description("이메일 중복체크 API")
+                        , responseFields(
+                                fieldWithPath("errorCode").description("에러 코드")
+                                , fieldWithPath("errorMessage").description("에러 메세지")
+                                , fieldWithPath("httpStatus").description("상태 코드")
+                        )));
+    }
 }
+
