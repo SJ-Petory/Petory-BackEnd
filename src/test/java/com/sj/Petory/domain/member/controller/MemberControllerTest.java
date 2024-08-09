@@ -7,27 +7,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.service.MemberService;
 import com.sj.Petory.exception.MemberException;
-import com.sj.Petory.exception.dto.ErrorResponse;
-import com.sj.Petory.exception.type.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.sj.Petory.exception.type.ErrorCode.EMAIL_DUPLICATED;
 import static com.sj.Petory.exception.type.ErrorCode.NAME_DUPLICATED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -220,8 +215,6 @@ class MemberControllerTest {
                 .andDo(MockMvcRestDocumentationWrapper.document("/members/check-email/fail",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
-                                .summary("Email Duplicate Check Fail API")
-                                .description("이메일 중복체크 API")
                                 .responseSchema(Schema.schema("ErrorResponse"))
                                 .responseHeaders(
                                         headerWithName("Code").defaultValue(400)
@@ -282,8 +275,6 @@ class MemberControllerTest {
                 .andDo(MockMvcRestDocumentationWrapper.document("/members/check-name/fail",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
-                                .summary("Name Duplicate Check Fail API")
-                                .description("이름 중복체크 API")
                                 .responseSchema(Schema.schema("ErrorResponse"))
                                 .responseHeaders(
                                         headerWithName("Code").defaultValue(400)
