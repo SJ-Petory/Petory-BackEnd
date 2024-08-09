@@ -12,8 +12,13 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public Boolean signUp(SignUp.Request request) {
+    public boolean signUp(SignUp.Request request) {
+
+        checkEmailDuplicate(request.getEmail());
+        checkNameDuplicate(request.getName());
+
         memberRepository.save(request.toEntity());
+
         return true;
     }
 
