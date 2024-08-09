@@ -78,3 +78,5 @@ replay_pid*
 *.xhtml
 
 appllication.yml
+*.yml
+open-api-3.0.1.json
