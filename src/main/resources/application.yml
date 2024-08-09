@@ -2,6 +2,13 @@ spring:
   application:
     name: Petory
 
+  profiles:
+    active:
+      - local
+  config:
+    import: classpath:/config/application-prod.yml
+---
+spring:
   datasource:
     url: jdbc:h2:mem:test
     username: sa
@@ -11,3 +18,11 @@ spring:
   h2:
     console:
       enabled: true
+      settings:
+        web-allow-others: true
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /docs/swagger
+    url: /docs/open-api-3.0.1.json
+  default-consumes-media-type: application/json;charset=UTF-8
