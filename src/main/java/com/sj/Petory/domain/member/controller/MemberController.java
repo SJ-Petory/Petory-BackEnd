@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.controller;
 
+import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -38,5 +39,17 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.checkNameDuplicate(name)
         );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<SignIn.Response> signIn(
+            @RequestBody @Valid SignIn.Request request) {
+
+        return ResponseEntity.ok(memberService.signIn(request));
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "hello";
     }
 }

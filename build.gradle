@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
@@ -45,7 +45,12 @@ dependencies {
     //openAPI3
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.4'// 0.16.4 -> 0.18.4
     //swaggerUI
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0' //코드 변경
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    //jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
 }
 
 task copySecret(type: Copy) {

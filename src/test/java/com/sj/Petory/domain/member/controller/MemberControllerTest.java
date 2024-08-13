@@ -4,7 +4,7 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sj.Petory.config.SecurityConfig;
+import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.service.MemberService;
 import com.sj.Petory.exception.MemberException;
@@ -15,16 +15,13 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.sj.Petory.exception.type.ErrorCode.EMAIL_DUPLICATED;
-import static com.sj.Petory.exception.type.ErrorCode.NAME_DUPLICATED;
+import static com.sj.Petory.exception.type.ErrorCode.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -68,7 +65,7 @@ class MemberControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(String.valueOf(true)))
-                .andDo(document("/members/signup-success",
+                .andDo(document("/members/signup/success",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
                                 .summary("Member request API")
@@ -105,7 +102,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("EMAIL_DUPLICATED"))
                 .andExpect(jsonPath("$.errorMessage").value("중복된 이메일입니다."))
                 .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-                .andDo(document("/members/signup-fail-emailDuplicated",
+                .andDo(document("/members/signup/fail-emailDuplicated",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
                                 .summary("Member request API")
@@ -149,7 +146,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("NAME_DUPLICATED"))
                 .andExpect(jsonPath("$.errorMessage").value("중복된 이름입니다."))
                 .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
-                .andDo(document("/members/signup-fail-NameDuplicated",
+                .andDo(document("/members/signup/fail-NameDuplicated",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
                                 .summary("Member request API")
@@ -190,7 +187,7 @@ class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().string(String.valueOf(true)))
-                .andDo(document("/members/check-email",
+                .andDo(document("/members/check-email/success",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
                                 .summary("Email Duplicate Check API")
@@ -251,7 +248,7 @@ class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().string(String.valueOf(true)))
-                .andDo(document("/members/check-name",
+                .andDo(document("/members/check-name/success",
                         ResourceSnippetParameters.builder()
                                 .tag("Member API")
                                 .summary("Name Duplicate Check API")
@@ -305,5 +302,131 @@ class MemberControllerTest {
                         .image("imageURL")
                         .build();
         return request;
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
+    void signInSuccessTest() throws Exception {
+        //given
+        SignIn.Request request = new SignIn.Request(
+                "test@naver.com", "qwerty123!"
+        );
+        SignIn.Response response = new SignIn.Response(
+                "ATK", "RTK"
+        );
+
+        //when
+        given(memberService.signIn(any()))
+                .willReturn(response);
+
+        //then
+        mockMvc.perform(post("/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("ATK"))
+                .andExpect(jsonPath("$.refreshToken").value("RTK"))
+                .andDo(MockMvcRestDocumentationWrapper.document("/members/login/success",
+                        ResourceSnippetParameters.builder()
+                                .tag("Member API")
+                                .summary("login API")
+                                .description("로그인 API")
+                                .requestSchema(Schema.schema("SignIn.Request"))
+                                .responseSchema(Schema.schema("SignIn.Response"))
+                        , requestFields(
+                                fieldWithPath("email").description("이메일")
+                                , fieldWithPath("password").description("비밀번호")
+
+                        )
+                        , responseFields(
+                                fieldWithPath("accessToken").description("accessToken")
+                                , fieldWithPath("refreshToken").description("refreshToken")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 회원정보 없음")
+    void signInFailTest_MemberNotFound() throws Exception {
+        //given
+        SignIn.Request request = new SignIn.Request(
+                "test@naver.com", "qwerty123!"
+        );
+        SignIn.Response response = new SignIn.Response(
+                "ATK", "RTK"
+        );
+
+        //when
+        given(memberService.signIn(any()))
+                .willThrow(new MemberException(MEMBER_NOT_FOUND));
+
+        //then
+        mockMvc.perform(post("/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("MEMBER_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorMessage").value("사용자를 찾을 수 없습니다."))
+                .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+                .andDo(MockMvcRestDocumentationWrapper.document("/members/login/fail-memberNotFound",
+                        ResourceSnippetParameters.builder()
+                                .tag("Member API")
+                                .summary("login API")
+                                .description("로그인 API")
+                                .requestSchema(Schema.schema("SignIn.Request"))
+                                .responseSchema(Schema.schema("ErrorResponse"))
+                        , requestFields(
+                                fieldWithPath("email").description("이메일")
+                                , fieldWithPath("password").description("비밀번호")
+
+                        )
+                        , responseFields(
+                                fieldWithPath("errorCode").description("에러 코드")
+                                , fieldWithPath("errorMessage").description("에러 메세지")
+                                , fieldWithPath("httpStatus").description("상태 코드")
+                        )));
+    }@Test
+    @DisplayName("로그인 실패 - 비밀번호 불일치")
+    void signInFailTest_PasswordUnmatched() throws Exception {
+        //given
+        SignIn.Request request = new SignIn.Request(
+                "test@naver.com", "qwerty123!"
+        );
+        SignIn.Response response = new SignIn.Response(
+                "ATK", "RTK"
+        );
+
+        //when
+        given(memberService.signIn(any()))
+                .willThrow(new MemberException(PASSWORD_UNMATCHED));
+
+        //then
+        mockMvc.perform(post("/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("PASSWORD_UNMATCHED"))
+                .andExpect(jsonPath("$.errorMessage").value("비밀번호가 일치하지 않습니다."))
+                .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"))
+                .andDo(MockMvcRestDocumentationWrapper.document("/members/login/fail-passwordUnmatched",
+                        ResourceSnippetParameters.builder()
+                                .tag("Member API")
+                                .summary("login API")
+                                .description("로그인 API")
+                                .requestSchema(Schema.schema("SignIn.Request"))
+                                .responseSchema(Schema.schema("ErrorResponse"))
+                        , requestFields(
+                                fieldWithPath("email").description("이메일")
+                                , fieldWithPath("password").description("비밀번호")
+
+                        )
+                        , responseFields(
+                                fieldWithPath("errorCode").description("에러 코드")
+                                , fieldWithPath("errorMessage").description("에러 메세지")
+                                , fieldWithPath("httpStatus").description("상태 코드")
+                        )));
     }
 }

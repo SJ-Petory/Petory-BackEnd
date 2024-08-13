@@ -43,7 +43,8 @@ public class SecurityConfig {
                                         , "/members/check-email"
                                         , "/members/check-name"
                                         , "members/login"
-                                        , "/h2-console/**").permitAll()
+                                        , "/h2-console/**"
+                                        , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 
