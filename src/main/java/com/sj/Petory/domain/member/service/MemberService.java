@@ -49,17 +49,24 @@ public class MemberService {
 
     public SignIn.Response signIn(SignIn.Request request) {
 
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = getMember(request);
 
-
-        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
-            throw new MemberException(ErrorCode.PASSWORD_UNMATCHED);
-        }
+        validatedPassword(request, member);
 
         return SignIn.Response.toResponse(
                 jwtUtils.generateToken(request.getEmail(), "ATK")
                 , jwtUtils.generateToken(request.getEmail(), "RTK"));
 
+    }
+
+    private Member getMember(SignIn.Request request) {
+        return memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    private void validatedPassword(SignIn.Request request, Member member) {
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            throw new MemberException(ErrorCode.PASSWORD_UNMATCHED);
+        }
     }
 }
