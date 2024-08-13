@@ -5,6 +5,7 @@ import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,10 +13,15 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     public boolean signUp(SignUp.Request request) {
 
         checkEmailDuplicate(request.getEmail());
         checkNameDuplicate(request.getName());
+
+        request.setPassword(
+                passwordEncoder.encode(request.getPassword()));
 
         memberRepository.save(request.toEntity());
 
