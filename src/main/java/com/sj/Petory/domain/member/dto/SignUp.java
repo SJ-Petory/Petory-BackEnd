@@ -15,20 +15,20 @@ public class SignUp {
     public static class Request {
 
         @NotBlank
-        String name;
+        private String name;
 
         @NotBlank
         @Email
-        String email;
+        private String email;
 
         @NotBlank
-        String password;
+        private String password;
 
         @NotBlank
-        String phone;
+        private String phone;
 
 
-        String image;
+        private String image;
 
         public Member toEntity() {
             return Member.builder()
