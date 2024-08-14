@@ -1,5 +1,7 @@
 package com.sj.Petory.domain.member.service;
 
+import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.member.dto.MemberInfoResponse;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.dto.SignUp;
 import com.sj.Petory.domain.member.entity.Member;
@@ -8,6 +10,9 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +54,7 @@ public class MemberService {
 
     public SignIn.Response signIn(SignIn.Request request) {
 
-        Member member = getMember(request);
+        Member member = getMemberByEmail(request.getEmail());
 
         validatedPassword(request, member);
 
@@ -59,8 +64,8 @@ public class MemberService {
 
     }
 
-    private Member getMember(SignIn.Request request) {
-        return memberRepository.findByEmail(request.getEmail())
+    private Member getMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -68,5 +73,12 @@ public class MemberService {
         if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new MemberException(ErrorCode.PASSWORD_UNMATCHED);
         }
+    }
+
+
+    public MemberInfoResponse getMembers(final MemberAdapter memberAdapter) {
+        Member member = getMemberByEmail(memberAdapter.getUsername());
+
+        return MemberInfoResponse.fromEntity(member);
     }
 }
