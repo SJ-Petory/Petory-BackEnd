@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.entity;
 
+import com.sj.Petory.domain.member.type.MemberStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,10 @@ public class Member {
 
     @Column
     private String image;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
 
     @CreatedDate
     @Column(updatable = false)
