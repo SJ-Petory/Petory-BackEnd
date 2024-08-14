@@ -5,6 +5,8 @@ import lombok.*;
 
 public class SignIn {
 
+    private static final String TOKEN_PREFIX = "Bearer ";
+
     @Getter
     @Setter
     @Builder
@@ -31,7 +33,9 @@ public class SignIn {
 
         public static Response toResponse(String accessToken, String refreshToken) {
 
-            return new Response(accessToken, refreshToken);
+            return new Response(
+                    TOKEN_PREFIX + accessToken,
+                    TOKEN_PREFIX + refreshToken);
         }
     }
 }
