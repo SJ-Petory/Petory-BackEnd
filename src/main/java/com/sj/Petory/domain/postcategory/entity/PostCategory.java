@@ -27,7 +27,7 @@ public class PostCategory {
     private long postCategoryId;
 
     @OneToMany(mappedBy = "postCategory", fetch = FetchType.EAGER)
-    private List<Post> postList = new ArrayList<>();
+    private List<Post> postList;
 
     private String categoryName;
 }
