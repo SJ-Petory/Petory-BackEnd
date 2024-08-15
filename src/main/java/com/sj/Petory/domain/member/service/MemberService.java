@@ -10,9 +10,6 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

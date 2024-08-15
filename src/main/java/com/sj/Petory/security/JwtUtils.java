@@ -95,11 +95,13 @@ public class JwtUtils {
         return new UsernamePasswordAuthenticationToken(
                 userDetails
                 , ""
+                , userDetails.getAuthorities()
         );
     }
     private String parseEmail(String token) {
         return parseClaims(token).getSubject();
     }
+
     private Claims parseClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)

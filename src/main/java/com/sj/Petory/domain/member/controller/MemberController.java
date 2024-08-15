@@ -54,7 +54,7 @@ public class MemberController {
     @GetMapping
     public ResponseEntity<MemberInfoResponse> getMembers(
             @AuthenticationPrincipal MemberAdapter memberAdapter) {
-        System.out.println(memberAdapter);
+
         return ResponseEntity.ok(memberService.getMembers(memberAdapter));
     }
 
