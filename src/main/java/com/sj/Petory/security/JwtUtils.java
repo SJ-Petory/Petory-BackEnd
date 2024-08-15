@@ -71,7 +71,6 @@ public class JwtUtils {
             return null;
         }
 
-        System.out.println("Bearer 제거 토큰 :" + header.substring("Bearer ".length()));
         return header.substring("Bearer ".length());
     }
 
@@ -83,9 +82,9 @@ public class JwtUtils {
                 .getBody()
                 .getExpiration();
 
-//        if (!exp.before(new Date())) {//날짜 개념 학습
-//            throw new MemberException(ErrorCode.TOKEN_EXPIRED);
-//        }
+        if (exp.before(new Date())) {//날짜 개념 학습
+            throw new MemberException(ErrorCode.TOKEN_EXPIRED);
+        }
         return true;
     }
 
@@ -93,7 +92,6 @@ public class JwtUtils {
         UserDetails userDetails = userDetailsService.loadUserByUsername(
                 parseEmail(token));
 
-        System.out.println("userDetails : " + userDetails);
         return new UsernamePasswordAuthenticationToken(
                 userDetails
                 , ""
