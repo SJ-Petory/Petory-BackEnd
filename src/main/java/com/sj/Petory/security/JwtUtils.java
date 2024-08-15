@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -67,7 +68,7 @@ public class JwtUtils {
     public String resolveToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
             return null;
         }
 
