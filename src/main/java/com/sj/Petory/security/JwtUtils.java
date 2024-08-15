@@ -26,6 +26,7 @@ import java.util.Date;
 @Slf4j
 public class JwtUtils {
     private static final String TOKEN_TYPE = "token_type";
+    private static final String TOKEN_PREFIX = "Bearer ";
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -68,11 +69,11 @@ public class JwtUtils {
     public String resolveToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
 
-        if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
+        if (!StringUtils.hasText(header) || !header.startsWith(TOKEN_PREFIX)) {
             return null;
         }
 
-        return header.substring("Bearer ".length());
+        return header.substring(TOKEN_PREFIX.length());
     }
 
     public boolean validateToken(String token) {
