@@ -23,13 +23,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        System.out.println("헤더에서 가져온 토큰 : " + request.getHeader("Authorization"));
+
         String token = jwtUtils.resolveToken(request);
-        System.out.println(token);
+
         if (StringUtils.hasText(token) && jwtUtils.validateToken(token)) {
             Authentication authentication = jwtUtils.getAuthentication(token);
-            System.out.println(authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info(String.valueOf(SecurityContextHolder.getContext().getAuthentication()));
         }
         filterChain.doFilter(request, response);
     }
