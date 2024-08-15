@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.pet.entity;
 
+import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.pet.dto.PetRegister;
 import com.sj.Petory.domain.pet.type.PetBreed;
@@ -68,4 +69,12 @@ public class Pet {
     @LastModifiedDate
     @Column
     private LocalDateTime updatedAt;
+
+    public PetResponse toDto() {
+        return PetResponse.builder()
+                .petId(this.getPetId())
+                .name(this.getPetName())
+                .image(this.getPetImage())
+                .build();
+    }
 }
