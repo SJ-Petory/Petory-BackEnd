@@ -70,6 +70,8 @@ public class JwtUtils {
         if (header == null || !header.startsWith("Bearer ")) {
             return null;
         }
+
+        System.out.println("Bearer 제거 토큰 :" + header.substring("Bearer ".length()));
         return header.substring("Bearer ".length());
     }
 
