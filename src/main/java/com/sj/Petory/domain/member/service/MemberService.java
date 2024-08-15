@@ -3,6 +3,7 @@ package com.sj.Petory.domain.member.service;
 import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.member.type.MemberStatus;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.post.entity.Post;
@@ -116,6 +117,15 @@ public class MemberService {
                     passwordEncoder.encode(request.getPassword()));
         }
         member.updateInfo(request);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean deleteMember(final MemberAdapter memberAdapter) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        member.updateStatus(MemberStatus.DELETED);
 
         return true;
     }

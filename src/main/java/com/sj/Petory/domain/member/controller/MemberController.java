@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
@@ -86,6 +84,14 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.updateMember(
                         memberAdapter, request));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Boolean> deleteMember(
+            @AuthenticationPrincipal MemberAdapter memberAdapter) {
+
+        return ResponseEntity.ok(
+                memberService.deleteMember(memberAdapter));
     }
 
     @GetMapping("/test")
