@@ -42,10 +42,12 @@ public class SecurityConfig {
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
                 .authorizeHttpRequests((authz) ->
+
                         authz
+                                .requestMatchers(HttpMethod.GET, "/members").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/members").permitAll()
                                 .requestMatchers(
-                                        "/members"
-                                        , "/members/check-email"
+                                        "/members/check-email"
                                         , "/members/check-name"
                                         , "members/login"
                                         , "/h2-console/**"
@@ -53,8 +55,6 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
-
-        ;
 
         return http.build();
     }
