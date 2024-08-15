@@ -68,6 +68,16 @@ public class MemberController {
                         memberAdapter, pageable));
     }
 
+    @GetMapping("/posts")
+    public ResponseEntity<Page<PostResponse>> getMembersPosts(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(
+                memberService.getMembersPosts(
+                        memberAdapter, pageable));
+    }
+
     @GetMapping("/test")
     public String test() {
         return "hello";
