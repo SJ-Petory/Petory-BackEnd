@@ -68,4 +68,8 @@ public class Member {
 
         return this;
     }
+
+    public void updateStatus(final MemberStatus memberStatus) {
+        this.status = memberStatus;
+    }
 }

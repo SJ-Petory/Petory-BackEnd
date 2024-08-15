@@ -3,6 +3,7 @@ package com.sj.Petory.domain.member.service;
 import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.member.type.MemberStatus;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.post.entity.Post;
@@ -13,7 +14,6 @@ import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,5 +118,22 @@ public class MemberService {
         member.updateInfo(request);
 
         return true;
+    }
+
+    @Transactional
+    public boolean deleteMember(final MemberAdapter memberAdapter) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        validateDeleteMember(member);
+
+        member.updateStatus(MemberStatus.DELETED);
+
+        return true;
+    }
+
+    private void validateDeleteMember(Member member) {
+        if (member.getStatus().equals(MemberStatus.DELETED)) {
+            throw new MemberException(ErrorCode.ALREADY_DELETED_MEMBER);
+        }
     }
 }
