@@ -78,6 +78,16 @@ public class MemberController {
                         memberAdapter, pageable));
     }
 
+    @PatchMapping
+    public ResponseEntity<Boolean> updateMember(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody UpdateMemberRequest request) {
+
+        return ResponseEntity.ok(
+                memberService.updateMember(
+                        memberAdapter, request));
+    }
+
     @GetMapping("/test")
     public String test() {
         return "hello";

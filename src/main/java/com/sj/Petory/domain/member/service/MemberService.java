@@ -13,8 +13,11 @@ import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -100,5 +103,20 @@ public class MemberService {
         return postRepository.findByMember(
                 getMemberByEmail(memberAdapter.getEmail()), pageable)
                 .map(Post::toDto);
+    }
+
+    @Transactional
+    public boolean updateMember(final MemberAdapter memberAdapter, final UpdateMemberRequest request) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        checkNameDuplicate(request.getName());
+
+        if (StringUtils.hasText(request.getPassword())) {
+            request.setPassword(
+                    passwordEncoder.encode(request.getPassword()));
+        }
+        member.updateInfo(request);
+
+        return true;
     }
 }
