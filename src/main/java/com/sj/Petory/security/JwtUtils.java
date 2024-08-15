@@ -1,11 +1,9 @@
 package com.sj.Petory.security;
 
-import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.service.UserDetailsServiceImpl;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +23,7 @@ import java.util.Date;
 @Slf4j
 public class JwtUtils {
     private static final String TOKEN_TYPE = "token_type";
+    private static final String TOKEN_PREFIX = "Bearer ";
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -68,22 +66,18 @@ public class JwtUtils {
     public String resolveToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
 
-        if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
+        if (!StringUtils.hasText(header) || !header.startsWith(TOKEN_PREFIX)) {
             return null;
         }
 
-        return header.substring("Bearer ".length());
+        return header.substring(TOKEN_PREFIX.length());
     }
 
     public boolean validateToken(String token) {
 
-        Date exp = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
+        Date exp = parseClaims(token).getExpiration();
 
-        if (exp.before(new Date())) {//날짜 개념 학습
+        if (exp.before(new Date())) {
             throw new MemberException(ErrorCode.TOKEN_EXPIRED);
         }
         return true;
@@ -99,6 +93,7 @@ public class JwtUtils {
                 , userDetails.getAuthorities()
         );
     }
+
     private String parseEmail(String token) {
         return parseClaims(token).getSubject();
     }
