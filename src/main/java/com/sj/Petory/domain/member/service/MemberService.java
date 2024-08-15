@@ -5,6 +5,8 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.PetRepository;
+import com.sj.Petory.domain.post.entity.Post;
+import com.sj.Petory.domain.post.repository.PostRepository;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
+    private final PostRepository postRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -88,5 +91,14 @@ public class MemberService {
 
         return petRepository.findByMember(member, pageable)
                 .map(Pet::toDto);
+    }
+
+    public Page<PostResponse> getMembersPosts(
+            final MemberAdapter memberAdapter
+            , final Pageable pageable) {
+
+        return postRepository.findByMember(
+                getMemberByEmail(memberAdapter.getEmail()), pageable)
+                .map(Post::toDto);
     }
 }
