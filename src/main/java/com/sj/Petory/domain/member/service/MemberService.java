@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +30,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUtils jwtUtils;
+    private final AmazonS3Service amazonS3Service;
 
-    public boolean signUp(SignUp.Request request) {
+    public boolean signUp(final SignUp.Request request) {
 
         checkEmailDuplicate(request.getEmail());
         checkNameDuplicate(request.getName());
@@ -101,7 +103,7 @@ public class MemberService {
             , final Pageable pageable) {
 
         return postRepository.findByMember(
-                getMemberByEmail(memberAdapter.getEmail()), pageable)
+                        getMemberByEmail(memberAdapter.getEmail()), pageable)
                 .map(Post::toDto);
     }
 
@@ -135,5 +137,11 @@ public class MemberService {
         if (member.getStatus().equals(MemberStatus.DELETED)) {
             throw new MemberException(ErrorCode.ALREADY_DELETED_MEMBER);
         }
+    }
+
+    public String imageUpload(MultipartFile image) {
+        String imageUrl = amazonS3Service.upload(image);
+        System.out.println(imageUrl);
+        return imageUrl;
     }
 }

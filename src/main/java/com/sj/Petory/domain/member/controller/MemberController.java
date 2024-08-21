@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/members")
@@ -19,11 +20,16 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<Boolean> signUp(
             @RequestBody @Valid SignUp.Request request) {
-
         return ResponseEntity.ok(
                 memberService.signUp(request));
     }
 
+    @PostMapping("/image")
+    public ResponseEntity<?> s3ImageUpload(
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        return ResponseEntity.ok(memberService.imageUpload(image));
+    }
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmailDuplicate(
             @RequestParam("email") String email) {

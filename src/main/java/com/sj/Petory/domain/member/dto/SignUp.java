@@ -29,8 +29,6 @@ public class SignUp {
         private String phone;
 
 
-        private String image;
-
         public Member toEntity() {
             return Member.builder()
                     .name(this.name)
@@ -38,7 +36,6 @@ public class SignUp {
                     .password(this.password)
                     .phone(this.phone)
                     .status(MemberStatus.ACTIVE)
-                    .image(this.image)
                     .build();
         }
     }

@@ -307,7 +307,6 @@ class MemberControllerTest {
                         .email("test@naver.com")
                         .password("abcd12345!")
                         .phone("010-1111-1111")
-                        .image("imageURL")
                         .build();
         return request;
     }
