@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class KakaoLogin {
+public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
     @GetMapping("/oauth/kakao/callback")//인가코드 발급
     public ResponseEntity<?> callbackKakao(@RequestParam("code") String code) {
 
         System.out.println(code);
-        kakaoLoginService.getAccessTokenFromKakao(code);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(kakaoLoginService.getAccessTokenFromKakao(code));
+
     }
 }
