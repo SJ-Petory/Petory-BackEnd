@@ -16,7 +16,12 @@ public enum ErrorCode {
     PASSWORD_UNMATCHED("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     TOKEN_EXPIRED("만료된 토큰입니다.", HttpStatus.BAD_REQUEST),
 
-    ALREADY_DELETED_MEMBER("이미 탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST);
+    ALREADY_DELETED_MEMBER("이미 탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST),
+
+    //s3
+    FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
+    FILE_EXTENSION_NOT_ALLOWED("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST),
+    IMAGE_UPLOAD_FAIL("이미지 업로드가 실패 하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String description;
     private final HttpStatus httpStatus;
