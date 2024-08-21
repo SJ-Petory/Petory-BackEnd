@@ -85,7 +85,6 @@ class MemberControllerTest {
                                 , fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
                                 , fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                                 , fieldWithPath("phone").type(JsonFieldType.STRING).description("전화번호")
-                                , fieldWithPath("image").type(JsonFieldType.STRING).description("이미지 경로")
                         )
                 ));
     }
@@ -124,7 +123,6 @@ class MemberControllerTest {
                                 , fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
                                 , fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                                 , fieldWithPath("phone").type(JsonFieldType.STRING).description("전화번호")
-                                , fieldWithPath("image").type(JsonFieldType.STRING).description("이미지 경로")
                         )
                         , responseFields(
                                 fieldWithPath("errorCode").type(JsonFieldType.STRING).description("에러 코드")
@@ -168,7 +166,6 @@ class MemberControllerTest {
                                 , fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
                                 , fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                                 , fieldWithPath("phone").type(JsonFieldType.STRING).description("전화번호")
-                                , fieldWithPath("image").type(JsonFieldType.STRING).description("이미지 경로")
                         )
                         , responseFields(
                                 fieldWithPath("errorCode").type(JsonFieldType.STRING).description("에러 코드")
