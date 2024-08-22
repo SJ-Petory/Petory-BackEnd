@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.*;
 public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
-    @PostMapping("/oauth/kakao/callback")//인가코드 발급
+    @GetMapping("/oauth/kakao/callback")//인가코드 발급
     public ResponseEntity<SignIn.Response> callbackKakao(
             @RequestParam("code") String code
-            , @RequestBody @Valid ExtraUserInfo extraUserInfo) {
+            , @RequestParam("email") String email
+            , @RequestParam("phone") String phone) {
 
         System.out.println(code);
         return ResponseEntity.ok(
-                kakaoLoginService.getAccessTokenFromKakao(code, extraUserInfo));
+                kakaoLoginService.getAccessTokenFromKakao(code, email, phone));
 
     }
 }
