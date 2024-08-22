@@ -27,7 +27,7 @@ public class KakaoLoginService {
     private final JwtUtils jwtUtils;
 
 
-    public SignIn.Response getAccessTokenFromKakao(String code) {
+    public SignIn.Response getAccessTokenFromKakao(String code, ExtraUserInfo extraUserInfo) {
 
         KakaoTokenResponse kakaoTokenResponseDto =
                 WebClient.create(KAUTH_TOKEN_URL_HOST).post()
@@ -53,11 +53,12 @@ public class KakaoLoginService {
         log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
         log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
 
-        return userSearch(kakaoTokenResponseDto);
+        return userSearch(kakaoTokenResponseDto, extraUserInfo);
 //        return kakaoTokenResponseDto.getAccessToken();
     }
 
-    public SignIn.Response userSearch(KakaoTokenResponse kakaoTokenResponseDto) {
+    public SignIn.Response userSearch(
+            KakaoTokenResponse kakaoTokenResponseDto, ExtraUserInfo extraUserInfo) {
         String accessToken = kakaoTokenResponseDto.getAccessToken();
 
         UserInfoResponse userInfoResponse = WebClient.create(KAUTH_USER_URL_HOST).get()
@@ -71,32 +72,31 @@ public class KakaoLoginService {
                 .retrieve()
                 .bodyToMono(UserInfoResponse.class)
                 .block();
-        KakaoExtraUserInfo kakaoExtraUserInfo = new KakaoExtraUserInfo("email", "phone");
         //회원 존재하는지 확인 -> 이걸 이메일로 확인해야하는데 .........
-        memberRepository.save(findOrCreateMember(userInfoResponse, kakaoExtraUserInfo));
+        memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
 
         System.out.println(userInfoResponse.getKakaoAcount().getProfile().getNickName());
         System.out.println(userInfoResponse.getKakaoAcount().getProfile().getProfileImageUrl());
 
         return new SignIn.Response(
-                jwtUtils.generateToken(kakaoExtraUserInfo.getEmail(), "ATK")
-                , jwtUtils.generateToken(kakaoExtraUserInfo.getEmail(), "RTK")
+                jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK")
+                , jwtUtils.generateToken(extraUserInfo.getEmail(), "RTK")
         );
     }
 
     //findOrCreateMember()
     //존재하면 -> 로그인 성공 ATK, RTK 발급
     //존재하지 않으면 -> 회원 정보 저장
-    public Member findOrCreateMember(UserInfoResponse userInfoResponse, KakaoExtraUserInfo kakaoExtraUserInfo) {
-        return memberRepository.findByEmail(kakaoExtraUserInfo.getEmail())
-                .orElseGet(() -> createMember(userInfoResponse, kakaoExtraUserInfo));
+    public Member findOrCreateMember(UserInfoResponse userInfoResponse, ExtraUserInfo extraUserInfo) {
+        return memberRepository.findByEmail(extraUserInfo.getEmail())
+                .orElseGet(() -> createMember(userInfoResponse, extraUserInfo));
     }
 
-    private Member createMember(UserInfoResponse userInfoResponse, KakaoExtraUserInfo kakaoExtraUserInfo) {
+    private Member createMember(UserInfoResponse userInfoResponse, ExtraUserInfo extraUserInfo) {
         return Member.builder()
                 .name(userInfoResponse.getKakaoAcount().getProfile().getNickName())
-                .email(kakaoExtraUserInfo.getEmail())
-                .phone(kakaoExtraUserInfo.getPhone())
+                .email(extraUserInfo.getEmail())
+                .phone(extraUserInfo.getPhone())
                 .image(userInfoResponse.getKakaoAcount().getProfile().getProfileImageUrl())
                 .build();
     }
