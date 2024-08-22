@@ -23,7 +23,7 @@ public class KakaoLoginController {
         System.out.println(code);
         String accessTokenFromKakao = kakaoLoginService.getAccessTokenFromKakao(code);
 
-        String redirectUrl = "https://43.202.195.199/inputInfo?token=" + accessTokenFromKakao;
+        String redirectUrl = "http://43.202.195.199/inputInfo?token=" + accessTokenFromKakao;
 
         response.sendRedirect(redirectUrl);
     }
