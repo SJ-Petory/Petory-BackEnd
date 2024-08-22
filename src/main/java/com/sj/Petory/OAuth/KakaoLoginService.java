@@ -27,7 +27,7 @@ public class KakaoLoginService {
     private final JwtUtils jwtUtils;
 
 
-    public SignIn.Response getAccessTokenFromKakao(String code, ExtraUserInfo extraUserInfo) {
+    public SignIn.Response getAccessTokenFromKakao(String code, String email, String phone) {
 
         KakaoTokenResponse kakaoTokenResponseDto =
                 WebClient.create(KAUTH_TOKEN_URL_HOST).post()
@@ -53,6 +53,7 @@ public class KakaoLoginService {
         log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
         log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
 
+        ExtraUserInfo extraUserInfo = new ExtraUserInfo(email, phone);
         return userSearch(kakaoTokenResponseDto, extraUserInfo);
 //        return kakaoTokenResponseDto.getAccessToken();
     }
