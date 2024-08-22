@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
-    @PostMapping("/oauth/kakao/callback")//인가코드 발급
+    @GetMapping("/oauth/kakao/callback")//인가코드 발급
     public ResponseEntity<SignIn.Response> callbackKakao(
             @RequestParam("code") String code
             , @RequestParam("email") String email
