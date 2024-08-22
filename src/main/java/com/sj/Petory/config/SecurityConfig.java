@@ -52,7 +52,7 @@ public class SecurityConfig {
                                         , "members/login"
                                         , "/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                                .requestMatchers("/oauth/kakao/callback", "/members/image").permitAll()
+                                .requestMatchers("/oauth/kakao/**", "/members/image").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
