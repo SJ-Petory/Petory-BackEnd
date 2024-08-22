@@ -13,14 +13,20 @@ public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
     @GetMapping("/oauth/kakao/callback")//인가코드 발급
-    public ResponseEntity<SignIn.Response> callbackKakao(
-            @RequestParam("code") String code
-            , @RequestParam("email") String email
-            , @RequestParam("phone") String phone) {
+    public ResponseEntity<String> callbackKakao(
+            @RequestParam("code") String code) {
 
         System.out.println(code);
         return ResponseEntity.ok(
-                kakaoLoginService.getAccessTokenFromKakao(code, email, phone));
+                kakaoLoginService.getAccessTokenFromKakao(code));
+    }
 
+    @PostMapping("/oauth/kakao/extraInfo")
+    public ResponseEntity<SignIn.Response> kakaoExtraInfo(
+            @RequestHeader("Authorization") String accessToken
+            , @RequestBody @Valid ExtraUserInfo extraUserInfo) {
+
+        return ResponseEntity.ok(
+                kakaoLoginService.kakaoExtraInfo(accessToken, extraUserInfo));
     }
 }
