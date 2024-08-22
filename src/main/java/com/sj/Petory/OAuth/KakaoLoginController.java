@@ -16,7 +16,7 @@ public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
     @GetMapping("/oauth/kakao/callback")//인가코드 발급
-    public ResponseEntity<Void> callbackKakao(
+    public void callbackKakao(
             @RequestParam("code") String code
             , HttpServletResponse response) throws IOException {
 
