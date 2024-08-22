@@ -1,5 +1,6 @@
 package com.sj.Petory.OAuth;
 
+import com.sj.Petory.domain.member.dto.SignIn;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
     @GetMapping("/oauth/kakao/callback")//인가코드 발급
-    public ResponseEntity<?> callbackKakao(
+    public ResponseEntity<SignIn.Response> callbackKakao(
             @RequestParam("code") String code
             , @RequestBody @Valid ExtraUserInfo extraUserInfo) {
 
