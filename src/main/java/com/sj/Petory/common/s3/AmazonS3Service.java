@@ -1,4 +1,4 @@
-package com.sj.Petory.domain.member.service;
+package com.sj.Petory.common.s3;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -6,13 +6,18 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.sj.Petory.exception.S3Exception;
 import com.sj.Petory.exception.type.ErrorCode;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -29,14 +34,36 @@ public class AmazonS3Service {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName;
 
+    public String uploadImageforKakao(String imageUrl) {
+
+        if (StringUtils.isEmpty(imageUrl)) {
+            return "";
+        }
+        String randomFilename = generateRandomFilename(imageUrl);
+        try {
+            InputStream inputStream = new URL(imageUrl).openStream();
+
+            ObjectMetadata metaData = new ObjectMetadata();
+            metaData.setContentType("image/jpeg");
+
+            amazonS3.putObject(bucketName, randomFilename, inputStream, metaData);
+
+            return amazonS3.getUrl(bucketName, randomFilename).toString();
+
+        } catch (Exception e) {
+            throw new S3Exception(IMAGE_UPLOAD_FAIL);
+        }
+    }
+
     public String upload(MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
             throw new S3Exception(ErrorCode.FILE_EMPTY);
         }
         return this.uploadImage(image);
     }
+
     private String uploadImage(MultipartFile image) {
-        String randomFilename = generateRandomFilename(image);
+        String randomFilename = generateRandomFilename(image.getOriginalFilename());
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(image.getSize());
@@ -61,8 +88,7 @@ public class AmazonS3Service {
         return amazonS3.getUrl(bucketName, randomFilename).toString();
     }
 
-    private String generateRandomFilename(MultipartFile image) {
-        String originName = image.getOriginalFilename();
+    private String generateRandomFilename(String originName) {
         String fileExtension = validateFileExtension(originName);
 
         return UUID.randomUUID() + "." + fileExtension;

@@ -1,5 +1,9 @@
-package com.sj.Petory.OAuth;
+package com.sj.Petory.OAuth.service;
 
+import com.sj.Petory.OAuth.dto.ExtraUserInfo;
+import com.sj.Petory.OAuth.dto.KakaoTokenResponse;
+import com.sj.Petory.OAuth.dto.UserInfoResponse;
+import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
@@ -25,7 +29,7 @@ public class KakaoLoginService {
 
     private final MemberRepository memberRepository;
     private final JwtUtils jwtUtils;
-
+    private final AmazonS3Service amazonS3Service;
 
     public String getAccessTokenFromKakao(String code) {
 
@@ -74,8 +78,6 @@ public class KakaoLoginService {
 
         memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
 
-        System.out.println(userInfoResponse.getKakaoAcount().getProfile().getNickName());
-        System.out.println(userInfoResponse.getKakaoAcount().getProfile().getProfileImageUrl());
 
         return SignIn.Response.toResponse(
                 jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK")
@@ -91,12 +93,19 @@ public class KakaoLoginService {
                 .orElseGet(() -> createMember(userInfoResponse, extraUserInfo));
     }
 
-    private Member createMember(UserInfoResponse userInfoResponse, ExtraUserInfo extraUserInfo) {
+    private Member createMember(
+            final UserInfoResponse userInfoResponse
+            , final ExtraUserInfo extraUserInfo) {
+
+        UserInfoResponse.KakaoAcount.ProfileInfo profile
+                = userInfoResponse.getKakaoAcount().getProfile();
+
         return Member.builder()
-                .name(userInfoResponse.getKakaoAcount().getProfile().getNickName())
+                .name(profile.getNickName())
                 .email(extraUserInfo.getEmail())
                 .phone(extraUserInfo.getPhone())
-                .image(userInfoResponse.getKakaoAcount().getProfile().getProfileImageUrl())
+                .image(amazonS3Service.uploadImageforKakao(
+                        profile.getProfileImageUrl()))
                 .build();
     }
 }

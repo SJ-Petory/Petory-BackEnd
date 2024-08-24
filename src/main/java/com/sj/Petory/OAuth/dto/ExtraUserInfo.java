@@ -1,4 +1,4 @@
-package com.sj.Petory.OAuth;
+package com.sj.Petory.OAuth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
