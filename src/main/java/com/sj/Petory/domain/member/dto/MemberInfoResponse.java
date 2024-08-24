@@ -17,6 +17,7 @@ public class MemberInfoResponse {
         return MemberInfoResponse.builder()
                 .name(member.getName())
                 .phone(member.getPhone())
+                .image(member.getImage())
                 .build();
     }
 }
