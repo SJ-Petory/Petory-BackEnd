@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.service;
 
+import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
