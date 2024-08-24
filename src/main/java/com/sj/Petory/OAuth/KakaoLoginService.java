@@ -71,13 +71,13 @@ public class KakaoLoginService {
                 .retrieve()
                 .bodyToMono(UserInfoResponse.class)
                 .block();
-        
+
         memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
 
         System.out.println(userInfoResponse.getKakaoAcount().getProfile().getNickName());
         System.out.println(userInfoResponse.getKakaoAcount().getProfile().getProfileImageUrl());
 
-        return new SignIn.Response(
+        return SignIn.Response.toResponse(
                 jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK")
                 , jwtUtils.generateToken(extraUserInfo.getEmail(), "RTK")
         );
