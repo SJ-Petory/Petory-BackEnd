@@ -28,7 +28,6 @@ public class SignUp {
         @NotBlank
         private String phone;
 
-
         public Member toEntity() {
             return Member.builder()
                     .name(this.name)

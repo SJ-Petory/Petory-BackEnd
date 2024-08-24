@@ -53,8 +53,6 @@ public class KakaoLoginService {
         log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
         log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
 
-//        ExtraUserInfo extraUserInfo = new ExtraUserInfo(email, phone);
-//        return userSearch(kakaoTokenResponseDto, extraUserInfo);
         return kakaoTokenResponseDto.getAccessToken();
     }
 
@@ -73,7 +71,7 @@ public class KakaoLoginService {
                 .retrieve()
                 .bodyToMono(UserInfoResponse.class)
                 .block();
-        //회원 존재하는지 확인 -> 이걸 이메일로 확인해야하는데 .........
+        
         memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
 
         System.out.println(userInfoResponse.getKakaoAcount().getProfile().getNickName());
