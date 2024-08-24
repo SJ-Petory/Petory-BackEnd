@@ -139,9 +139,16 @@ public class MemberService {
         }
     }
 
-    public String imageUpload(MultipartFile image) {
+    @Transactional
+    public String imageUpload(
+            final MemberAdapter memberAdapter, final MultipartFile image) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
         String imageUrl = amazonS3Service.upload(image);
-        System.out.println(imageUrl);
+
+        member.updateImage(imageUrl);
+
         return imageUrl;
     }
 }

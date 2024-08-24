@@ -72,4 +72,8 @@ public class Member {
     public void updateStatus(final MemberStatus memberStatus) {
         this.status = memberStatus;
     }
+
+    public void updateImage(final String imageUrl) {
+        this.image = imageUrl;
+    }
 }
