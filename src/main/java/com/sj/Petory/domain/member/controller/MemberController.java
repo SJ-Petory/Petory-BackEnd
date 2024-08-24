@@ -24,12 +24,14 @@ public class MemberController {
                 memberService.signUp(request));
     }
 
-    @PostMapping("/image")
+    @PatchMapping("/image")
     public ResponseEntity<?> s3ImageUpload(
-            @RequestPart(value = "image", required = false) MultipartFile image) {
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestPart(value = "image", required = false) MultipartFile image) {
 
-        return ResponseEntity.ok(memberService.imageUpload(image));
+        return ResponseEntity.ok(memberService.imageUpload(memberAdapter, image));
     }
+
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmailDuplicate(
             @RequestParam("email") String email) {
