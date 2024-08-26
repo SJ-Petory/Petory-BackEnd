@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.postcategory.entity;
 
+import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "postcategory")
 public class PostCategory {
 
     @Id
