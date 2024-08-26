@@ -7,6 +7,7 @@ import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.member.type.MemberStatus;
 import com.sj.Petory.security.JwtUtils;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
@@ -106,6 +107,7 @@ public class KakaoLoginService {
                 .phone(extraUserInfo.getPhone())
                 .image(amazonS3Service.uploadImageforKakao(
                         profile.getProfileImageUrl()))
+                .status(MemberStatus.ACTIVE)
                 .build();
     }
 }
