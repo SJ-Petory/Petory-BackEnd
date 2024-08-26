@@ -80,3 +80,4 @@ replay_pid*
 application.yml
 *.yml
 open-api-3.0.1.json
+src/main/resources/db/migration/h2/
