@@ -39,10 +39,10 @@ public class FriendInfoController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/{memberId}")
     public ResponseEntity<Boolean> friendRequest(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @RequestParam("memberId") Long memberId) {
+            , @PathVariable Long memberId) {
 
         return ResponseEntity.ok(
                 friendService.friendRequest(
