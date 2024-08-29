@@ -13,15 +13,6 @@ import static com.sj.Petory.exception.type.ErrorCode.INTERNAL_SERVER_ERROR;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(
-            Exception e) {
-
-        log.error("{} : {}", e.getClass().getName(), e.getMessage());
-
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR.getHttpStatus())
-                .body(ErrorResponse.from(e, INTERNAL_SERVER_ERROR));
-    }
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(
@@ -31,5 +22,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(ErrorResponse.from(e));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(
+            Exception e) {
+
+        log.error("{} : {}", e.getClass().getName(), e.getMessage());
+
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR.getHttpStatus())
+                .body(ErrorResponse.from(e, INTERNAL_SERVER_ERROR));
     }
 }
