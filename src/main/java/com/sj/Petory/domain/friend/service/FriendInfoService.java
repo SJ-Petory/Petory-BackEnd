@@ -91,7 +91,7 @@ public class FriendInfoService {
             final MemberAdapter memberAdapter,
             final String status, final Pageable pageable) {
 
-        return friendInfoRepository.findByMemberIdAndFriendStatus(
+        return friendInfoRepository.findByFriendIdAndFriendStatus(
                 getMemberByEmail(memberAdapter.getEmail())
                 , getFriendStatus(status)
                 , pageable)

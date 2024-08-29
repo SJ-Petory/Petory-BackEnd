@@ -15,5 +15,5 @@ public interface FriendInfoRepository extends JpaRepository<FriendInfo, Long> {
 
     Optional<FriendInfo> findByMemberIdAndFriendId(Member member, Member friend);
 
-    Page<FriendInfo> findByMemberIdAndFriendStatus(Member member, FriendStatus friendStatus, Pageable pageable);
+    Page<FriendInfo> findByFriendIdAndFriendStatus(Member member, FriendStatus friendStatus, Pageable pageable);
 }
