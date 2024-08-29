@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.friend.controller;
 
+import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.friend.service.FriendInfoService;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
@@ -42,10 +43,21 @@ public class FriendInfoController {
     @PostMapping("/{memberId}")
     public ResponseEntity<Boolean> friendRequest(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable Long memberId) {
+            , @PathVariable("memberId") Long memberId) {
 
         return ResponseEntity.ok(
                 friendService.friendRequest(
                         memberAdapter, memberId));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<Page<FriendListResponse>> friendList(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestParam("status") String status
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(
+                friendService.friendList(
+                        memberAdapter, status, pageable));
     }
 }
