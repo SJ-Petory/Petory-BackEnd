@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.entity;
 
+import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.UpdateMemberRequest;
 import com.sj.Petory.domain.member.type.MemberStatus;
 import jakarta.persistence.*;
@@ -76,5 +77,13 @@ public class Member {
 
     public void updateImage(final String imageUrl) {
         this.image = imageUrl;
+    }
+
+    public MemberSearchResponse toDto() {
+        return MemberSearchResponse.builder()
+                .id(this.memberId)
+                .name(this.getName())
+                .image(this.getImage())
+                .build();
     }
 }
