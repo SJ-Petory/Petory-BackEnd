@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.friend.entity;
 
+import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +50,14 @@ public class FriendInfo {
                 .memberId(member)
                 .friendStatus(new FriendStatus(1L, "Pending"))
                 .friendId(friend)
+                .build();
+    }
+
+    public FriendListResponse toDto() {
+        return FriendListResponse.builder()
+                .id(this.getFriendId().getMemberId())
+                .name(this.getFriendId().getName())
+                .image(this.getFriendId().getImage())
                 .build();
     }
 }

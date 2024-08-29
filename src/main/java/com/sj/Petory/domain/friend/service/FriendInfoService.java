@@ -1,7 +1,9 @@
 package com.sj.Petory.domain.friend.service;
 
+import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.friend.entity.FriendInfo;
+import com.sj.Petory.domain.friend.entity.FriendStatus;
 import com.sj.Petory.domain.friend.repository.FriendInfoRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
@@ -13,6 +15,7 @@ import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -82,5 +85,20 @@ public class FriendInfoService {
     private Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public Page<FriendListResponse> friendList(
+            final MemberAdapter memberAdapter,
+            final String status, final Pageable pageable) {
+
+        return friendInfoRepository.findByMemberIdAndFriendStatus(
+                getMemberByEmail(memberAdapter.getEmail())
+                , getFriendStatus(status)
+                , pageable)
+                .map(FriendInfo::toDto);
+    }
+
+    private FriendStatus getFriendStatus(String status) {
+        return friendStatusRepository.findByStatus(status);
     }
 }
