@@ -1,7 +1,7 @@
 package com.sj.Petory.domain.friend.controller;
 
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
-import com.sj.Petory.domain.friend.service.FriendService;
+import com.sj.Petory.domain.friend.service.FriendInfoService;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/friends")
 @RequiredArgsConstructor
-public class FriendController {
+public class FriendInfoController {
 
-    private final FriendService friendService;
+    private final FriendInfoService friendService;
 
 //    @GetMapping("/keyword")
 //    public ResponseEntity<Page<MemberDocument>> searchMember(
@@ -29,22 +29,23 @@ public class FriendController {
 
     @GetMapping("/keyword")
     public ResponseEntity<Page<MemberSearchResponse>> searchMember(
-//            @AuthenticationPrincipal MemberAdapter memberAdapter,
+            @AuthenticationPrincipal MemberAdapter memberAdapter,
             @RequestParam("keyword") String keyword
             , Pageable pageable) {
 
         return ResponseEntity.ok(
                 friendService.searchMember(
-                        keyword, pageable)
+                        memberAdapter, keyword, pageable)
         );
     }
 
-    @PostMapping()
-    public ResponseEntity<?> friendRequest(
+    @PostMapping
+    public ResponseEntity<Boolean> friendRequest(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @RequestParam("memberId") long memberId) {
+            , @RequestParam("memberId") Long memberId) {
 
-        friendService.friendRequest(memberAdapter, memberId);
-        return null;
+        return ResponseEntity.ok(
+                friendService.friendRequest(
+                        memberAdapter, memberId));
     }
 }
