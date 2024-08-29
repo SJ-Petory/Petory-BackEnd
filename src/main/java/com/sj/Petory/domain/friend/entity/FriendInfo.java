@@ -2,10 +2,7 @@ package com.sj.Petory.domain.friend.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,4 +44,11 @@ public class FriendInfo {
     @Column
     private LocalDateTime updatedAt;
 
+    public static FriendInfo friendRequestToEntity(Member member, Member friend) {
+        return FriendInfo.builder()
+                .memberId(member)
+                .friendStatus(new FriendStatus(1L, "Pending"))
+                .friendId(friend)
+                .build();
+    }
 }
