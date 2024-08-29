@@ -1,0 +1,3 @@
+INSERT INTO friendstatus VALUES (NULL, 'PENDING');
+INSERT INTO friendstatus VALUES (NULL, 'ACCEPTED');
+INSERT INTO friendstatus VALUES (NULL, 'REJECTED');
