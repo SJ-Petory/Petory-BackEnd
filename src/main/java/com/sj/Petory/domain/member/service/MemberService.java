@@ -28,6 +28,8 @@ public class MemberService {
     private final PetRepository petRepository;
     private final PostRepository postRepository;
 
+//    private final MemberElasticsearchRepository memberElasticsearchRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUtils jwtUtils;
@@ -41,7 +43,8 @@ public class MemberService {
         request.setPassword(
                 passwordEncoder.encode(request.getPassword()));
 
-        memberRepository.save(request.toEntity());
+        Member member = memberRepository.save(request.toEntity());
+//        memberElasticsearchRepository.save(request.toDocument(member));
 
         return true;
     }
