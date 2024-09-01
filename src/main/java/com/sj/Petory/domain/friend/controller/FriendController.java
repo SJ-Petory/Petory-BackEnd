@@ -50,7 +50,7 @@ public class FriendController {
                         memberAdapter, memberId));
     }
 
-    @GetMapping("/process")
+    @GetMapping
     public ResponseEntity<Page<FriendListResponse>> friendList(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @RequestParam("status") String status
@@ -60,5 +60,15 @@ public class FriendController {
                 friendService.friendList(
                         memberAdapter, status, pageable));
     }
-    
+
+    @PatchMapping("/{memberId}")
+    public ResponseEntity<Boolean> requestProcess(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("memberId") Long memberId
+            , @RequestParam("status") String status) {
+
+        return ResponseEntity.ok(
+                friendService.requestProcess(
+                        memberAdapter, memberId, status));
+    }
 }

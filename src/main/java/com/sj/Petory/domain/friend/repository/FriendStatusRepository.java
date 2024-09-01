@@ -4,8 +4,10 @@ import com.sj.Petory.domain.friend.entity.FriendStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface FriendStatusRepository extends JpaRepository<FriendStatus, Long> {
 
-    FriendStatus findByStatus(String status);
+    Optional<FriendStatus> findByStatus(String status);
 }
