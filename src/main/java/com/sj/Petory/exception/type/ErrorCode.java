@@ -22,6 +22,7 @@ public enum ErrorCode {
     ALREADY_FRIEND_MEMBER("이미 친구인 사용자 입니다.", HttpStatus.BAD_REQUEST),
     ALREADY_FRIEND_REQUEST("이미 요청보낸 사용자 입니다.", HttpStatus.BAD_REQUEST),
     REQUEST_MYSELF_NOT_ALLOWED("자기 자신에게 요청은 불가합니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_RECEIVE_FRIEND_REQUEST("이미 상대방이 친구요청을 보냈습니다.", HttpStatus.BAD_REQUEST),
 
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
