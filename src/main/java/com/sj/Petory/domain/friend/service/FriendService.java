@@ -4,7 +4,7 @@ import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.friend.entity.FriendInfo;
 import com.sj.Petory.domain.friend.entity.FriendStatus;
-import com.sj.Petory.domain.friend.repository.FriendInfoRepository;
+import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
@@ -15,17 +15,14 @@ import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
-public class FriendInfoService {
+public class FriendService {
 
-    private final FriendInfoRepository friendInfoRepository;
+    private final FriendRepository friendRepository;
     private final FriendStatusRepository friendStatusRepository;
     private final MemberRepository memberRepository;
 
@@ -37,7 +34,7 @@ public class FriendInfoService {
 
     public Page<MemberSearchResponse> searchMember(
             final MemberAdapter memberAdapter
-            ,final String keyword, final Pageable pageable) {
+            , final String keyword, final Pageable pageable) {
 
         getMemberByEmail(memberAdapter.getEmail());
 
@@ -53,7 +50,7 @@ public class FriendInfoService {
         Member friend = getMemberById(friendId);
 
         if (validateFriendRequest(member, friend)) {
-            friendInfoRepository.save(
+            friendRepository.save(
                     FriendInfo.friendRequestToEntity(member, friend));
         }
 
@@ -64,13 +61,20 @@ public class FriendInfoService {
         if (member.equals(friend)) {
             throw new FriendException(ErrorCode.REQUEST_MYSELF_NOT_ALLOWED);
         }
-        friendInfoRepository.findByMemberIdAndFriendId(
+        friendRepository.findByMemberAndFriend(
                         member, friend)
                 .ifPresent(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_REQUEST);
                     } else if (info.getFriendStatus().getFriendStatusId() == 2) {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_MEMBER);
+                    }
+                });
+        friendRepository.findByMemberAndFriend(
+                        friend, member)
+                .ifPresent(info -> {
+                    if (info.getFriendStatus().getFriendStatusId() == 1) {
+                        throw new FriendException(ErrorCode.ALREADY_RECEIVE_FRIEND_REQUEST);
                     }
                 });
 
@@ -91,11 +95,24 @@ public class FriendInfoService {
             final MemberAdapter memberAdapter,
             final String status, final Pageable pageable) {
 
-        return friendInfoRepository.findByFriendIdAndFriendStatus(
-                getMemberByEmail(memberAdapter.getEmail())
-                , getFriendStatus(status)
-                , pageable)
-                .map(FriendInfo::toDto);
+        FriendStatus friendStatus = getFriendStatus(status);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        switch (friendStatus.getStatus()) {
+            case "PENDING" -> {
+                return friendRepository.findByFriendAndFriendStatus(
+                        member
+                        , getFriendStatus(status)
+                        , pageable).map(FriendInfo::toDto);
+            }
+            case "ACCEPTED" -> {
+                return friendRepository.findByMemberAndFriendStatusOrFriendAndFriendStatus
+                                (member, friendStatus, member, friendStatus, pageable)
+                        .map(FriendInfo::toDto);
+            }
+        }
+
+        return null;
     }
 
     private FriendStatus getFriendStatus(String status) {
