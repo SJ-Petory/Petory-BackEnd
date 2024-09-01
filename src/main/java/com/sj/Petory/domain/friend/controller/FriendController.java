@@ -28,7 +28,7 @@ public class FriendController {
 //                friendService.searchMember(keyword, pageable));
 //    }
 
-    @GetMapping("/keyword")
+    @GetMapping("/search")
     public ResponseEntity<Page<MemberSearchResponse>> searchMember(
             @AuthenticationPrincipal MemberAdapter memberAdapter,
             @RequestParam("keyword") String keyword
@@ -50,7 +50,7 @@ public class FriendController {
                         memberAdapter, memberId));
     }
 
-    @GetMapping("/status")
+    @GetMapping("/process")
     public ResponseEntity<Page<FriendListResponse>> friendList(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @RequestParam("status") String status
@@ -60,4 +60,5 @@ public class FriendController {
                 friendService.friendList(
                         memberAdapter, status, pageable));
     }
+    
 }
