@@ -4,6 +4,7 @@ import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -12,10 +13,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "friendinfo")
 public class FriendInfo {
@@ -59,5 +60,9 @@ public class FriendInfo {
                 .name(this.getMember().getName())
                 .image(this.getMember().getImage())
                 .build();
+    }
+
+    public void setFriendStatus(FriendStatus friendStatus) {
+        this.friendStatus = friendStatus;
     }
 }

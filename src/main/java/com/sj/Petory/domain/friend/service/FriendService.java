@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -116,6 +117,31 @@ public class FriendService {
     }
 
     private FriendStatus getFriendStatus(String status) {
-        return friendStatusRepository.findByStatus(status);
+        return friendStatusRepository.findByStatus(status)
+                .orElseThrow(() -> new FriendException(ErrorCode.STATUS_NOT_ALLOWED));
+    }
+
+    @Transactional
+    public boolean requestProcess(
+            final MemberAdapter memberAdapter
+            , final Long memberId
+            , final String status) {
+
+        Member member = getMemberByEmail(
+                memberAdapter.getEmail());
+
+        FriendStatus pending = getFriendStatus("PENDING");
+
+        FriendStatus friendStatus = getFriendStatus(status);
+
+        Member friend = getMemberById(memberId);
+
+        FriendInfo friendInfo = friendRepository.findByFriendAndMemberAndFriendStatus(
+                        member, friend, pending)
+                .orElseThrow(() -> new FriendException(ErrorCode.REQUEST_NOT_FOUND));
+
+        friendInfo.setFriendStatus(friendStatus);
+
+        return true;
     }
 }
