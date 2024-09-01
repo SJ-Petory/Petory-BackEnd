@@ -13,7 +13,11 @@ import java.util.Optional;
 @Repository
 public interface FriendRepository extends JpaRepository<FriendInfo, Long> {
 
-    Optional<FriendInfo> findByMemberIdAndFriendId(Member member, Member friend);
+    Optional<FriendInfo> findByMemberAndFriend(Member member, Member friend);
 
-    Page<FriendInfo> findByFriendIdAndFriendStatus(Member member, FriendStatus friendStatus, Pageable pageable);
+    Page<FriendInfo> findByFriendAndFriendStatus(Member member, FriendStatus friendStatus, Pageable pageable);
+
+    Page<FriendInfo> findByMemberAndFriendStatusOrFriendAndFriendStatus
+            (Member member1, FriendStatus friendStatus1
+                    , Member member2, FriendStatus friendStatus2, Pageable pageable);
 }

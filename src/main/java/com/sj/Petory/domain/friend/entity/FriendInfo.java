@@ -27,7 +27,7 @@ public class FriendInfo {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member memberId;
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "friend_status_id")
@@ -35,7 +35,7 @@ public class FriendInfo {
 
     @ManyToOne
     @JoinColumn(name = "friend_id")
-    private Member friendId;
+    private Member friend;
 
     @CreatedDate
     @Column(updatable = false)
@@ -47,17 +47,17 @@ public class FriendInfo {
 
     public static FriendInfo friendRequestToEntity(Member member, Member friend) {
         return FriendInfo.builder()
-                .memberId(member)
+                .member(member)
                 .friendStatus(new FriendStatus(1L, "Pending"))
-                .friendId(friend)
+                .friend(friend)
                 .build();
     }
 
     public FriendListResponse toDto() {
         return FriendListResponse.builder()
-                .id(this.getFriendId().getMemberId())
-                .name(this.getFriendId().getName())
-                .image(this.getFriendId().getImage())
+                .id(this.getMember().getMemberId())
+                .name(this.getMember().getName())
+                .image(this.getMember().getImage())
                 .build();
     }
 }

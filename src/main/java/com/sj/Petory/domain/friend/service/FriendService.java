@@ -34,7 +34,7 @@ public class FriendService {
 
     public Page<MemberSearchResponse> searchMember(
             final MemberAdapter memberAdapter
-            ,final String keyword, final Pageable pageable) {
+            , final String keyword, final Pageable pageable) {
 
         getMemberByEmail(memberAdapter.getEmail());
 
@@ -61,7 +61,7 @@ public class FriendService {
         if (member.equals(friend)) {
             throw new FriendException(ErrorCode.REQUEST_MYSELF_NOT_ALLOWED);
         }
-        friendRepository.findByMemberIdAndFriendId(
+        friendRepository.findByMemberAndFriend(
                         member, friend)
                 .ifPresent(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
@@ -70,8 +70,8 @@ public class FriendService {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_MEMBER);
                     }
                 });
-        friendRepository.findByMemberIdAndFriendId(
-                friend, member)
+        friendRepository.findByMemberAndFriend(
+                        friend, member)
                 .ifPresent(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
                         throw new FriendException(ErrorCode.ALREADY_RECEIVE_FRIEND_REQUEST);
@@ -95,11 +95,24 @@ public class FriendService {
             final MemberAdapter memberAdapter,
             final String status, final Pageable pageable) {
 
-        return friendRepository.findByFriendIdAndFriendStatus(
-                getMemberByEmail(memberAdapter.getEmail())
-                , getFriendStatus(status)
-                , pageable)
-                .map(FriendInfo::toDto);
+        FriendStatus friendStatus = getFriendStatus(status);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        switch (friendStatus.getStatus()) {
+            case "PENDING" -> {
+                return friendRepository.findByFriendAndFriendStatus(
+                        member
+                        , getFriendStatus(status)
+                        , pageable).map(FriendInfo::toDto);
+            }
+            case "ACCEPTED" -> {
+                return friendRepository.findByMemberAndFriendStatusOrFriendAndFriendStatus
+                                (member, friendStatus, member, friendStatus, pageable)
+                        .map(FriendInfo::toDto);
+            }
+        }
+
+        return null;
     }
 
     private FriendStatus getFriendStatus(String status) {
