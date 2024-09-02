@@ -69,7 +69,7 @@ public class FriendService {
         if (member.equals(friend)) {
             throw new FriendException(ErrorCode.REQUEST_MYSELF_NOT_ALLOWED);
         }
-        friendRepository.findByMemberAndFriend(
+        friendRepository.findBySendMemberAndReceiveMember(
                         member, friend)
                 .ifPresent(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
@@ -78,7 +78,7 @@ public class FriendService {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_MEMBER);
                     }
                 });
-        friendRepository.findByMemberAndFriend(
+        friendRepository.findBySendMemberAndReceiveMember(
                         friend, member)
                 .ifPresent(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
