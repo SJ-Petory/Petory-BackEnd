@@ -133,7 +133,7 @@ public class FriendService {
         Member sendMember = getMemberById(memberId);
 
         FriendInfo friendInfo = friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
-                        receiveMember, sendMember, pending)
+                        sendMember, receiveMember, pending)
                 .orElseThrow(() -> new FriendException(ErrorCode.REQUEST_NOT_FOUND));
 
         friendInfo.setFriendStatus(friendStatus);
