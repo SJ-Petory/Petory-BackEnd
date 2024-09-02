@@ -25,6 +25,8 @@ public enum ErrorCode {
     ALREADY_RECEIVE_FRIEND_REQUEST("이미 상대방이 친구요청을 보냈습니다.", HttpStatus.BAD_REQUEST),
     REQUEST_NOT_FOUND("요청을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     STATUS_NOT_ALLOWED("올바르지 않은 상태값입니다.", HttpStatus.BAD_REQUEST),
+    FRIEND_INFO_NOT_FOUND("친구 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+
 
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),

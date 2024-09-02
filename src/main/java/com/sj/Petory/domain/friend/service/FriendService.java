@@ -9,11 +9,8 @@ import com.sj.Petory.domain.friend.entity.FriendStatus;
 import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
-import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
-import com.sj.Petory.domain.pet.entity.CareGiver;
-import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.exception.FriendException;
@@ -25,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -59,12 +54,12 @@ public class FriendService {
             final MemberAdapter memberAdapter
             , final Long friendId) {
 
-        Member member = getMemberByEmail(memberAdapter.getEmail());
-        Member friend = getMemberById(friendId);
+        Member sendMember = getMemberByEmail(memberAdapter.getEmail());
+        Member receiveMember = getMemberById(friendId);
 
-        if (validateFriendRequest(member, friend)) {
+        if (validateFriendRequest(sendMember, receiveMember)) {
             friendRepository.save(
-                    FriendInfo.friendRequestToEntity(member, friend));
+                    FriendInfo.friendRequestToEntity(sendMember, receiveMember));
         }
 
         return true;
@@ -108,25 +103,13 @@ public class FriendService {
             final MemberAdapter memberAdapter,
             final String status, final Pageable pageable) {
 
-        FriendStatus friendStatus = getFriendStatus(status);
-        Member member = getMemberByEmail(memberAdapter.getEmail());
+        FriendStatus requestStatus = getFriendStatus(status);
 
-        switch (friendStatus.getStatus()) {
-            case "PENDING" -> {
-                return friendRepository.findByFriendAndFriendStatus(
-                        member
-                        , getFriendStatus(status)
-                        , pageable)
-                        .map(friendInfo -> friendInfo.toDto(member.getMemberId()));
-            }
-            case "ACCEPTED" -> {
-                return friendRepository.findByMemberAndFriendStatusOrFriendAndFriendStatus
-                                (member, friendStatus, member, friendStatus, pageable)
-                        .map(friendInfo -> friendInfo.toDto(member.getMemberId()));
-            }
-        }
+        Member receiveMember = getMemberByEmail(memberAdapter.getEmail());
 
-        return null;
+        return friendRepository.findByReceiveMemberAndFriendStatus(
+                        receiveMember, requestStatus, pageable)
+                .map(FriendInfo::toDto);
     }
 
     private FriendStatus getFriendStatus(String status) {
@@ -140,21 +123,27 @@ public class FriendService {
             , final Long memberId
             , final String status) {
 
-        Member member = getMemberByEmail(
+        Member receiveMember = getMemberByEmail(
                 memberAdapter.getEmail());
 
         FriendStatus pending = getFriendStatus("PENDING");
 
         FriendStatus friendStatus = getFriendStatus(status);
 
-        Member friend = getMemberById(memberId);
+        Member sendMember = getMemberById(memberId);
 
-        FriendInfo friendInfo = friendRepository.findByFriendAndMemberAndFriendStatus(
-                        member, friend, pending)
+        FriendInfo friendInfo = friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
+                        receiveMember, sendMember, pending)
                 .orElseThrow(() -> new FriendException(ErrorCode.REQUEST_NOT_FOUND));
 
         friendInfo.setFriendStatus(friendStatus);
 
+        friendRepository.save(
+                FriendInfo.builder()
+                        .sendMember(receiveMember)
+                        .friendStatus(friendStatus)
+                        .receiveMember(sendMember)
+                        .build());
         return true;
     }
 
@@ -168,23 +157,27 @@ public class FriendService {
         Member friend = getMemberById(memberId);
 
 
+        FriendStatus accept = getFriendStatus("ACCEPTED");
+
+        friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
+                        member, friend, accept)
+                .orElseThrow(() -> new FriendException(ErrorCode.FRIEND_INFO_NOT_FOUND));
+
         return FriendDetailResponse.builder()
-                .id(friend.getMemberId())
+                .id(memberId)
                 .name(friend.getName())
                 .image(friend.getImage())
                 .myPets(petRepository.findByMember(member, pageable)
                         .stream()
                         .filter(mypet ->
-                                careGiverRepository.findByPetAndMember(mypet, friend).isPresent()
-                        )  // 돌보미로 등록된 항목만 필터링
-                        .map(mypet -> new PetInfo(mypet.getPetId(), mypet.getPetName(), mypet.getPetImage()))  // PetInfo로 변환
+                                careGiverRepository.findByPetAndMember(mypet, friend).isPresent())
+                        .map(mypet -> new PetInfo(mypet.getPetId(), mypet.getPetName(), mypet.getPetImage()))
                         .collect(Collectors.toList()))
                 .careGivePets(petRepository.findByMember(friend, pageable)
                         .stream()
-                        .filter(mypet ->
-                                careGiverRepository.findByPetAndMember(mypet, member).isPresent()
-                        )  // 돌보미로 등록된 항목만 필터링
-                        .map(mypet -> new PetInfo(mypet.getPetId(), mypet.getPetName(), mypet.getPetImage()))  // PetInfo로 변환
+                        .filter(friendpet ->
+                                careGiverRepository.findByPetAndMember(friendpet, member).isPresent())
+                        .map(friendPet -> new PetInfo(friendPet.getPetId(), friendPet.getPetName(), friendPet.getPetImage()))
                         .collect(Collectors.toList()))
                 .build();
     }
