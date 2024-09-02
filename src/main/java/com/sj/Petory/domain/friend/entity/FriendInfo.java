@@ -27,16 +27,16 @@ public class FriendInfo {
     private Long friendInfoId;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "send_member_id")
+    private Member sendMember;
 
     @ManyToOne
     @JoinColumn(name = "friend_status_id")
     private FriendStatus friendStatus;
 
     @ManyToOne
-    @JoinColumn(name = "friend_id")
-    private Member friend;
+    @JoinColumn(name = "receive_member_id")
+    private Member receiveMember;
 
     @CreatedDate
     @Column(updatable = false)
@@ -48,26 +48,18 @@ public class FriendInfo {
 
     public static FriendInfo friendRequestToEntity(Member member, Member friend) {
         return FriendInfo.builder()
-                .member(member)
+                .sendMember(member)
                 .friendStatus(new FriendStatus(1L, "Pending"))
-                .friend(friend)
+                .receiveMember(friend)
                 .build();
     }
 
-    public FriendListResponse toDto(Long memberId) {
-        if (this.member.getMemberId().equals(memberId)) {
-            return FriendListResponse.builder()
-                    .id(this.getFriend().getMemberId())
-                    .name(this.getFriend().getName())
-                    .image(this.getFriend().getImage())
-                    .build();
-        } else {
-            return FriendListResponse.builder()
-                    .id(this.getMember().getMemberId())
-                    .name(this.getMember().getName())
-                    .image(this.getMember().getImage())
-                    .build();
-        }
+    public FriendListResponse toDto() {
+        return FriendListResponse.builder()
+                .id(this.getReceiveMember().getMemberId())
+                .name(this.getReceiveMember().getName())
+                .image(this.getReceiveMember().getImage())
+                .build();
     }
 
     public void setFriendStatus(FriendStatus friendStatus) {

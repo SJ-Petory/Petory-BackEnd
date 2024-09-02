@@ -13,5 +13,5 @@ import java.util.Optional;
 
 @Repository
 public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
-    Optional<CareGiver> findByPetAndMember(Pet mypet, Member friend);
+    Optional<CareGiver> findByPetAndMember(Pet pet, Member member);
 }
