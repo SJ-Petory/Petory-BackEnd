@@ -57,36 +57,35 @@ public class FriendService {
         Member sendMember = getMemberByEmail(memberAdapter.getEmail());
         Member receiveMember = getMemberById(friendId);
 
-        if (validateFriendRequest(sendMember, receiveMember)) {
-            friendRepository.save(
-                    FriendInfo.friendRequestToEntity(sendMember, receiveMember));
-        }
+        validateFriendRequest(sendMember, receiveMember);
+
+        friendRepository.save(
+                FriendInfo.friendRequestToEntity(sendMember, receiveMember));
 
         return true;
     }
 
-    private boolean validateFriendRequest(Member member, Member friend) {
-        if (member.equals(friend)) {
+    private void validateFriendRequest(Member sendMember, Member receiveMember) {
+        if (sendMember.equals(receiveMember)) {
             throw new FriendException(ErrorCode.REQUEST_MYSELF_NOT_ALLOWED);
         }
-        friendRepository.findBySendMemberAndReceiveMember(
-                        member, friend)
-                .ifPresent(info -> {
+
+        friendRepository.findBySendMemberAndReceiveMember(sendMember, receiveMember)
+                .forEach(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_REQUEST);
-                    } else if (info.getFriendStatus().getFriendStatusId() == 2) {
+                    }
+                    if (info.getFriendStatus().getFriendStatusId() == 2) {
                         throw new FriendException(ErrorCode.ALREADY_FRIEND_MEMBER);
                     }
                 });
-        friendRepository.findBySendMemberAndReceiveMember(
-                        friend, member)
-                .ifPresent(info -> {
+
+        friendRepository.findBySendMemberAndReceiveMember(receiveMember, sendMember)
+                .forEach(info -> {
                     if (info.getFriendStatus().getFriendStatusId() == 1) {
                         throw new FriendException(ErrorCode.ALREADY_RECEIVE_FRIEND_REQUEST);
                     }
                 });
-
-        return true;
     }
 
     private Member getMemberByEmail(String email) {
