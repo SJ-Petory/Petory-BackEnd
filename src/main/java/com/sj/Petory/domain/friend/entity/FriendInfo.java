@@ -56,9 +56,9 @@ public class FriendInfo {
 
     public FriendListResponse toDto() {
         return FriendListResponse.builder()
-                .id(this.getReceiveMember().getMemberId())
-                .name(this.getReceiveMember().getName())
-                .image(this.getReceiveMember().getImage())
+                .id(this.getSendMember().getMemberId())
+                .name(this.getSendMember().getName())
+                .image(this.getSendMember().getImage())
                 .build();
     }
 
