@@ -138,12 +138,15 @@ public class FriendService {
 
         friendInfo.setFriendStatus(friendStatus);
 
-        friendRepository.save(
-                FriendInfo.builder()
-                        .sendMember(receiveMember)
-                        .friendStatus(friendStatus)
-                        .receiveMember(sendMember)
-                        .build());
+        if (friendStatus.getStatus().equals("ACCEPTED")) {
+            friendRepository.save(
+                    FriendInfo.builder()
+                            .sendMember(receiveMember)
+                            .friendStatus(friendStatus)
+                            .receiveMember(sendMember)
+                            .build());
+        }
+
         return true;
     }
 
