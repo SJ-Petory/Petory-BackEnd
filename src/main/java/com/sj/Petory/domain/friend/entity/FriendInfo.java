@@ -54,12 +54,20 @@ public class FriendInfo {
                 .build();
     }
 
-    public FriendListResponse toDto() {
-        return FriendListResponse.builder()
-                .id(this.getMember().getMemberId())
-                .name(this.getMember().getName())
-                .image(this.getMember().getImage())
-                .build();
+    public FriendListResponse toDto(Long memberId) {
+        if (this.member.getMemberId().equals(memberId)) {
+            return FriendListResponse.builder()
+                    .id(this.getFriend().getMemberId())
+                    .name(this.getFriend().getName())
+                    .image(this.getFriend().getImage())
+                    .build();
+        } else {
+            return FriendListResponse.builder()
+                    .id(this.getMember().getMemberId())
+                    .name(this.getMember().getName())
+                    .image(this.getMember().getImage())
+                    .build();
+        }
     }
 
     public void setFriendStatus(FriendStatus friendStatus) {

@@ -116,12 +116,13 @@ public class FriendService {
                 return friendRepository.findByFriendAndFriendStatus(
                         member
                         , getFriendStatus(status)
-                        , pageable).map(FriendInfo::toDto);
+                        , pageable)
+                        .map(friendInfo -> friendInfo.toDto(member.getMemberId()));
             }
             case "ACCEPTED" -> {
                 return friendRepository.findByMemberAndFriendStatusOrFriendAndFriendStatus
                                 (member, friendStatus, member, friendStatus, pageable)
-                        .map(FriendInfo::toDto);
+                        .map(friendInfo -> friendInfo.toDto(member.getMemberId()));
             }
         }
 
