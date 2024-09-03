@@ -2,6 +2,7 @@ package com.sj.Petory.domain.pet.entity;
 
 import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
 import com.sj.Petory.domain.pet.type.PetGender;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import jakarta.persistence.*;
@@ -9,9 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +25,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class Pet {
 
     @Id
@@ -77,5 +82,20 @@ public class Pet {
                 .gender(this.getPetGender())
                 .memo(this.getMemo())
                 .build();
+    }
+
+    public void updateInfo(final UpdatePetRequest request) {
+        if (StringUtils.hasText(request.getName())) {
+            this.petName = request.getName();
+        }
+        if (!ObjectUtils.(request.getAge())) {
+            this.petAge = request.getAge();
+        }
+        if (StringUtils.hasText(request.getImage())) {
+            this.petImage = request.getImage();
+        }
+        if (StringUtils.hasText(request.getMemo())) {
+            this.memo = request.getMemo();
+        }
     }
 }
