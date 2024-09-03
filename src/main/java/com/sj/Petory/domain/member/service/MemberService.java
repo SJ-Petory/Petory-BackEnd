@@ -5,8 +5,12 @@ import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.member.type.MemberStatus;
+import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
+import com.sj.Petory.domain.pet.entity.Species;
+import com.sj.Petory.domain.pet.repository.BreedRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
+import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
 import com.sj.Petory.exception.MemberException;
@@ -21,12 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final PostRepository postRepository;
+    private final SpeciesRepository speciesRepository;
+    private final BreedRepository breedRepository;
 
 //    private final MemberElasticsearchRepository memberElasticsearchRepository;
 
@@ -99,7 +107,8 @@ public class MemberService {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         return petRepository.findByMember(member, pageable)
-                .map(Pet::toDto);
+                .map(pet -> pet.toDto(
+                        breedRepository.findByBreedId(pet.getBreed())));
     }
 
     public Page<PostResponse> getMembersPosts(

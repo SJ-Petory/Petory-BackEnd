@@ -24,14 +24,6 @@ public class MemberController {
                 memberService.signUp(request));
     }
 
-    @PatchMapping("/image")
-    public ResponseEntity<?> s3ImageUpload(
-            @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @RequestPart(value = "image", required = false) MultipartFile image) {
-
-        return ResponseEntity.ok(memberService.imageUpload(memberAdapter, image));
-    }
-
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmailDuplicate(
             @RequestParam("email") String email) {
@@ -84,6 +76,14 @@ public class MemberController {
                         memberAdapter, pageable));
     }
 
+    @PatchMapping("/image")
+    public ResponseEntity<?> s3ImageUpload(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        return ResponseEntity.ok(memberService.imageUpload(memberAdapter, image));
+    }
+
     @PatchMapping
     public ResponseEntity<Boolean> updateMember(
             @AuthenticationPrincipal MemberAdapter memberAdapter
@@ -100,10 +100,5 @@ public class MemberController {
 
         return ResponseEntity.ok(
                 memberService.deleteMember(memberAdapter));
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "hello";
     }
 }
