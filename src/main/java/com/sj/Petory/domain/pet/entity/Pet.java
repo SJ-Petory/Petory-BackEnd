@@ -2,10 +2,7 @@ package com.sj.Petory.domain.pet.entity;
 
 import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.domain.pet.dto.PetRegister;
-import com.sj.Petory.domain.pet.type.PetBreed;
 import com.sj.Petory.domain.pet.type.PetGender;
-import com.sj.Petory.domain.pet.type.PetSpecies;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,22 +34,21 @@ public class Pet {
     @Column
     private String petName;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private PetSpecies species;
+    @ManyToOne
+    @JoinColumn(name = "species_id")
+    private Species species;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private PetBreed breed;
+    @Column(name = "breed_id")
+    private Long breed;
 
-    @Column
+    @Column(name = "pet_gender")
     @Enumerated(EnumType.STRING)
     private PetGender petGender;
 
     @Column
     private Long petAge;
 
-    @Column
+    @Column(name = "pet_image")
     private String petImage;
 
     @Column
@@ -70,11 +66,16 @@ public class Pet {
     @Column
     private LocalDateTime updatedAt;
 
-    public PetResponse toDto() {
+    public PetResponse toDto(Breed breed) {
         return PetResponse.builder()
                 .petId(this.getPetId())
                 .name(this.getPetName())
                 .image(this.getPetImage())
+                .species(this.getSpecies().getSpeciesName())
+                .breed(breed.getBreedName())
+                .age(this.getPetAge())
+                .gender(this.getPetGender())
+                .memo(this.getMemo())
                 .build();
     }
 }

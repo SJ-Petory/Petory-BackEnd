@@ -1,10 +1,10 @@
 package com.sj.Petory.domain.pet.dto;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
-import com.sj.Petory.domain.pet.type.PetBreed;
+import com.sj.Petory.domain.pet.entity.Species;
 import com.sj.Petory.domain.pet.type.PetGender;
-import com.sj.Petory.domain.pet.type.PetSpecies;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,11 +19,11 @@ public class PetRegister {
     @Builder
     public static class Request {
 
-        @NotBlank
-        private String species;
+        @NotNull
+        private long speciesId;
 
-        @NotBlank
-        private String breed;
+        @NotNull
+        private long breedId;
 
         @NotBlank
         private String name;
@@ -37,12 +37,16 @@ public class PetRegister {
         private String image;
         private String memo;
 
-        public Pet toEntity(Member member) {
+        public Pet toEntity(
+                final Member member
+                , final Species species
+                , final Breed breed) {
+
             return Pet.builder()
                     .member(member)
                     .petName(this.getName())
-                    .species(PetSpecies.valueOf(this.getSpecies()))
-                    .breed(PetBreed.valueOf(this.getBreed()))
+                    .species(species)
+                    .breed(breed.getBreedId())
                     .petGender(PetGender.valueOf(this.getGender()))
                     .petAge(this.getAge())
                     .petImage(this.getImage())
