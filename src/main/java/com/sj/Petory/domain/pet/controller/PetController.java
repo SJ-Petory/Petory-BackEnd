@@ -44,5 +44,13 @@ public class PetController {
                 petService.petDelete(memberAdapter, petId));
     }
 
+    @PostMapping("/{petId}")
+    public ResponseEntity<Boolean> CareGiverRegister(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("petId") long petId
+            , @RequestParam("memberId") long memberId) {
 
+        return ResponseEntity.ok(
+                petService.careGiverRegister(memberAdapter, petId, memberId));
+    }
 }
