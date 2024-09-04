@@ -42,4 +42,10 @@ public class CareGiver {
     @Column
     private LocalDateTime updatedAt;
 
+    public static CareGiver toEntity(Member friend, Pet pet) {
+        return CareGiver.builder()
+                .member(friend)
+                .pet(pet)
+                .build();
+    }
 }
