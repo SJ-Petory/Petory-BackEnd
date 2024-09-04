@@ -156,6 +156,7 @@ public class PetService {
         return careGiverRepository.findByMember(member, pageable)
                 .map(careGiver -> careGiver.toDto(
                         breedRepository.findByBreedId(careGiver.getPet().getBreed())
+                                .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND))
                 ));
     }
 }
