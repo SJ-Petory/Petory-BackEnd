@@ -11,6 +11,7 @@ import com.sj.Petory.domain.pet.entity.Species;
 import com.sj.Petory.domain.pet.repository.BreedRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.repository.SpeciesRepository;
+import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
@@ -58,6 +59,8 @@ public class PetService {
 
         Member member = getMembers(memberAdapter);
 
+        validatePetMember(petId, member);
+
         Pet pet = getPetById(petId);
 
         pet.updateInfo(request);
@@ -68,5 +71,24 @@ public class PetService {
     private Pet getPetById(long petId) {
         return petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND));
+    }
+
+    @Transactional
+    public boolean petDelete(
+            final MemberAdapter memberAdapter, final long petId) {
+
+        Member member = getMembers(memberAdapter);
+        Pet pet = getPetById(petId);
+
+        validatePetMember(petId, member);
+
+        pet.updateStatus(PetStatus.DELETED);
+
+        return true;
+    }
+
+    private void validatePetMember(long petId, Member member) {
+        petRepository.findByPetIdAndMember(petId, member)
+                .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
     }
 }
