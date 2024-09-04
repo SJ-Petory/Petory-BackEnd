@@ -13,6 +13,7 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
+import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.exception.FriendException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
@@ -169,13 +170,13 @@ public class FriendService {
                 .id(memberId)
                 .name(friend.getName())
                 .image(friend.getImage())
-                .myPets(petRepository.findByMember(member, pageable)
+                .myPets(petRepository.findByMemberAndStatus(member, PetStatus.ACTIVE, pageable)
                         .stream()
                         .filter(mypet ->
                                 careGiverRepository.findByPetAndMember(mypet, friend).isPresent())
                         .map(mypet -> new PetInfo(mypet.getPetId(), mypet.getPetName(), mypet.getPetImage()))
                         .collect(Collectors.toList()))
-                .careGivePets(petRepository.findByMember(friend, pageable)
+                .careGivePets(petRepository.findByMemberAndStatus(friend, PetStatus.ACTIVE, pageable)
                         .stream()
                         .filter(friendpet ->
                                 careGiverRepository.findByPetAndMember(friendpet, member).isPresent())

@@ -98,4 +98,8 @@ public class Pet {
             this.memo = request.getMemo();
         }
     }
+
+    public void updateStatus(final PetStatus petStatus) {
+        this.status = petStatus;
+    }
 }

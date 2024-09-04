@@ -34,4 +34,15 @@ public class PetController {
         return ResponseEntity.ok(
                 petService.petUpdate(memberAdapter, petId, request));
     }
+
+    @DeleteMapping("/{petId}")
+    public ResponseEntity<Boolean> petDelete(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("petId") long petId) {
+
+        return ResponseEntity.ok(
+                petService.petDelete(memberAdapter, petId));
+    }
+
+
 }
