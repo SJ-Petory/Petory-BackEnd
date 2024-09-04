@@ -6,6 +6,7 @@ import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
 import com.sj.Petory.domain.pet.dto.PetRegister;
 import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
 import com.sj.Petory.domain.pet.entity.Breed;
@@ -22,9 +23,10 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Objects;
 
@@ -43,10 +45,14 @@ public class PetService {
     public boolean registerPet(
             final MemberAdapter memberAdapter,
             final PetRegister.Request request) {
-        Member member = getMembers(memberAdapter);
+        Member member = getMember(memberAdapter);
 
-        Species species = speciesRepository.findBySpeciesId(request.getSpeciesId());
-        Breed breed = breedRepository.findByBreedId(request.getBreedId());
+        Species species = speciesRepository.findBySpeciesId(
+                request.getSpeciesId())
+                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
+
+        Breed breed = breedRepository.findByBreedId(request.getBreedId())
+                .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND));
 
         petRepository.save(request.toEntity(member, species, breed));
 
@@ -58,7 +64,7 @@ public class PetService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public Member getMembers(final MemberAdapter memberAdapter) {
+    public Member getMember(final MemberAdapter memberAdapter) {
 
         return getMemberByEmail(memberAdapter.getUsername());
     }
@@ -69,7 +75,7 @@ public class PetService {
             , final long petId
             , final UpdatePetRequest request) {
 
-        Member member = getMembers(memberAdapter);
+        Member member = getMember(memberAdapter);
 
         validatePetMember(petId, member);
 
@@ -89,7 +95,7 @@ public class PetService {
     public boolean petDelete(
             final MemberAdapter memberAdapter, final long petId) {
 
-        Member member = getMembers(memberAdapter);
+        Member member = getMember(memberAdapter);
         Pet pet = getPetById(petId);
 
         validatePetMember(petId, member);
@@ -109,7 +115,7 @@ public class PetService {
             , final long petId
             , final long memberId) {
 
-        Member member = getMembers(memberAdapter);
+        Member member = getMember(memberAdapter);
         Member friend = getMemberById(memberId);
         Pet pet = getPetById(petId);
 
@@ -139,5 +145,17 @@ public class PetService {
     private FriendStatus getFriendStatus(String status) {
         return friendStatusRepository.findByStatus(status)
                 .orElseThrow(() -> new FriendException(ErrorCode.STATUS_NOT_ALLOWED));
+    }
+
+    public Page<CareGiverPetResponse> caregiverPetList(
+            final MemberAdapter memberAdapter
+            , final Pageable pageable) {
+
+        Member member = getMember(memberAdapter);
+
+        return careGiverRepository.findByMember(member, pageable)
+                .map(careGiver -> careGiver.toDto(
+                        breedRepository.findByBreedId(careGiver.getPet().getBreed())
+                ));
     }
 }
