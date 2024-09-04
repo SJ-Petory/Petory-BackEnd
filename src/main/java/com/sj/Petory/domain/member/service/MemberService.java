@@ -104,7 +104,8 @@ public class MemberService {
 
         return petRepository.findByMemberAndStatus(member, PetStatus.ACTIVE, pageable)
                 .map(pet -> pet.toDto(
-                        breedRepository.findByBreedId(pet.getBreed())));
+                        breedRepository.findByBreedId(pet.getBreed())
+                                .orElseThrow(() -> new MemberException(ErrorCode.BREED_NOT_FOUND))));
     }
 
     public Page<PostResponse> getMembersPosts(

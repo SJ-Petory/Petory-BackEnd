@@ -2,6 +2,7 @@ package com.sj.Petory.domain.pet.entity;
 
 import com.sj.Petory.domain.friend.dto.PetInfo;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,20 @@ public class CareGiver {
         return CareGiver.builder()
                 .member(friend)
                 .pet(pet)
+                .build();
+    }
+
+    public CareGiverPetResponse toDto(Breed breed) {
+        Pet pet = this.getPet();
+        return CareGiverPetResponse.builder()
+                .petId(pet.getPetId())
+                .name(pet.getPetName())
+                .image(pet.getPetImage())
+                .species(pet.getSpecies().getSpeciesName())
+                .breed(breed.getBreedName())
+                .age(pet.getPetAge())
+                .gender(pet.getPetGender())
+                .memo(pet.getMemo())
                 .build();
     }
 }
