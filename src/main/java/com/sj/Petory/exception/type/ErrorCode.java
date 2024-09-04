@@ -30,6 +30,8 @@ public enum ErrorCode {
     //pet
     PET_NOT_FOUND("반려동물을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     PET_MEMBER_UNMATCHED("자신의 반려동물만 접근이 가능합니다.", HttpStatus.BAD_REQUEST),
+    SPECIES_NOT_FOUND("종을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    BREED_NOT_FOUND("세부 종을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),

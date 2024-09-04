@@ -14,4 +14,6 @@ import java.util.Optional;
 @Repository
 public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     Optional<CareGiver> findByPetAndMember(Pet pet, Member member);
+
+    Page<CareGiver> findByMember(Member member, Pageable pageable);
 }
