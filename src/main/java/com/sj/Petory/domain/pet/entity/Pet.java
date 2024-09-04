@@ -88,7 +88,7 @@ public class Pet {
         if (StringUtils.hasText(request.getName())) {
             this.petName = request.getName();
         }
-        if (StringUtils.hasText(String.valueOf(request.getAge()))) {
+        if (request.getAge() != 0) {
             this.petAge = request.getAge();
         }
         if (StringUtils.hasText(request.getImage())) {
