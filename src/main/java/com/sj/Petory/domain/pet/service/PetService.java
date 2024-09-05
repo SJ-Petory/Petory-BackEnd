@@ -48,7 +48,7 @@ public class PetService {
         Member member = getMember(memberAdapter);
 
         Species species = speciesRepository.findBySpeciesId(
-                request.getSpeciesId())
+                        request.getSpeciesId())
                 .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
 
         Breed breed = breedRepository.findByBreedId(request.getBreedId())
@@ -123,9 +123,19 @@ public class PetService {
 
         validatePetMember(petId, member);
 
+        validateGareGiver(friend, pet);
+
         careGiverRepository.save(CareGiver.toEntity(friend, pet));
 
         return true;
+    }
+
+    private void validateGareGiver(Member friend, Pet pet) {
+        careGiverRepository.findByPetAndMember(pet, friend)
+                .ifPresent(info ->
+                {
+                    throw new PetException(ErrorCode.ALREADY_REGISTERED_MEMBER);
+                });
     }
 
     private void validateFriend(Member member, Member friend) {
