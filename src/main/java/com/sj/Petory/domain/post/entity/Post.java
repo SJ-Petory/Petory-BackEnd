@@ -3,7 +3,6 @@ package com.sj.Petory.domain.post.entity;
 import com.sj.Petory.domain.member.dto.PostResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.type.PostStatus;
-import com.sj.Petory.domain.postcategory.entity.PostCategory;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

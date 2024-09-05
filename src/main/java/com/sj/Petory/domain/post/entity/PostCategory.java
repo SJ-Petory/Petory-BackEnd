@@ -1,4 +1,4 @@
-package com.sj.Petory.domain.postcategory.entity;
+package com.sj.Petory.domain.post.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
