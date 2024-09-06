@@ -11,6 +11,7 @@ import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,6 +33,8 @@ public class CreateScheduleRequest {
     private long noticeAt;
 
     private PriorityType priority;
+
+    private List<Long> petId;
 
     public Schedule toScheduleEntity(
             ScheduleCategory category

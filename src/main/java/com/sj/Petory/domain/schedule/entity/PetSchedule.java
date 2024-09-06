@@ -22,9 +22,11 @@ public class PetSchedule {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
-    private Pet petId;
+    private Pet pet;
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
+
 }
+

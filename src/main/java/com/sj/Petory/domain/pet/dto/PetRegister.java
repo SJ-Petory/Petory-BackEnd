@@ -31,7 +31,7 @@ public class PetRegister {
         @NotNull
         private long age;
 
-        @NotBlank
+        @NotNull
         private PetGender gender;
 
         private String image;
