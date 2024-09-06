@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface ScheduleCategoryRepository extends JpaRepository<ScheduleCategory, Long> {
 
     Optional<ScheduleCategory> findByCategoryName(String name);
+
+    Optional<ScheduleCategory> findByCategoryId(Long id);
 }

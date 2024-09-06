@@ -47,9 +47,11 @@ public class Schedule {
     private LocalDateTime scheduleAt;
 
     @Column(name = "repeat_type")
+    @Enumerated(EnumType.STRING)
     private RepeatType repeatType;
 
     @Column(name = "repeat_cycle")
+    @Enumerated(EnumType.STRING)
     private RepeatCycle repeatCycle;
 
     @Column(name = "notice_yn")
@@ -59,10 +61,15 @@ public class Schedule {
     private long noticeAt;
 
     @Column(name = "priority")
+    @Enumerated(EnumType.STRING)
     private PriorityType priority;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
+
+    @OneToOne(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private CustomRepeatPattern customRepeatPattern;
 
     @CreatedDate
     @Column(updatable = false)

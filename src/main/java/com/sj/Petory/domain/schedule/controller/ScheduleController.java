@@ -2,6 +2,7 @@ package com.sj.Petory.domain.schedule.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
+import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
 import com.sj.Petory.domain.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +26,14 @@ public class ScheduleController {
 
         return ResponseEntity.ok(
                 scheduleService.createCategory(memberAdapter, request));
+    }
+
+    @PostMapping
+    public ResponseEntity<Boolean> createSchedule(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody CreateScheduleRequest request) {
+
+        return ResponseEntity.ok(
+                scheduleService.createSchedule(memberAdapter, request));
     }
 }
