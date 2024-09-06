@@ -16,5 +16,5 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     Optional<Pet> findByPetIdAndMember(long petId, Member member);
 
-    boolean existsByPetId(Long petId);
+    boolean existsByPetIdAndMember(Long petId, Member member);
 }

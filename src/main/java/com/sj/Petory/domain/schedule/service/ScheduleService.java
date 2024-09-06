@@ -75,9 +75,8 @@ public class ScheduleService {
 
         Schedule saveSchedule = scheduleRepository.save(schedule);
 
-        System.out.println(request.getPetId());
         request.getPetId().stream()
-                .filter(petRepository::existsByPetId)
+                .filter(petId -> petRepository.existsByPetIdAndMember(petId, member))
                 .forEach(petId -> petScheduleRepository.save(
                         PetSchedule.builder()
                                 .pet(getPetById(petId))
