@@ -4,6 +4,7 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.entity.Pet;
+import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
 import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
@@ -33,6 +34,7 @@ public class ScheduleService {
     private final CustomRepeatPatternRepository customRepeatPatternRepository;
     private final PetRepository petRepository;
     private final PetScheduleRepository petScheduleRepository;
+    private final CareGiverRepository careGiverRepository;
 
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
@@ -76,7 +78,9 @@ public class ScheduleService {
         Schedule saveSchedule = scheduleRepository.save(schedule);
 
         request.getPetId().stream()
-                .filter(petId -> petRepository.existsByPetIdAndMember(petId, member))
+                .filter(petId ->
+                        petRepository.existsByPetIdAndMember(petId, member)
+                                || careGiverRepository.existsByPetAndMember(getPetById(petId), member))
                 .forEach(petId -> petScheduleRepository.save(
                         PetSchedule.builder()
                                 .pet(getPetById(petId))
