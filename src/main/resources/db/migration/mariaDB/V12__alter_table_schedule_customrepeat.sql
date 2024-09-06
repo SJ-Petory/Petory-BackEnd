@@ -1,18 +1,17 @@
 --Schedule table
-ALTER TABLE schedule ALTER COLUMN repeat_type ENUM('BASIC', 'CUSTOM');
-ALTER TABLE schedule ALTER COLUMN repeat_cycle ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
-ALTER TABLE schedule ALTER COLUMN priority ENUM('HIGH', 'MEDIUM', 'LOW');
-ALTER TABLE schedule ALTER COLUMN status ENUM('ONGOING', 'DONE');
+ALTER TABLE schedule MODIFY repeat_type ENUM('BASIC', 'CUSTOM');
+ALTER TABLE schedule MODIFY repeat_cycle ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
+ALTER TABLE schedule MODIFY priority ENUM('HIGH', 'MEDIUM', 'LOW');
+ALTER TABLE schedule MODIFY status ENUM('ONGOING', 'DONE');
 
 --CustomRepeatPattern
 ALTER TABLE CustomRepeatPattern ALTER COLUMN id RENAME TO custom_repeat_id;
-ALTER TABLE CustomRepeatPattern ADD COLUMN schedule_id BIGINT NOT NULL;
+ALTER TABLE CustomRepeatPattern ADD schedule_id BIGINT NOT NULL;
 ALTER TABLE CustomRepeatPattern ALTER COLUMN frequency ENUM('DAY', 'WEEK', 'MONTH', 'YEAR');
-ALTER TABLE CustomRepeatPattern DROP COLUMN daysOfWeek;
-ALTER TABLE CustomRepeatPattern DROP COLUMN daysOfMonth;
-ALTER TABLE CustomRepeatPattern ALTER COLUMN endDate RENAME TO end_date;
-ALTER TABLE CustomRepeatPattern ALTER COLUMN end_date TIMESTAMP NULL;
-ALTER TABLE CustomRepeatPattern ALTER COLUMN `interval` RENAME TO repeat_interval;
+ALTER TABLE CustomRepeatPattern DROP daysOfWeek;
+ALTER TABLE CustomRepeatPattern DROP daysOfMonth;
+ALTER TABLE CustomRepeatPattern CHANGE endDate end_date TIMESTAMP NULL;
+ALTER TABLE CustomRepeatPattern CHANGE `interval` repeat_interval;
 
 ALTER TABLE CustomRepeatPattern DROP CONSTRAINT PK_CUSTOMREPEATPATTERN;
 
