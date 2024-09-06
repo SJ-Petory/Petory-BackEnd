@@ -31,8 +31,8 @@ public class PetRegister {
         @NotNull
         private long age;
 
-        @NotBlank
-        private String gender;
+        @NotNull
+        private PetGender gender;
 
         private String image;
         private String memo;
@@ -47,7 +47,7 @@ public class PetRegister {
                     .petName(this.getName())
                     .species(species)
                     .breed(breed.getBreedId())
-                    .petGender(PetGender.valueOf(this.getGender()))
+                    .petGender(this.getGender())
                     .petAge(this.getAge())
                     .petImage(this.getImage())
                     .memo(this.getMemo())

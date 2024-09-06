@@ -34,6 +34,11 @@ public enum ErrorCode {
     BREED_NOT_FOUND("세부 종을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     ALREADY_REGISTERED_MEMBER("이미 돌보미로 등록된 회원입니다.", HttpStatus.BAD_REQUEST),
+
+    //schedule
+    DUPLICATED_CATEGORY_NAME("중복된 이름입니다.", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
     FILE_EXTENSION_NOT_ALLOWED("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST),
