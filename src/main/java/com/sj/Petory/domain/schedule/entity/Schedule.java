@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.schedule.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import com.sj.Petory.domain.schedule.type.PriorityType;
 import com.sj.Petory.domain.schedule.type.RepeatCycle;
 import com.sj.Petory.domain.schedule.type.RepeatType;
@@ -77,4 +78,16 @@ public class Schedule {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public ScheduleListResponse toDto() {
+        return ScheduleListResponse.builder()
+                .scheduleId(this.getScheduleId())
+                .title(this.getScheduleTitle())
+                .scheduleAt(this.getScheduleAt())
+                .priority(this.getPriority())
+                .status(this.getStatus())
+//                .petId(pet)
+//                .petName()
+                .build();
+    }
 }
