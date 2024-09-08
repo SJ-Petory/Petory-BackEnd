@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    Page<Schedule> findByScheduleId(Schedule schedule);
+    Page<Schedule> findByScheduleId(Schedule schedule, Pageable pageable);
 
     Page<Schedule> findByMember(Member member, Pageable pageable);
 }
