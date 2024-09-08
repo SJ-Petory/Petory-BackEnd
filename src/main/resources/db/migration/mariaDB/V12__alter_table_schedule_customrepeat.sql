@@ -16,9 +16,9 @@ ALTER TABLE CustomRepeatPattern CHANGE `interval` repeat_interval bigint;
 
 -- ALTER TABLE CustomRepeatPattern DROP CONSTRAINT PK_CUSTOMREPEATPATTERN;
 
-ALTER TABLE `CustomRepeatPattern` ADD CONSTRAINT `PK_CUSTOMREPEATPATTERN` PRIMARY KEY (
-	`schedule_id`
-);
+--ALTER TABLE `CustomRepeatPattern` ADD CONSTRAINT `PK_CUSTOMREPEATPATTERN` PRIMARY KEY (
+--	`schedule_id`
+--);
 ALTER TABLE `CustomRepeatPattern` ADD CONSTRAINT `FK_Schedule_TO_CustomRepeatPattern_1` FOREIGN KEY (`schedule_id`)
 REFERENCES `Schedule` (`schedule_id`) ON DELETE CASCADE;
 
