@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.schedule.entity;
 
 import com.sj.Petory.domain.pet.entity.Pet;
+import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,18 @@ public class PetSchedule {
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
+    public ScheduleListResponse toDto() {
+        Schedule scheduleEntity = this.schedule;
+
+        return ScheduleListResponse.builder()
+                .scheduleId(scheduleEntity.getScheduleId())
+                .title(scheduleEntity.getScheduleTitle())
+                .scheduleAt(scheduleEntity.getScheduleAt())
+                .priority(scheduleEntity.getPriority())
+                .status(scheduleEntity.getStatus())
+//                .petId(pet)
+//                .petName()
+                .build();
+    }
 }
 
