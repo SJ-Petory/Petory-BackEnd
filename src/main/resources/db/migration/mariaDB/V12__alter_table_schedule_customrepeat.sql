@@ -14,7 +14,7 @@ ALTER TABLE CustomRepeatPattern DROP daysOfMonth;
 ALTER TABLE CustomRepeatPattern CHANGE endDate end_date TIMESTAMP NULL;
 ALTER TABLE CustomRepeatPattern CHANGE `interval` repeat_interval bigint;
 
-ALTER TABLE CustomRepeatPattern DROP CONSTRAINT PK_CUSTOMREPEATPATTERN;
+-- ALTER TABLE CustomRepeatPattern DROP CONSTRAINT PK_CUSTOMREPEATPATTERN;
 
 ALTER TABLE `CustomRepeatPattern` ADD CONSTRAINT `PK_CUSTOMREPEATPATTERN` PRIMARY KEY (
 	`custom_repeat_id`,
