@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -130,9 +131,12 @@ public class ScheduleService {
         List<ScheduleListResponse> scheduleListResponse =
                 scheduleRepository.findByMember(member, pageable)
                         .map(schedule -> {
-                            List<PetSchedule> scheduleList =
-                                    petScheduleRepository.findBySchedule(schedule);
-                            return schedule.toDto(scheduleList);
+//                            if (!ObjectUtils.isEmpty(schedule)) {
+                                List<PetSchedule> scheduleList =
+                                        petScheduleRepository.findBySchedule(schedule);
+                                return schedule.toDto(scheduleList);
+//                            }
+//                            return null;
                         })
                         .stream().toList();
 
@@ -140,16 +144,19 @@ public class ScheduleService {
         // 1. 돌보미에서 로그인한 사용자가 돌보는 동물을 찾고(돌보미 테이블)
         // 2. 해당 반려동물들로 일정을 찾고(반려동물 일정테이블)
         // 3. dto 타입으로 반환
-        PetSchedule petSchedule = new PetSchedule();
 
         List<ScheduleListResponse> careGiverScheduleList =
                 careGiverRepository.findByMember(member, pageable)
                         .map(careGiver ->
                         {
                             List<PetSchedule> petScheduleList = petScheduleRepository.findByPet(careGiver.getPet());
-                            return petSchedule.toDto(petScheduleList);
+                            if (petScheduleList.size() != 0) {
+                                return PetSchedule.toDto(petScheduleList);
+                            }
+                            return null;
                         }).stream().toList();
 
+        // 자기의 펫이지만 돌보미로 등로된 사용자가 만든 일정은 안 뜬다.
         return new PageImpl<>(
                 Stream.of(scheduleListResponse, careGiverScheduleList)
                         .flatMap(Collection::stream)

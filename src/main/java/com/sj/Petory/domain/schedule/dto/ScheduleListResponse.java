@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,6 +20,6 @@ public class ScheduleListResponse {
     private LocalDateTime scheduleAt;
     private PriorityType priority;
     private ScheduleStatus status;
-    private List<Long> petId;
-    private List<String> petName;
+    private Set<Long> petId;
+    private Set<String> petName;
 }

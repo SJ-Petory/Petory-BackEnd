@@ -18,6 +18,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -83,13 +85,13 @@ public class Schedule {
     public ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
         Schedule scheduleEntity = this;
 
-        List<Long> petIds = petScheduleList.stream()
+        Set<Long> petIds = petScheduleList.stream()
                 .map(petSchedule -> petSchedule.getPet().getPetId())
-                .toList();
+                .collect(Collectors.toSet());
 
-        List<String> petNames = petScheduleList.stream()
+        Set<String> petNames = petScheduleList.stream()
                 .map(petSchedule -> petSchedule.getPet().getPetName())
-                .toList();
+                .collect(Collectors.toSet());
 
         return ScheduleListResponse.builder()
                 .scheduleId(scheduleEntity.getScheduleId())
