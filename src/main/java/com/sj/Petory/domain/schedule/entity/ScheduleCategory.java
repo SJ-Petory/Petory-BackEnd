@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.schedule.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,11 @@ public class ScheduleCategory {
 
     @Column(name = "category_name")
     private String categoryName;
+
+    public CategoryListResponse toDto() {
+
+        return CategoryListResponse.builder()
+                .name(categoryName)
+                .build();
+    }
 }

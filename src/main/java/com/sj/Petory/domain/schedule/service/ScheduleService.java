@@ -6,6 +6,7 @@ import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
+import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
 import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
@@ -126,5 +127,14 @@ public class ScheduleService {
                         (ScheduleListResponse) petScheduleRepository.findByPet(careGiver.getPet())
                                 .stream().map(PetSchedule::toDto)
                 );
+    }
+
+    public Page<CategoryListResponse> categoryList(
+            final MemberAdapter memberAdapter, final Pageable pageable) {
+
+        Member member = getMember(memberAdapter);
+
+        return scheduleCategoryRepository.findByMember(member, pageable)
+                .map(ScheduleCategory::toDto);
     }
 }

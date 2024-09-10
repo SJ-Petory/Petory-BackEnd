@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.schedule.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
 import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
@@ -26,6 +27,15 @@ public class ScheduleController {
 
         return ResponseEntity.ok(
                 scheduleService.createCategory(memberAdapter, request));
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<Page<CategoryListResponse>> categoryList(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(
+                scheduleService.categoryList(memberAdapter, pageable));
     }
 
     @PostMapping
