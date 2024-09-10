@@ -25,10 +25,15 @@ import com.sj.Petory.exception.ScheduleException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +52,7 @@ public class ScheduleService {
 
         Member member = getMember(memberAdapter);
 
-        scheduleCategoryRepository.findByCategoryName(request.getName())
+        scheduleCategoryRepository.findByCategoryNameAndMember(request.getName(), member)
                 .ifPresent(scheduleCategory -> {
                     throw new ScheduleException(ErrorCode.DUPLICATED_CATEGORY_NAME);
                 });
@@ -55,6 +60,15 @@ public class ScheduleService {
         scheduleCategoryRepository.save(request.toEntity(member));
 
         return true;
+    }
+
+    public Page<CategoryListResponse> categoryList(
+            final MemberAdapter memberAdapter, final Pageable pageable) {
+
+        Member member = getMember(memberAdapter);
+
+        return scheduleCategoryRepository.findByMember(member, pageable)
+                .map(ScheduleCategory::toDto);
     }
 
     private Member getMemberByEmail(String email) {
@@ -112,29 +126,40 @@ public class ScheduleService {
 
         Member member = getMember(memberAdapter);
 
+
         //로그인 한 사용자가 만든 일정
-        Page<ScheduleListResponse> scheduleListResponses =
+        List<ScheduleListResponse> scheduleListResponse =
                 scheduleRepository.findByMember(member, pageable)
-                        .map(Schedule::toDto);
+                        .map(schedule -> {
+//                            if (!ObjectUtils.isEmpty(schedule)) {
+                                List<PetSchedule> scheduleList =
+                                        petScheduleRepository.findBySchedule(schedule);
+                                return schedule.toDto(scheduleList);
+//                            }
+//                            return null;
+                        })
+                        .stream().toList();
 
         //로그인 한 사용자가 돌보미로 등록된 일정
         // 1. 돌보미에서 로그인한 사용자가 돌보는 동물을 찾고(돌보미 테이블)
         // 2. 해당 반려동물들로 일정을 찾고(반려동물 일정테이블)
         // 3. dto 타입으로 반환
 
-        return careGiverRepository.findByMember(member, pageable)
-                .map(careGiver ->
-                        (ScheduleListResponse) petScheduleRepository.findByPet(careGiver.getPet())
-                                .stream().map(PetSchedule::toDto)
-                );
-    }
+        List<ScheduleListResponse> careGiverScheduleList =
+                careGiverRepository.findByMember(member, pageable)
+                        .map(careGiver ->
+                        {
+                            List<PetSchedule> petScheduleList = petScheduleRepository.findByPet(careGiver.getPet());
+                            if (petScheduleList.size() != 0) {
+                                return PetSchedule.toDto(petScheduleList);
+                            }
+                            return null;
+                        }).stream().toList();
 
-    public Page<CategoryListResponse> categoryList(
-            final MemberAdapter memberAdapter, final Pageable pageable) {
-
-        Member member = getMember(memberAdapter);
-
-        return scheduleCategoryRepository.findByMember(member, pageable)
-                .map(ScheduleCategory::toDto);
+        // 자기의 펫이지만 돌보미로 등로된 사용자가 만든 일정은 안 뜬다.
+        return new PageImpl<>(
+                Stream.of(scheduleListResponse, careGiverScheduleList)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList()));
     }
 }

@@ -17,6 +17,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -79,15 +82,25 @@ public class Schedule {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public ScheduleListResponse toDto() {
+    public ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
+        Schedule scheduleEntity = this;
+
+        Set<Long> petIds = petScheduleList.stream()
+                .map(petSchedule -> petSchedule.getPet().getPetId())
+                .collect(Collectors.toSet());
+
+        Set<String> petNames = petScheduleList.stream()
+                .map(petSchedule -> petSchedule.getPet().getPetName())
+                .collect(Collectors.toSet());
+
         return ScheduleListResponse.builder()
-                .scheduleId(this.getScheduleId())
-                .title(this.getScheduleTitle())
-                .scheduleAt(this.getScheduleAt())
-                .priority(this.getPriority())
-                .status(this.getStatus())
-//                .petId(pet)
-//                .petName()
+                .scheduleId(scheduleEntity.getScheduleId())
+                .title(scheduleEntity.getScheduleTitle())
+                .scheduleAt(scheduleEntity.getScheduleAt())
+                .priority(scheduleEntity.getPriority())
+                .status(scheduleEntity.getStatus())
+                .petId(petIds)
+                .petName(petNames)
                 .build();
     }
 }

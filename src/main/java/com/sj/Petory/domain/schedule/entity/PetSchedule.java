@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Entity
 @Getter
 @Builder
@@ -29,8 +33,16 @@ public class PetSchedule {
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
-    public ScheduleListResponse toDto() {
-        Schedule scheduleEntity = this.schedule;
+    public static ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
+        Schedule scheduleEntity = petScheduleList.get(0).getSchedule();
+
+        Set<Long> petIds = petScheduleList.stream()
+                .map(petSchedule -> petSchedule.getPet().getPetId())
+                .collect(Collectors.toSet());
+
+        Set<String> petNames = petScheduleList.stream()
+                .map(petSchedule -> petSchedule.getPet().getPetName())
+                .collect(Collectors.toSet());
 
         return ScheduleListResponse.builder()
                 .scheduleId(scheduleEntity.getScheduleId())
@@ -38,8 +50,8 @@ public class PetSchedule {
                 .scheduleAt(scheduleEntity.getScheduleAt())
                 .priority(scheduleEntity.getPriority())
                 .status(scheduleEntity.getStatus())
-//                .petId(pet)
-//                .petName()
+                .petId(petIds)
+                .petName(petNames)
                 .build();
     }
 }
