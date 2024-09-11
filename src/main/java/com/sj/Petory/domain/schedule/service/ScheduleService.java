@@ -132,9 +132,9 @@ public class ScheduleService {
                 scheduleRepository.findByMember(member, pageable)
                         .map(schedule -> {
 //                            if (!ObjectUtils.isEmpty(schedule)) {
-                                List<PetSchedule> scheduleList =
-                                        petScheduleRepository.findBySchedule(schedule);
-                                return schedule.toDto(scheduleList);
+                            List<PetSchedule> scheduleList =
+                                    petScheduleRepository.findBySchedule(schedule);
+                            return schedule.toDto(scheduleList);
 //                            }
 //                            return null;
                         })
@@ -149,7 +149,8 @@ public class ScheduleService {
                 careGiverRepository.findByMember(member, pageable)
                         .map(careGiver ->
                         {
-                            List<PetSchedule> petScheduleList = petScheduleRepository.findByPet(careGiver.getPet());
+                            List<PetSchedule> petScheduleList =
+                                    petScheduleRepository.findByPet(careGiver.getPet());
                             if (petScheduleList.size() != 0) {
                                 return PetSchedule.toDto(petScheduleList);
                             }

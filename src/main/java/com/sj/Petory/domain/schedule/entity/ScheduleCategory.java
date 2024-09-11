@@ -30,7 +30,8 @@ public class ScheduleCategory {
     public CategoryListResponse toDto() {
 
         return CategoryListResponse.builder()
-                .name(categoryName)
+                .categoryId(this.categoryId)
+                .name(this.categoryName)
                 .build();
     }
 }
