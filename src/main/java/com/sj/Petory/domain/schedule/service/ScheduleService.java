@@ -18,6 +18,7 @@ import com.sj.Petory.domain.schedule.repository.CustomRepeatPatternRepository;
 import com.sj.Petory.domain.schedule.repository.PetScheduleRepository;
 import com.sj.Petory.domain.schedule.repository.ScheduleCategoryRepository;
 import com.sj.Petory.domain.schedule.repository.ScheduleRepository;
+import com.sj.Petory.domain.schedule.type.RepeatType;
 import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
@@ -107,11 +108,12 @@ public class ScheduleService {
                                 .schedule(saveSchedule)
                                 .build()));
 
-        CustomRepeatPattern customRepeatPattern =
-                request.toCustomRepeatEntity(saveSchedule);
+        if (request.getRepeatType().equals(RepeatType.CUSTOM)) {
+            CustomRepeatPattern customRepeatPattern =
+                    request.toCustomRepeatEntity(saveSchedule);
 
-
-        customRepeatPatternRepository.save(customRepeatPattern);
+            customRepeatPatternRepository.save(customRepeatPattern);
+        }
 
         return true;
     }
