@@ -32,27 +32,5 @@ public class PetSchedule {
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
-
-    public static ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
-        Schedule scheduleEntity = petScheduleList.get(0).getSchedule();
-
-        Set<Long> petIds = petScheduleList.stream()
-                .map(petSchedule -> petSchedule.getPet().getPetId())
-                .collect(Collectors.toSet());
-
-        Set<String> petNames = petScheduleList.stream()
-                .map(petSchedule -> petSchedule.getPet().getPetName())
-                .collect(Collectors.toSet());
-
-        return ScheduleListResponse.builder()
-                .scheduleId(scheduleEntity.getScheduleId())
-                .title(scheduleEntity.getScheduleTitle())
-                .scheduleAt(scheduleEntity.getScheduleAt())
-                .priority(scheduleEntity.getPriority())
-                .status(scheduleEntity.getStatus())
-                .petId(petIds)
-                .petName(petNames)
-                .build();
-    }
 }
 

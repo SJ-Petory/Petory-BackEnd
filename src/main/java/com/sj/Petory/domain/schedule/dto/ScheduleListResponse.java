@@ -20,6 +20,6 @@ public class ScheduleListResponse {
     private LocalDateTime scheduleAt;
     private PriorityType priority;
     private ScheduleStatus status;
-    private Set<Long> petId;
-    private Set<String> petName;
+    private List<Long> petId;
+    private List<String> petName;
 }

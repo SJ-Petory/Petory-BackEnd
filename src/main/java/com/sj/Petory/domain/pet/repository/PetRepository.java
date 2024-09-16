@@ -6,8 +6,11 @@ import com.sj.Petory.domain.pet.type.PetStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +20,11 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     Optional<Pet> findByPetIdAndMember(long petId, Member member);
 
     boolean existsByPetIdAndMember(Long petId, Member member);
+
+//    Page<Pet> findByMember(Member member, Pageable pageable);
+
+    List<Pet> findByMember(Member member);
+    @Query("select p.pet_id from pet " +
+            "where p.member.id = :memberId")
+    List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
 }

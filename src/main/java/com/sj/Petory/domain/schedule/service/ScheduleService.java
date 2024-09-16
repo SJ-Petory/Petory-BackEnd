@@ -31,8 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -128,41 +127,38 @@ public class ScheduleService {
 
         Member member = getMember(memberAdapter);
 
+        //로그인 한 사용자의 펫이 있는 일정 아이디
+        List<Long> userPetSchedules =
+                petRepository.findPetIdsByMember(member.getMemberId())
+                        .stream()
+                        .flatMap(petId -> petScheduleRepository.findScheduleIdByPet(petId).stream())
+                        .toList();
 
-        //로그인 한 사용자가 만든 일정
-        List<ScheduleListResponse> scheduleListResponse =
-                scheduleRepository.findByMember(member, pageable)
-                        .map(schedule -> {
-//                            if (!ObjectUtils.isEmpty(schedule)) {
-                            List<PetSchedule> scheduleList =
-                                    petScheduleRepository.findBySchedule(schedule);
-                            return schedule.toDto(scheduleList);
-//                            }
-//                            return null;
-                        })
-                        .stream().toList();
 
-        //로그인 한 사용자가 돌보미로 등록된 일정
-        // 1. 돌보미에서 로그인한 사용자가 돌보는 동물을 찾고(돌보미 테이블)
-        // 2. 해당 반려동물들로 일정을 찾고(반려동물 일정테이블)
-        // 3. dto 타입으로 반환
+        //로그인 한 사용자가 돌보미인 펫의 일정 아이디
+        List<Long> careGiverPetSchedules =
+                careGiverRepository.findPetIdsByMember(member.getMemberId())
+                        .stream()
+                        .flatMap(petId -> petScheduleRepository.findScheduleIdByPet(petId).stream())
+                        .toList();
 
-        List<ScheduleListResponse> careGiverScheduleList =
-                careGiverRepository.findByMember(member, pageable)
-                        .map(careGiver ->
-                        {
-                            List<PetSchedule> petScheduleList =
-                                    petScheduleRepository.findByPet(careGiver.getPet());
-                            if (petScheduleList.size() != 0) {
-                                return PetSchedule.toDto(petScheduleList);
-                            }
-                            return null;
-                        }).stream().toList();
+        // Set으로 합치기
+        Set<Long> scheduleIds = new HashSet<>();
+        scheduleIds.addAll(userPetSchedules);
+        scheduleIds.addAll(careGiverPetSchedules);
+
+        //Set을 Page<dto> 형태로 변환
+        // set<scheduleId>를 -> list<dto>
+        List<ScheduleListResponse> scheduleListResponseList =
+                scheduleIds.stream().map(id ->
+                {
+                    Optional<Schedule> schedule = scheduleRepository.findById(id);
+                    List<PetSchedule> petSchedules = petScheduleRepository.findBySchedule(schedule.get());
+                    return schedule.get().toDto(petSchedules);
+                }).toList();
+
 
         // 자기의 펫이지만 돌보미로 등로된 사용자가 만든 일정은 안 뜬다.
-        return new PageImpl<>(
-                Stream.of(scheduleListResponse, careGiverScheduleList)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList()));
+        return new PageImpl<>(scheduleListResponseList, pageable, scheduleListResponseList.size());
     }
 }
