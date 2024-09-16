@@ -85,13 +85,13 @@ public class Schedule {
     public ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
         Schedule scheduleEntity = this;
 
-        Set<Long> petIds = petScheduleList.stream()
+        List<Long> petIds = petScheduleList.stream()
                 .map(petSchedule -> petSchedule.getPet().getPetId())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        Set<String> petNames = petScheduleList.stream()
+        List<String> petNames = petScheduleList.stream()
                 .map(petSchedule -> petSchedule.getPet().getPetName())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return ScheduleListResponse.builder()
                 .scheduleId(scheduleEntity.getScheduleId())

@@ -6,6 +6,8 @@ import com.sj.Petory.domain.pet.entity.Pet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +20,8 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     Page<CareGiver> findByMember(Member member, Pageable pageable);
 
     boolean existsByPetAndMember(Pet pet, Member member);
+
+    @Query("select cg.pet.id from CareGiver cg" +
+            " where cg.member.id = :memberId")
+    List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
 }
