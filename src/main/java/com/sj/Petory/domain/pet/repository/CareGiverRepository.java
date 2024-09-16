@@ -21,7 +21,7 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
 
     boolean existsByPetAndMember(Pet pet, Member member);
 
-    @Query("select cg.pet.id from caregiver cg" +
-            "where cg.member.id = :memberId")
+    @Query("select cg.pet.id from CareGiver cg" +
+            " where cg.member.id = :memberId")
     List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
 }

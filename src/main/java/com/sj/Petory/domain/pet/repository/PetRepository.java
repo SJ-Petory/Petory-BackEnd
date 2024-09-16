@@ -24,7 +24,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 //    Page<Pet> findByMember(Member member, Pageable pageable);
 
     List<Pet> findByMember(Member member);
-    @Query("select p.pet_id from pet " +
-            "where p.member.id = :memberId")
+    @Query("select p.petId from Pet p" +
+            " where p.member.id = :memberId")
     List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
 }
