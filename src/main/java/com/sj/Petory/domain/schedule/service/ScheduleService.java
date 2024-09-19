@@ -3,6 +3,7 @@ package com.sj.Petory.domain.schedule.service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.pet.entity.CareGiver;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
@@ -127,6 +128,14 @@ public class ScheduleService {
 
         Member member = getMember(memberAdapter);
 
+        //로그인한 사용자의 펫 List
+        List<Pet> myPetList = petRepository.findByMember(member);
+        // 돌보미 펫 List
+        List<Pet> careGiverPetList =
+                careGiverRepository.findByMember(member).stream()
+                        .flatMap(cg -> petRepository.findByPetId(cg.getPet().getPetId()).stream())
+                        .toList();
+
         //로그인 한 사용자의 펫이 있는 일정 아이디
         List<Long> userPetSchedules =
                 petRepository.findPetIdsByMember(member.getMemberId())
@@ -150,11 +159,23 @@ public class ScheduleService {
         //Set을 Page<dto> 형태로 변환
         // set<scheduleId>를 -> list<dto>
         List<ScheduleListResponse> scheduleListResponseList =
-                scheduleIds.stream().map(id ->
+                scheduleIds.stream().map(id -> // 일정 하나당 실행
                 {
                     Optional<Schedule> schedule = scheduleRepository.findById(id);
                     List<PetSchedule> petSchedules = petScheduleRepository.findBySchedule(schedule.get());
-                    return schedule.get().toDto(petSchedules);
+
+                    List<Long> petIds = petSchedules.stream()
+                            .filter(ps -> myPetList.contains(ps.getPet())
+                                    || careGiverPetList.contains(ps.getPet()))
+                            .map(ps -> ps.getPet().getPetId())
+                            .toList();
+                    List<String> petNames = petSchedules.stream()
+                            .filter(ps -> myPetList.contains(ps.getPet())
+                                    || careGiverPetList.contains(ps.getPet()))
+                            .map(ps -> ps.getPet().getPetName())
+                            .toList();
+                    //petSchedule을 Set으로 바꾸고 findBy를 뭐 어케 조건을 걸어서 member caregiver인지
+                    return schedule.get().toDto(petSchedules, petIds, petNames);
                 }).toList();
 
 

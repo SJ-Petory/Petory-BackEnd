@@ -82,16 +82,9 @@ public class Schedule {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public ScheduleListResponse toDto(List<PetSchedule> petScheduleList) {
+    public ScheduleListResponse toDto(List<PetSchedule> petScheduleList
+            , List<Long> petIds, List<String> petNames) {
         Schedule scheduleEntity = this;
-
-        List<Long> petIds = petScheduleList.stream()
-                .map(petSchedule -> petSchedule.getPet().getPetId())
-                .collect(Collectors.toList());
-
-        List<String> petNames = petScheduleList.stream()
-                .map(petSchedule -> petSchedule.getPet().getPetName())
-                .collect(Collectors.toList());
 
         return ScheduleListResponse.builder()
                 .scheduleId(scheduleEntity.getScheduleId())
