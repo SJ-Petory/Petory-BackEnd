@@ -3,14 +3,10 @@ package com.sj.Petory.domain.schedule.service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
-import com.sj.Petory.domain.pet.entity.CareGiver;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
-import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
-import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
-import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
-import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
+import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.entity.CustomRepeatPattern;
 import com.sj.Petory.domain.schedule.entity.PetSchedule;
 import com.sj.Petory.domain.schedule.entity.Schedule;
@@ -30,11 +26,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -175,11 +171,39 @@ public class ScheduleService {
                             .map(ps -> ps.getPet().getPetName())
                             .toList();
                     //petSchedule을 Set으로 바꾸고 findBy를 뭐 어케 조건을 걸어서 member caregiver인지
-                    return schedule.get().toDto(petSchedules, petIds, petNames);
+                    return schedule.get().toListDto(petSchedules, petIds, petNames);
                 }).toList();
 
 
         // 자기의 펫이지만 돌보미로 등로된 사용자가 만든 일정은 안 뜬다.
         return new PageImpl<>(scheduleListResponseList, pageable, scheduleListResponseList.size());
+    }
+
+    public ScheduleDetailResponse scheduleDetail(
+            final MemberAdapter memberAdapter, final Long scheduleId) {
+
+        Member member = getMember(memberAdapter);
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        List<Long> petIds =
+                petScheduleRepository.findPetIdsBySchedule(schedule);
+
+        List<String> petNames =
+                petScheduleRepository.findByPetNamesBySchedule(schedule);
+
+        ScheduleDetailResponse scheduleDetailResponse =
+                schedule.toDetailDto(petIds, petNames);
+
+        if (schedule.getRepeatType().equals(RepeatType.CUSTOM)) {
+
+
+            CustomRepeatPattern customRepeatPattern = customRepeatPatternRepository.findBySchedule(schedule)
+                    .orElseThrow(() -> new ScheduleException(ErrorCode.CUSTOM_PATTERN_NOT_FOUND));
+
+            scheduleDetailResponse.customRepeatRes(customRepeatPattern);
+        }
+        return scheduleDetailResponse;
     }
 }
