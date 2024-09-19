@@ -1,10 +1,7 @@
 package com.sj.Petory.domain.schedule.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
-import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
-import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
-import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
-import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
+import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,5 +51,14 @@ public class ScheduleController {
 
         return ResponseEntity.ok(
                 scheduleService.scheduleList(memberAdapter, pageable));
+    }
+
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleDetailResponse> scheduleDetail(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("scheduleId") Long scheduleId) {
+
+        return ResponseEntity.ok(
+                scheduleService.scheduleDetail(memberAdapter, scheduleId));
     }
 }

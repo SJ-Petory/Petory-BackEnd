@@ -1,6 +1,8 @@
 package com.sj.Petory.domain.schedule.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.schedule.dto.CustomRepeatResponse;
+import com.sj.Petory.domain.schedule.dto.ScheduleDetailResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import com.sj.Petory.domain.schedule.type.PriorityType;
 import com.sj.Petory.domain.schedule.type.RepeatCycle;
@@ -11,15 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -82,7 +81,7 @@ public class Schedule {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public ScheduleListResponse toDto(List<PetSchedule> petScheduleList
+    public ScheduleListResponse toListDto(List<PetSchedule> petScheduleList
             , List<Long> petIds, List<String> petNames) {
         Schedule scheduleEntity = this;
 
@@ -92,6 +91,28 @@ public class Schedule {
                 .scheduleAt(scheduleEntity.getScheduleAt())
                 .priority(scheduleEntity.getPriority())
                 .status(scheduleEntity.getStatus())
+                .petId(petIds)
+                .petName(petNames)
+                .build();
+    }
+
+    public ScheduleDetailResponse toDetailDto(
+            List<Long> petIds, List<String> petNames
+    ) {
+
+        return ScheduleDetailResponse.builder()
+                .categoryId(this.getScheduleCategory().getCategoryId())
+                .categoryName(this.getScheduleCategory().getCategoryName())
+                .scheduleId(this.getScheduleId())
+                .title(this.getScheduleTitle())
+                .content(this.getScheduleContent())
+                .scheduleAt(this.getScheduleAt())
+                .repeatType(this.getRepeatType())
+                .repeatCycle(this.getRepeatCycle())
+                .noticeYn(this.isNoticeYn())
+                .noticeAt(this.getNoticeAt())
+                .priority(this.getPriority())
+                .status(this.getStatus())
                 .petId(petIds)
                 .petName(petNames)
                 .build();

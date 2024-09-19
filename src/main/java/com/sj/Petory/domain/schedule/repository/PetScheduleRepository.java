@@ -19,4 +19,12 @@ public interface PetScheduleRepository extends JpaRepository<PetSchedule, Long> 
     @Query("select ps.schedule.id from PetSchedule ps " +
             " where ps.pet.id = :petId ")
     List<Long> findScheduleIdByPet(@Param("petId") Long petId);
+
+    @Query("select ps.pet.petId from PetSchedule ps " +
+            " where ps.schedule = :schedule")
+    List<Long> findPetIdsBySchedule(@Param("schedule") Schedule schedule);
+
+    @Query("select ps.pet.petName from PetSchedule ps " +
+            " where ps.schedule = :schedule")
+    List<String> findByPetNamesBySchedule(@Param("schedule") Schedule schedule);
 }
