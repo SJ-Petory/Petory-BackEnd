@@ -39,7 +39,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+    //es
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     //restDocs
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     //openAPI3
