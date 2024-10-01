@@ -20,6 +20,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<Boolean> signUp(
             @RequestBody @Valid SignUp.Request request) {
+
         return ResponseEntity.ok(
                 memberService.signUp(request));
     }

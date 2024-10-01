@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "memberId": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "member_search_analyzer"
+    },
+    "email": {
+      "type": "text",
+      "analyzer": "member_search_analyzer"
+    },
+    "image": {
+      "type": "text"
+    }
+  }
+}
