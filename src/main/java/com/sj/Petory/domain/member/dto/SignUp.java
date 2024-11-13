@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.dto;
 
+import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.type.MemberStatus;
 import jakarta.validation.constraints.Email;
@@ -35,6 +36,16 @@ public class SignUp {
                     .password(this.password)
                     .phone(this.phone)
                     .status(MemberStatus.ACTIVE)
+                    .build();
+        }
+
+        public MemberDocument toDocument(Member member) {
+
+            return MemberDocument.builder()
+                    .memberId(member.getMemberId())
+                    .name(member.getName())
+                    .email(member.getEmail())
+                    .image(member.getImage())
                     .build();
         }
     }

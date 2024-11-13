@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.friend.service;
 
+import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.domain.friend.dto.FriendDetailResponse;
 import com.sj.Petory.domain.friend.dto.FriendListResponse;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
@@ -10,6 +11,7 @@ import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
@@ -35,20 +37,14 @@ public class FriendService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final CareGiverRepository careGiverRepository;
-//    public Page<MemberDocument> searchMember(
-//            final String keyword, final Pageable pageable) {
-//
-//        return memberElasticsearchRepository.findByName(keyword, pageable);
-//    }
+    private final MemberEsRepository memberEsRepository;
+
 
     public Page<MemberSearchResponse> searchMember(
-            final MemberAdapter memberAdapter
-            , final String keyword, final Pageable pageable) {
+            final String keyword, final Pageable pageable) {
 
-        getMemberByEmail(memberAdapter.getEmail());
-
-        return memberRepository.findByNameOrEmail(keyword, keyword, pageable)
-                .map(Member::toDto);
+        return memberEsRepository.findByNameOrEmail(keyword, keyword, pageable)
+                .map(MemberDocument::toDto);
     }
 
     public Boolean friendRequest(

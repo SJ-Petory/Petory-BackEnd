@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.service;
 
+import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
@@ -32,7 +33,7 @@ public class MemberService {
     private final SpeciesRepository speciesRepository;
     private final BreedRepository breedRepository;
 
-//    private final MemberElasticsearchRepository memberElasticsearchRepository;
+    private final MemberEsRepository memberEsRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -48,7 +49,7 @@ public class MemberService {
                 passwordEncoder.encode(request.getPassword()));
 
         Member member = memberRepository.save(request.toEntity());
-//        memberElasticsearchRepository.save(request.toDocument(member));
+        memberEsRepository.save(request.toDocument(member));
 
         return true;
     }
