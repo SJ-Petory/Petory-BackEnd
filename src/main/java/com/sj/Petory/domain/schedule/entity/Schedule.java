@@ -4,18 +4,23 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.schedule.dto.CustomRepeatResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleDetailResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
+import com.sj.Petory.domain.schedule.dto.ScheduleUpdateRequest;
 import com.sj.Petory.domain.schedule.type.PriorityType;
 import com.sj.Petory.domain.schedule.type.RepeatCycle;
 import com.sj.Petory.domain.schedule.type.RepeatType;
 import com.sj.Petory.domain.schedule.type.ScheduleStatus;
+import jakarta.json.Json;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +31,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class Schedule {
 
     @Id
@@ -49,13 +55,12 @@ public class Schedule {
     @Column(name = "schedule_at")
     private LocalDateTime scheduleAt;
 
-    @Column(name = "repeat_type")
+    @Column(name = "repeat_yn")
     @Enumerated(EnumType.STRING)
-    private RepeatType repeatType;
+    private boolean repeatYn;
 
-    @Column(name = "repeat_cycle")
-    @Enumerated(EnumType.STRING)
-    private RepeatCycle repeatCycle;
+    @Column(name = "selected_dates")
+    private String selectedDates;
 
     @Column(name = "notice_yn")
     private boolean noticeYn;
@@ -107,8 +112,7 @@ public class Schedule {
                 .title(this.getScheduleTitle())
                 .content(this.getScheduleContent())
                 .scheduleAt(this.getScheduleAt())
-                .repeatType(this.getRepeatType())
-                .repeatCycle(this.getRepeatCycle())
+                .repeatYn(this.isRepeatYn())
                 .noticeYn(this.isNoticeYn())
                 .noticeAt(this.getNoticeAt())
                 .priority(this.getPriority())
@@ -116,5 +120,33 @@ public class Schedule {
                 .petId(petIds)
                 .petName(petNames)
                 .build();
+    }
+
+    public void updateSchedule(ScheduleCategory category, ScheduleUpdateRequest request) {
+        if (!ObjectUtils.isEmpty(category)) {
+            this.scheduleCategory = category;
+        }
+        if (StringUtils.hasText(request.getTitle())) {
+            this.scheduleTitle = request.getTitle();
+        }
+        if (StringUtils.hasText(request.getContent())) {
+            this.scheduleContent = request.getContent();
+        }
+        if (!ObjectUtils.isEmpty(request.getScheduleAt())) {
+            this.scheduleAt = request.getScheduleAt();
+        }
+        if (StringUtils.hasText(String.valueOf(request.isRepeatYn()))) {
+            this.repeatYn = request.isRepeatYn();
+        }
+
+        if (!ObjectUtils.isEmpty(request.isNoticeYn())) {
+            this.noticeYn = request.isNoticeYn();
+        }
+        if (!ObjectUtils.isEmpty(request.getNoticeAt())) {
+            this.noticeAt = request.getNoticeAt();
+        }
+        if (StringUtils.hasText(String.valueOf(request.getPriority()))) {
+            this.priority = request.getPriority();
+        }
     }
 }

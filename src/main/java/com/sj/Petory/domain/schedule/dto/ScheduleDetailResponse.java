@@ -24,8 +24,8 @@ public class ScheduleDetailResponse {
     private String content;
     private LocalDateTime scheduleAt;
 
-    private RepeatType repeatType;
-    private RepeatCycle repeatCycle;
+    private boolean repeatYn;
+    private String scheduleDates;
     private CustomRepeatResponse customRepeat;
 
     private boolean noticeYn;

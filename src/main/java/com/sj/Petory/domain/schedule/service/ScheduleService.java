@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -197,13 +198,40 @@ public class ScheduleService {
                 schedule.toDetailDto(petIds, petNames);
 
         if (schedule.getRepeatType().equals(RepeatType.CUSTOM)) {
-
-
             CustomRepeatPattern customRepeatPattern = customRepeatPatternRepository.findBySchedule(schedule)
                     .orElseThrow(() -> new ScheduleException(ErrorCode.CUSTOM_PATTERN_NOT_FOUND));
 
             scheduleDetailResponse.customRepeatRes(customRepeatPattern);
         }
         return scheduleDetailResponse;
+    }
+
+    @Transactional
+    public boolean scheduleUpdate(
+            final MemberAdapter memberAdapter, final Long scheduleId, final ScheduleUpdateRequest request) {
+
+        Member member = getMember(memberAdapter);
+
+        if (!scheduleRepository.existsByScheduleIdAndMember(scheduleId, member) &&
+                scheduleRepository.findCareGiver(scheduleId).contains(member.getMemberId())) {
+            throw new ScheduleException(ErrorCode.UPDATE_ONLY_OWN_SCHEDULE_ALLOWED);
+        }
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        List<PetSchedule> petSchedules = petScheduleRepository.findBySchedule(schedule);
+
+        ScheduleCategory category = scheduleCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        //schedule에서 변경된 사항 ,, 변경
+        //petSchedule에서 변경된 사항., 변경
+        //customRepeatPattern에서 변경된 사항 ,, 변경
+        //customPattern은 일정이 변경 된다음에 들어가야함.
+        schedule.updateSchedule(category, request);
+//        petSchedules.updateSchedule(request);
+
+        return true;
     }
 }
