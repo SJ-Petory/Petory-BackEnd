@@ -16,13 +16,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "customrepeatpattern")
-public class CustomRepeatPattern {
+@Table(name = "repeatpattern")
+public class RepeatPattern {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "custom_repeat_id")
-    private Long customRepeatId;
+    @Column(name = "repeat_pattern_id")
+    private Long repeatPatternId;
 
     @OneToOne
     @JoinColumn(name = "schedule_id")
@@ -31,18 +31,22 @@ public class CustomRepeatPattern {
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
 
+    @Column(name = "repeat_interval")
     private Long repeatInterval;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(targetClass = DayOfWeek.class)
-    @CollectionTable(name = "custom_repeat_days_of_week", joinColumns = @JoinColumn(name = "custom_repeat_id"))
+    @CollectionTable(name = "repeat_days_of_week", joinColumns = @JoinColumn(name = "repeat_pattern_id"))
     @Column(name = "day_of_week")
     private Set<DayOfWeek> daysOfWeek;
 
     @ElementCollection
-    @CollectionTable(name = "custom_repeat_days_of_month", joinColumns = @JoinColumn(name = "custom_repeat_id"))
+    @CollectionTable(name = "repeat_days_of_month", joinColumns = @JoinColumn(name = "repeat_pattern_id"))
     @Column(name = "day_of_month")
     private Set<Integer> daysOfMonth;
+
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
     private LocalDateTime endDate;

@@ -1,7 +1,5 @@
 package com.sj.Petory.domain.schedule.entity;
 
-import com.sj.Petory.domain.pet.entity.Pet;
-import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,30 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "petschedule")
 @DynamicUpdate
-public class PetSchedule {
+@Table(name = "selectdate")
+public class SelectDate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pet_schedule_id")
-    private Long petScheduleId;
-
-    @ManyToOne
-    @JoinColumn(name = "pet_id")
-    private Pet pet;
+    private long select_id;
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
-}
 
+    @Column(name = "selected_date")
+    private LocalDateTime selectedDate;
+}
