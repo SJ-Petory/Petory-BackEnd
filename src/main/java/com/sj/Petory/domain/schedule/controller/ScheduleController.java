@@ -44,21 +44,31 @@ public class ScheduleController {
                 scheduleService.createSchedule(memberAdapter, request));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<ScheduleListResponse>> scheduleList(
-            @AuthenticationPrincipal MemberAdapter memberAdapter
-            , Pageable pageable) {
-
-        return ResponseEntity.ok(
-                scheduleService.scheduleList(memberAdapter, pageable));
-    }
-
-    @GetMapping("/{scheduleId}")
-    public ResponseEntity<ScheduleDetailResponse> scheduleDetail(
-            @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("scheduleId") Long scheduleId) {
-
-        return ResponseEntity.ok(
-                scheduleService.scheduleDetail(memberAdapter, scheduleId));
-    }
+//    @GetMapping
+//    public ResponseEntity<Page<ScheduleListResponse>> scheduleList(
+//            @AuthenticationPrincipal MemberAdapter memberAdapter
+//            , Pageable pageable) {
+//
+//        return ResponseEntity.ok(
+//                scheduleService.scheduleList(memberAdapter, pageable));
+//    }
+//
+//    @GetMapping("/{scheduleId}")
+//    public ResponseEntity<ScheduleDetailResponse> scheduleDetail(
+//            @AuthenticationPrincipal MemberAdapter memberAdapter
+//            , @PathVariable("scheduleId") Long scheduleId) {
+//
+//        return ResponseEntity.ok(
+//                scheduleService.scheduleDetail(memberAdapter, scheduleId));
+//    }
+//
+//    @PatchMapping("/{scheduleId}")
+//    public ResponseEntity<Boolean> scheduleUpdate(
+//            @AuthenticationPrincipal MemberAdapter memberAdapter
+//            , @PathVariable("scheduleId") Long scheduleId
+//            , @RequestBody ScheduleUpdateRequest request) {
+//
+//        return ResponseEntity.ok(
+//                scheduleService.scheduleUpdate(memberAdapter, scheduleId, request));
+//    }
 }

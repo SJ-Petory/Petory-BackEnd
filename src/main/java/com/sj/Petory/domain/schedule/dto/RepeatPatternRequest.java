@@ -1,6 +1,5 @@
 package com.sj.Petory.domain.schedule.dto;
 
-import com.sj.Petory.domain.schedule.entity.CustomRepeatPattern;
 import com.sj.Petory.domain.schedule.type.Frequency;
 import lombok.*;
 
@@ -13,7 +12,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomRepeatRequest {
+public class RepeatPatternRequest {
 
     private Frequency frequency;
 
@@ -21,5 +20,7 @@ public class CustomRepeatRequest {
 
     private Set<DayOfWeek> daysOfWeek;
     private Set<Integer> daysOfMonth;
-    private LocalDateTime endDate;
+
+    private String startDate;
+    private String endDate;
 }
