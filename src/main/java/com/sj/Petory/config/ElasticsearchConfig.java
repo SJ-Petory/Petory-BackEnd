@@ -24,15 +24,18 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
-        if (Objects.isNull(username) && Objects.isNull(password)) {
-            return ClientConfiguration.builder()
-                    .connectedTo(host)
-                    .build();
-        }
+//        if (Objects.isNull(username) && Objects.isNull(password)) {
+//            return ClientConfiguration.builder()
+//                    .connectedTo(host)
+//                    .build();
+//        }
 
+//        return ClientConfiguration.builder()
+//                .connectedTo(host)
+//                .withBasicAuth(username, password)
+//                .build();
         return ClientConfiguration.builder()
                 .connectedTo(host)
-                .withBasicAuth(username, password)
                 .build();
     }
 }
