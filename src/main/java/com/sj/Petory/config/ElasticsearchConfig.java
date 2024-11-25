@@ -13,8 +13,11 @@ import java.util.Objects;
 @EnableElasticsearchRepositories
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
-    @Value("${spring.data.elasticsearch.host}")
+    @Value("${spring.data.elasticsearch.host:#{null}}")
     private String host;
+
+    @Value("${spring.data.elasticsearch.uris:#{null}}")
+    private String uris;
 
     @Value("${spring.data.elasticsearch.username:#{null}}")
     private String username;
@@ -24,18 +27,21 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
-//        if (Objects.isNull(username) && Objects.isNull(password)) {
+
+//        if (Objects.isNull(host)) {
 //            return ClientConfiguration.builder()
-//                    .connectedTo(host)
+//                    .connectedTo(uris)
+//                    .usingSsl()
+//                    .withBasicAuth(username, password)
 //                    .build();
 //        }
-
 //        return ClientConfiguration.builder()
 //                .connectedTo(host)
-//                .withBasicAuth(username, password)
 //                .build();
         return ClientConfiguration.builder()
-                .connectedTo(host)
+                .connectedTo(uris)
+                .usingSsl()
+                .withBasicAuth(username, password)
                 .build();
     }
 }
