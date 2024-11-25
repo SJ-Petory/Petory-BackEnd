@@ -16,7 +16,7 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.host:#{null}}")
     private String host;
 
-    @Value("${spring.data.elasticsearch.uris:#{null}}")
+    @Value("${spring.elasticsearch.uris:#{null}}")
     private String uris;
 
     @Value("${spring.data.elasticsearch.username:#{null}}")
