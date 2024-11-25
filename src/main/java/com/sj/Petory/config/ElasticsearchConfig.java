@@ -38,6 +38,7 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 //        return ClientConfiguration.builder()
 //                .connectedTo(host)
 //                .build();
+
         return ClientConfiguration.builder()
                 .connectedTo(uris)
                 .usingSsl()
