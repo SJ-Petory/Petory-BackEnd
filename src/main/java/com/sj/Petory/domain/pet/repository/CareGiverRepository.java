@@ -17,6 +17,15 @@ import java.util.Optional;
 public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     Optional<CareGiver> findByPetAndMember(Pet pet, Member member);
 
+    @Query("select case when exists (" +
+            "select 1 from CareGiver cg " +
+            "where cg.pet.petId = :petId and cg.member.memberId = :memberId) " +
+            "then true " +
+            "else false end")
+    boolean existsByPetIdAndMember(
+            @Param("petId")Long petId,
+            @Param("memberId")Long memberId);
+
     Page<CareGiver> findByMember(Member member, Pageable pageable);
 
     List<CareGiver> findByMember(Member member);

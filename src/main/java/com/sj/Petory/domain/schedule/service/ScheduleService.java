@@ -9,11 +9,11 @@ import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
 import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
+import com.sj.Petory.domain.schedule.entity.PetSchedule;
+import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
-import com.sj.Petory.domain.schedule.repository.RepeatPatternRepository;
-import com.sj.Petory.domain.schedule.repository.PetScheduleRepository;
-import com.sj.Petory.domain.schedule.repository.ScheduleCategoryRepository;
-import com.sj.Petory.domain.schedule.repository.ScheduleRepository;
+import com.sj.Petory.domain.schedule.entity.SelectDate;
+import com.sj.Petory.domain.schedule.repository.*;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.ScheduleException;
@@ -23,6 +23,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -30,15 +34,16 @@ public class ScheduleService {
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleCategoryRepository scheduleCategoryRepository;
-    private final RepeatPatternRepository customRepeatPatternRepository;
+    private final RepeatPatternRepository repeatPatternRepository;
     private final PetRepository petRepository;
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
+    private final SelectDateRepository selectDateRepository;
 
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
 
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByMemberAdapter(memberAdapter);
 
         scheduleCategoryRepository.findByCategoryNameAndMember(request.getName(), member)
                 .ifPresent(scheduleCategory -> {
@@ -53,7 +58,7 @@ public class ScheduleService {
     public Page<CategoryListResponse> categoryList(
             final MemberAdapter memberAdapter, final Pageable pageable) {
 
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByMemberAdapter(memberAdapter);
 
         return scheduleCategoryRepository.findByMember(member, pageable)
                 .map(ScheduleCategory::toDto);
@@ -63,9 +68,62 @@ public class ScheduleService {
             final MemberAdapter memberAdapter
             , final CreateScheduleRequest request) {
 
-        Member member = getMember(memberAdapter);
-        System.out.println("되냐 ?");
+        Member member = getMemberByMemberAdapter(memberAdapter);
+
+        validateMemberAndPet(request, member);
+
+        createScheduleForPet(request, member);
+
         return true;
+    }
+
+    private void createScheduleForPet(CreateScheduleRequest request, Member member) {
+        ScheduleCategory category = scheduleCategoryRepository.findByCategoryIdAndMember(
+                        request.getCategoryId(), member)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        Schedule schedule = scheduleRepository.save(
+                request.toScheduleEntity(member, category));
+
+        if (request.getRepeatYn()) {
+
+            repeatPatternRepository.save(
+                    request.toRepeatPatternEntity(schedule)
+            );
+        }
+        if (!request.getRepeatYn()) {
+            List<SelectDate> dates = request.getSelectedDates().stream()
+                    .map(datestr -> {
+                        SelectDate selectDate = new SelectDate();
+                        selectDate.setSchedule(schedule);
+                        selectDate.setSelectedDate(LocalDateTime.parse(datestr));
+                        return selectDate;
+                    }).toList();
+
+            schedule.setSelectedDates(dates);
+        }
+
+        List<PetSchedule> petScheduleList = request.getPetId().stream()
+                .map(petId -> petRepository.findByPetId(petId)
+                        .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND)))
+                .map(pet -> request.toPetScheduleEntity(pet, schedule))
+                .toList();
+
+
+        petScheduleRepository.saveAll(petScheduleList);
+    }
+
+    private void validateMemberAndPet(CreateScheduleRequest request, Member member) {
+
+        boolean allValid = request.getPetId()
+                .stream().allMatch(pet ->
+                        petRepository.existsByPetIdAndMember(pet, member) ||
+                                careGiverRepository.existsByPetIdAndMember(pet, member.getMemberId())
+                );
+
+        if (!allValid) {
+            throw new ScheduleException(ErrorCode.MEMBER_PET_UNMATCHED);
+        }
     }
 
     private Member getMemberByEmail(String email) {
@@ -73,7 +131,7 @@ public class ScheduleService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public Member getMember(final MemberAdapter memberAdapter) {
+    public Member getMemberByMemberAdapter(final MemberAdapter memberAdapter) {
 
         return getMemberByEmail(memberAdapter.getUsername());
     }

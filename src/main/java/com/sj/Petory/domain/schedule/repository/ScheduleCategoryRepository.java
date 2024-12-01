@@ -14,7 +14,7 @@ public interface ScheduleCategoryRepository extends JpaRepository<ScheduleCatego
 
     Optional<ScheduleCategory> findByCategoryNameAndMember(String name, Member member);
 
-    Optional<ScheduleCategory> findByCategoryId(Long id);
+    Optional<ScheduleCategory> findByCategoryIdAndMember(Long id, Member member);
 
     Page<ScheduleCategory> findByMember(Member member, Pageable pageable);
 }

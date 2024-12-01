@@ -50,4 +50,5 @@ public class RepeatPattern {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
 }

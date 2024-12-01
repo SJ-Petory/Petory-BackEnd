@@ -7,10 +7,7 @@ import com.sj.Petory.domain.schedule.dto.ScheduleUpdateRequest;
 import com.sj.Petory.domain.schedule.type.PriorityType;
 import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,6 +20,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -77,6 +75,7 @@ public class Schedule {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
 
     public ScheduleListResponse toListDto(List<PetSchedule> petScheduleList
             , List<Long> petIds, List<String> petNames) {

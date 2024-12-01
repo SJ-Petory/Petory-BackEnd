@@ -18,6 +18,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     Page<Pet> findByMemberAndStatus(Member member, PetStatus status, Pageable pageable);
 
     Optional<Pet> findByPetIdAndMember(long petId, Member member);
+    boolean existsByPetIdAndMember(long petId, Member member);
 
     boolean existsByPetIdAndMember(Long petId, Member member);
 
@@ -28,5 +29,5 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             " where p.member.id = :memberId")
     List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
 
-    List<Pet> findByPetId(Long petId);
+    Optional<Pet> findByPetId(Long petId);
 }
