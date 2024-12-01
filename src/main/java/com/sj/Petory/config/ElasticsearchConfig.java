@@ -6,6 +6,8 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+import java.util.Objects;
+
 @Configuration
 @EnableElasticsearchRepositories
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
@@ -49,12 +51,11 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
-//        if (Objects.isNull(username) && Objects.isNull(password)) {
-//            return ClientConfiguration.builder()
-//                    .connectedTo(host)
-//                    .build();
-//        }
-
+        if (Objects.isNull(username) && Objects.isNull(password)) {
+            return ClientConfiguration.builder()
+                    .connectedTo(uris)
+                    .build();
+        }
         return ClientConfiguration.builder()
                 .connectedTo(uris)
                 .usingSsl()
