@@ -16,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -45,6 +46,12 @@ public class Schedule {
 
     @Column(name = "schedule_content")
     private String scheduleContent;
+
+    @Column(name = "is_all_day")
+    private boolean isAllDay;
+
+    @Column(name = "schedule_at ")
+    private LocalTime scheduleAt;
 
     @Column(name = "repeat_yn")
     private boolean repeatYn;

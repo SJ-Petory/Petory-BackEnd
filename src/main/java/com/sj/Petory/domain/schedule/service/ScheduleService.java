@@ -84,6 +84,9 @@ public class ScheduleService {
 
         Schedule schedule = scheduleRepository.save(
                 request.toScheduleEntity(member, category));
+        if (!request.getIsAllDay()) {
+            schedule.setScheduleAt(request.getScheduleAt());
+        }
 
         if (request.getRepeatYn()) {
 
