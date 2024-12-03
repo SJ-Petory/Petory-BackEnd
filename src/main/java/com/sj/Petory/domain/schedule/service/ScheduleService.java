@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class ScheduleService {
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
     private final SelectDateRepository selectDateRepository;
+    private final ScheduleAtConverter scheduleAtConverter;
 
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
@@ -99,7 +101,9 @@ public class ScheduleService {
                     .map(datestr -> {
                         SelectDate selectDate = new SelectDate();
                         selectDate.setSchedule(schedule);
-                        selectDate.setSelectedDate(LocalDateTime.parse(datestr));
+                        selectDate.setSelectedDate(
+                                ScheduleAtConverter.convertToDateTime(
+                                        LocalDate.parse(datestr), schedule.getScheduleAt(), request.getIsAllDay()));
                         return selectDate;
                     }).toList();
 
