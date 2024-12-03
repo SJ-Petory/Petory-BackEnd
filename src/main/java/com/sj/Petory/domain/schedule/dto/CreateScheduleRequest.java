@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -24,6 +25,10 @@ public class CreateScheduleRequest {
     private long categoryId;
     private String title;
     private String content;
+
+    @NotNull
+    private Boolean isAllDay;
+    private LocalTime scheduleAt;
 
     @NotNull
     private Boolean repeatYn;
@@ -44,6 +49,7 @@ public class CreateScheduleRequest {
                 .member(member)
                 .scheduleTitle(this.getTitle())
                 .scheduleContent(this.getContent())
+                .isAllDay(this.getIsAllDay())
                 .repeatYn(this.getRepeatYn())
                 .noticeYn(this.isNoticeYn())
                 .noticeAt(this.getNoticeAt())

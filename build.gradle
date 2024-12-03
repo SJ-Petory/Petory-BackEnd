@@ -29,11 +29,11 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -44,7 +44,8 @@ dependencies {
     //restDocs
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     //openAPI3
-    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.4'// 0.16.4 -> 0.18.4
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.4'
+// 0.16.4 -> 0.18.4
     //swaggerUI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
