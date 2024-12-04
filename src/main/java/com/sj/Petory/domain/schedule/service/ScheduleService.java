@@ -199,7 +199,6 @@ public class ScheduleService {
                     }
                     start = start.plus(repeatPattern.getInterval(), ChronoUnit.WEEKS);
                 }
-                System.out.println(dateList);
             }
             case "MONTH" -> {
                 while (start.isBefore(end) || start.isEqual(end)) {
