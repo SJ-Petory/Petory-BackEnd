@@ -9,11 +9,13 @@ import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
 import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
 import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
+import com.sj.Petory.domain.schedule.dto.RepeatPatternRequest;
 import com.sj.Petory.domain.schedule.entity.PetSchedule;
 import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
 import com.sj.Petory.domain.schedule.entity.SelectDate;
 import com.sj.Petory.domain.schedule.repository.*;
+import com.sj.Petory.domain.schedule.type.Frequency;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.ScheduleException;
@@ -22,11 +24,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +74,7 @@ public class ScheduleService {
                 .map(ScheduleCategory::toDto);
     }
 
+    @Transactional
     public boolean createSchedule(
             final MemberAdapter memberAdapter
             , final CreateScheduleRequest request) {
@@ -86,29 +95,29 @@ public class ScheduleService {
 
         Schedule schedule = scheduleRepository.save(
                 request.toScheduleEntity(member, category));
+
         if (!request.getIsAllDay()) {
             schedule.setScheduleAt(request.getScheduleAt());
         }
+        List<SelectDate> dates = new ArrayList<>();
 
         if (request.getRepeatYn()) {
 
+            validateRepeatPattern(request.getRepeatPattern());
+
             repeatPatternRepository.save(
-                    request.toRepeatPatternEntity(schedule)
-            );
+                    request.toRepeatPatternEntity(schedule));
+
+            dates = createDateToRepeat(request.getRepeatPattern()).stream()
+                    .map(date -> toSelectDateEntity(schedule, date,
+                            schedule.getScheduleAt(), request.getIsAllDay())).toList();
         }
         if (!request.getRepeatYn()) {
-            List<SelectDate> dates = request.getSelectedDates().stream()
-                    .map(datestr -> {
-                        SelectDate selectDate = new SelectDate();
-                        selectDate.setSchedule(schedule);
-                        selectDate.setSelectedDate(
-                                ScheduleAtConverter.convertToDateTime(
-                                        LocalDate.parse(datestr), schedule.getScheduleAt(), request.getIsAllDay()));
-                        return selectDate;
-                    }).toList();
-
-            schedule.setSelectedDates(dates);
+            dates = request.getSelectedDates().stream()
+                    .map(datestr -> toSelectDateEntity(schedule, LocalDate.parse(datestr),
+                            schedule.getScheduleAt(), request.getIsAllDay())).toList();
         }
+        schedule.setSelectedDates(dates);
 
         List<PetSchedule> petScheduleList = request.getPetId().stream()
                 .map(petId -> petRepository.findByPetId(petId)
@@ -116,8 +125,103 @@ public class ScheduleService {
                 .map(pet -> request.toPetScheduleEntity(pet, schedule))
                 .toList();
 
-
         petScheduleRepository.saveAll(petScheduleList);
+    }
+
+    private void validateRepeatPattern(RepeatPatternRequest repeatPattern) {
+        String frequency = String.valueOf(
+                repeatPattern.getFrequency());
+
+        switch (frequency) {
+            case "DAY", "YEAR" -> {
+                if (repeatPattern.getDaysOfWeek() != null ||
+                        repeatPattern.getDaysOfMonth() != null) {
+                    throw new ScheduleException(
+                            ErrorCode.INVALID_REPEAT_PATTERN);
+                }
+            }
+            case "WEEK" -> {
+                if (repeatPattern.getDaysOfWeek() == null ||
+                        repeatPattern.getDaysOfMonth() != null) {
+                    throw new ScheduleException(
+                            ErrorCode.INVALID_REPEAT_PATTERN);
+                }
+            }
+            case "MONTH" -> {
+                if (repeatPattern.getDaysOfWeek() != null ||
+                        repeatPattern.getDaysOfMonth() == null) {
+                    throw new ScheduleException(
+                            ErrorCode.INVALID_REPEAT_PATTERN);
+                }
+            }
+        }
+    }
+
+    private SelectDate toSelectDateEntity(Schedule schedule, LocalDate date, LocalTime time, boolean isAllDay) {
+
+        return SelectDate.builder()
+                .schedule(schedule)
+                .selectedDate(
+                        ScheduleAtConverter.convertToDateTime(date, time, isAllDay))
+                .build();
+    }
+
+    private List<LocalDate> createDateToRepeat(RepeatPatternRequest repeatPattern) {
+        String frequency = String.valueOf(repeatPattern.getFrequency());
+        List<LocalDate> dateList = new ArrayList<>();
+
+        LocalDate start = LocalDate.parse(repeatPattern.getStartDate().substring(0, 10));
+        LocalDate end = LocalDate.parse(repeatPattern.getEndDate().substring(0, 10));
+
+        switch (frequency) {
+            case "DAY" -> {
+                while (start.isBefore(end) || start.isEqual(end)) {
+                    if (ScheduleAtConverter.convertToDate(start) != null) {
+                        dateList.add(start);
+                    }
+                    start = start.plus(repeatPattern.getInterval(), ChronoUnit.DAYS);
+                }
+            }
+            case "WEEK" -> {
+                while (start.isBefore(end) || start.isEqual(end)) {
+
+                    for (DayOfWeek day : repeatPattern.getDaysOfWeek()) {
+                        LocalDate nextDayOfWeek = start.with(TemporalAdjusters.nextOrSame(day));
+
+                        if (!nextDayOfWeek.isBefore(start) && !nextDayOfWeek.isAfter(end)) {
+                            dateList.add(nextDayOfWeek);
+                        }
+                    }
+                    start = start.plus(repeatPattern.getInterval(), ChronoUnit.WEEKS);
+                }
+                System.out.println(dateList);
+            }
+            case "MONTH" -> {
+                while (start.isBefore(end) || start.isEqual(end)) {
+                    for (int day : repeatPattern.getDaysOfMonth()) {
+                        LocalDate nextDayOfMonth =
+                                ScheduleAtConverter.convertToDate(
+                                        start.getYear(), start.getMonthValue(), day);
+
+                        if (nextDayOfMonth != null && !nextDayOfMonth.isBefore(start) && !nextDayOfMonth.isAfter(end)) {
+                            dateList.add(nextDayOfMonth);
+                        }
+                    }
+                    start = start.plus(repeatPattern.getInterval(), ChronoUnit.MONTHS);
+                }
+            }
+            case "YEAR" -> {
+                while (start.isBefore(end) || start.isEqual(end)) {
+                    if (ScheduleAtConverter.convertToDate(start) != null) {
+                        dateList.add(start);
+                    }
+                    start = start.plus(repeatPattern.getInterval(), ChronoUnit.YEARS);
+                }
+            }
+        }
+        dateList.sort(Comparator.naturalOrder());
+
+        return dateList;
     }
 
     private void validateMemberAndPet(CreateScheduleRequest request, Member member) {
