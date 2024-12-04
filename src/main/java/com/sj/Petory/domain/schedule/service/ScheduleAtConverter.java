@@ -1,7 +1,9 @@
 package com.sj.Petory.domain.schedule.service;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,5 +21,24 @@ public class ScheduleAtConverter {
         }
 
         return date.atTime(time);
+    }
+
+    public static LocalDate convertToDate(int year, int month, int day) {
+
+        try {
+            return LocalDate.of(year, month, day);
+        } catch (DateTimeException e) {
+            return null;
+        }
+    }
+
+    public static LocalDate convertToDate(LocalDate date) {
+
+        try {
+            return LocalDate.of(
+                    date.getYear(), date.getMonth(), date.getDayOfMonth());
+        } catch (DateTimeException e) {
+            return null;
+        }
     }
 }
