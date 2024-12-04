@@ -132,6 +132,11 @@ public class ScheduleService {
         String frequency = String.valueOf(
                 repeatPattern.getFrequency());
 
+        if (repeatPattern.getStartDate() == null ||
+                repeatPattern.getEndDate() == null) {
+            throw new ScheduleException(ErrorCode.MISSING_START_OR_END_DATE);
+        }
+
         switch (frequency) {
             case "DAY", "YEAR" -> {
                 if (repeatPattern.getDaysOfWeek() != null ||

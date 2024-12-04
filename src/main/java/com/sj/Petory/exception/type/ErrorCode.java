@@ -43,6 +43,7 @@ public enum ErrorCode {
     CUSTOM_PATTERN_NOT_FOUND("사용자 지정 반복주기를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     UPDATE_ONLY_OWN_SCHEDULE_ALLOWED("자신의 일정만 수정이 가능합니다.", HttpStatus.BAD_REQUEST),
     INVALID_REPEAT_PATTERN("유효하지 않은 반복 패턴입니다.", HttpStatus.BAD_REQUEST),
+    MISSING_START_OR_END_DATE("시작/종료 일자는 필수 항목입니다.", HttpStatus.BAD_REQUEST),
 
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
