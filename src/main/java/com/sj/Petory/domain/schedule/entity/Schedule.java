@@ -106,8 +106,7 @@ public class Schedule {
                 .build();
     }
 
-    public ScheduleDetailResponse toDetailDto(
-            List<Long> petIds, List<String> petNames
+    public ScheduleDetailResponse toDetailDto(List<Pet> petList
     ) {
 
         return ScheduleDetailResponse.builder()
@@ -120,11 +119,14 @@ public class Schedule {
                 .noticeAt(this.getNoticeAt())
                 .priority(this.getPriority())
                 .status(this.getStatus())
-                .petId(petIds)
-                .petName(petNames)
+                .isAllDay(this.isAllDay())
+                .repeatYn(this.isRepeatYn())
+                .petId(petList.stream().map(Pet::getPetId)
+                        .collect(Collectors.toList()))
+                .petName(petList.stream().map(Pet::getPetName)
+                        .collect(Collectors.toList()))
                 .build();
     }
-
 //    public void updateSchedule(ScheduleCategory category, ScheduleUpdateRequest request) {
 //        if (!ObjectUtils.isEmpty(category)) {
 //            this.scheduleCategory = category;

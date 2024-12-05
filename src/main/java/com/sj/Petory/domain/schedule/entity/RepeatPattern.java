@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.schedule.entity;
 
+import com.sj.Petory.domain.schedule.dto.RepeatPatternDto;
 import com.sj.Petory.domain.schedule.type.Frequency;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,4 +52,15 @@ public class RepeatPattern {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    public RepeatPatternDto.Response toDto() {
+
+        return RepeatPatternDto.Response.builder()
+                .frequency(this.getFrequency())
+                .interval(this.getRepeatInterval())
+                .daysOfWeek(this.getDaysOfWeek())
+                .daysOfMonth(this.getDaysOfMonth())
+                .startDate(String.valueOf(this.getStartDate()))
+                .endDate(String.valueOf(this.getEndDate()))
+                .build();
+    }
 }
