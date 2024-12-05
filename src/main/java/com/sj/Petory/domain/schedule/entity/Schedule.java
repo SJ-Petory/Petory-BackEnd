@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.schedule.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.schedule.dto.ScheduleDetailResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleUpdateRequest;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -59,6 +61,9 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SelectDate> selectedDates;
 
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetSchedule> petSchedules;
+
     @Column(name = "notice_yn")
     private boolean noticeYn;
 
@@ -84,17 +89,20 @@ public class Schedule {
     private LocalDateTime updatedAt;
 
 
-    public ScheduleListResponse toListDto(List<PetSchedule> petScheduleList
-            , List<Long> petIds, List<String> petNames) {
-        Schedule scheduleEntity = this;
+    public ScheduleListResponse toListDto(List<Pet> petList) {
 
         return ScheduleListResponse.builder()
-                .scheduleId(scheduleEntity.getScheduleId())
-                .title(scheduleEntity.getScheduleTitle())
-                .priority(scheduleEntity.getPriority())
-                .status(scheduleEntity.getStatus())
-                .petId(petIds)
-                .petName(petNames)
+                .categoryId(this.getScheduleCategory().getCategoryId())
+                .scheduleId(this.getScheduleId())
+                .title(this.getScheduleTitle())
+                .priority(this.getPriority())
+                .status(this.getStatus())
+                .petId(petList.stream().map(Pet::getPetId)
+                        .collect(Collectors.toList()))
+                .petName(petList.stream().map(Pet::getPetName)
+                        .collect(Collectors.toList()))
+                .selectedDates(this.getSelectedDates().stream()
+                        .map(SelectDate::getSelectedDate).toList())
                 .build();
     }
 

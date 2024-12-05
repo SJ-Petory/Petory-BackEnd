@@ -44,15 +44,15 @@ public class ScheduleController {
                 scheduleService.createSchedule(memberAdapter, request));
     }
 
-//    @GetMapping
-//    public ResponseEntity<Page<ScheduleListResponse>> scheduleList(
-//            @AuthenticationPrincipal MemberAdapter memberAdapter
-//            , Pageable pageable) {
-//
-//        return ResponseEntity.ok(
-//                scheduleService.scheduleList(memberAdapter, pageable));
-//    }
-//
+    @GetMapping
+    public ResponseEntity<Page<ScheduleListResponse>> scheduleList(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(
+                scheduleService.scheduleList(memberAdapter, pageable));
+    }
+
 //    @GetMapping("/{scheduleId}")
 //    public ResponseEntity<ScheduleDetailResponse> scheduleDetail(
 //            @AuthenticationPrincipal MemberAdapter memberAdapter
