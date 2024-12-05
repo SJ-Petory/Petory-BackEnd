@@ -12,7 +12,6 @@ import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
 import com.sj.Petory.domain.schedule.entity.SelectDate;
 import com.sj.Petory.domain.schedule.repository.*;
-import com.sj.Petory.domain.schedule.type.Frequency;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.ScheduleException;
@@ -28,7 +27,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -127,7 +125,7 @@ public class ScheduleService {
         }
     }
 
-    private void validateRepeatPattern(RepeatPatternRequest repeatPattern) {
+    private void validateRepeatPattern(RepeatPatternDto.Request repeatPattern) {
         String frequency = String.valueOf(
                 repeatPattern.getFrequency());
 
@@ -170,7 +168,7 @@ public class ScheduleService {
                 .build();
     }
 
-    private List<LocalDate> createDateToRepeat(RepeatPatternRequest repeatPattern) {
+    private List<LocalDate> createDateToRepeat(RepeatPatternDto.Request repeatPattern) {
         String frequency = String.valueOf(repeatPattern.getFrequency());
         List<LocalDate> dateList = new ArrayList<>();
 
@@ -286,32 +284,42 @@ public class ScheduleService {
 
         return new PageImpl<>(responseList);
     }
-//
-//    public ScheduleDetailResponse scheduleDetail(
-//            final MemberAdapter memberAdapter, final Long scheduleId) {
-//
-//        Member member = getMember(memberAdapter);
-//
-//        Schedule schedule = scheduleRepository.findById(scheduleId)
-//                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
-//
-//        List<Long> petIds =
-//                petScheduleRepository.findPetIdsBySchedule(schedule);
-//
-//        List<String> petNames =
-//                petScheduleRepository.findByPetNamesBySchedule(schedule);
-//
-//        ScheduleDetailResponse scheduleDetailResponse =
-//                schedule.toDetailDto(petIds, petNames);
-//
-//        if (schedule.getRepeatType().equals(RepeatType.CUSTOM)) {
-//            CustomRepeatPattern customRepeatPattern = customRepeatPatternRepository.findBySchedule(schedule)
-//                    .orElseThrow(() -> new ScheduleException(ErrorCode.CUSTOM_PATTERN_NOT_FOUND));
-//
-//            scheduleDetailResponse.customRepeatRes(customRepeatPattern);
-//        }
-//        return scheduleDetailResponse;
-//    }
+
+    public ScheduleDetailResponse scheduleDetail(
+            final MemberAdapter memberAdapter,
+            final Long scheduleId) {
+
+        Member member = getMemberByMemberAdapter(memberAdapter);
+
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        List<Pet> petList = schedule.getPetSchedules().stream()
+                .map(PetSchedule::getPet)
+                .filter(pet ->
+                        petRepository.existsByPetIdAndMember(pet.getPetId(), member) ||
+                                careGiverRepository.existsByPetAndMember(pet, member))
+                .toList();
+
+        ScheduleDetailResponse scheduleDetailResponse =
+                schedule.toDetailDto(petList);
+
+        if (!schedule.isAllDay()) {
+            scheduleDetailResponse.setScheduleAt(schedule.getScheduleAt());
+        }
+
+        if (schedule.isRepeatYn()) {
+            scheduleDetailResponse.setRepeatPattern(
+                    schedule.getRepeatPattern().toDto());
+        }
+        scheduleDetailResponse.setSelectedDates(
+                    schedule.getSelectedDates().stream()
+                            .map(selectDate -> String.valueOf(selectDate.getSelectedDate()))
+                            .collect(Collectors.toList()));
+
+        return scheduleDetailResponse;
+    }
 //
 //    @Transactional
 //    public boolean scheduleUpdate(

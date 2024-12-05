@@ -40,7 +40,7 @@ public class CreateScheduleRequest {
 
     private List<Long> petId;
 
-    private RepeatPatternRequest repeatPattern;
+    private RepeatPatternDto.Request repeatPattern;
 
     public Schedule toScheduleEntity(Member member, ScheduleCategory scheduleCategory) {
 
