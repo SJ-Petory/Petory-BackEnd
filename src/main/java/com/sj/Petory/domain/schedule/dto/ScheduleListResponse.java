@@ -15,11 +15,12 @@ import java.util.Set;
 @Builder
 public class ScheduleListResponse {
 
+    private Long categoryId;
     private Long scheduleId;
     private String title;
-    private LocalDateTime scheduleAt;
     private PriorityType priority;
     private ScheduleStatus status;
     private List<Long> petId;
     private List<String> petName;
+    private List<LocalDateTime> selectedDates;
 }

@@ -6,10 +6,7 @@ import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
-import com.sj.Petory.domain.schedule.dto.CategoryListResponse;
-import com.sj.Petory.domain.schedule.dto.CreateCategoryRequest;
-import com.sj.Petory.domain.schedule.dto.CreateScheduleRequest;
-import com.sj.Petory.domain.schedule.dto.RepeatPatternRequest;
+import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.entity.PetSchedule;
 import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
@@ -22,6 +19,7 @@ import com.sj.Petory.exception.ScheduleException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +30,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +44,6 @@ public class ScheduleService {
     private final PetRepository petRepository;
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
-    private final SelectDateRepository selectDateRepository;
-    private final ScheduleAtConverter scheduleAtConverter;
 
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
@@ -81,7 +76,9 @@ public class ScheduleService {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
 
-        validateMemberAndPet(request, member);
+        if (request.getPetId() != null) {
+            validateMemberAndPet(request, member);
+        }
 
         createScheduleForPet(request, member);
 
@@ -119,13 +116,15 @@ public class ScheduleService {
         }
         schedule.setSelectedDates(dates);
 
-        List<PetSchedule> petScheduleList = request.getPetId().stream()
-                .map(petId -> petRepository.findByPetId(petId)
-                        .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND)))
-                .map(pet -> request.toPetScheduleEntity(pet, schedule))
-                .toList();
+        if (request.getPetId() != null) {
+            List<PetSchedule> petScheduleList = request.getPetId().stream()
+                    .map(petId -> petRepository.findByPetId(petId)
+                            .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND)))
+                    .map(pet -> request.toPetScheduleEntity(pet, schedule))
+                    .toList();
 
-        petScheduleRepository.saveAll(petScheduleList);
+            petScheduleRepository.saveAll(petScheduleList);
+        }
     }
 
     private void validateRepeatPattern(RepeatPatternRequest repeatPattern) {
@@ -257,65 +256,36 @@ public class ScheduleService {
                 .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND));
     }
 
-//    public Page<ScheduleListResponse> scheduleList(
-//            final MemberAdapter memberAdapter, final Pageable pageable) {
-//
-//        Member member = getMember(memberAdapter);
-//
-//        //로그인한 사용자의 펫 List
-//        List<Pet> myPetList = petRepository.findByMember(member);
-//        // 돌보미 펫 List
-//        List<Pet> careGiverPetList =
-//                careGiverRepository.findByMember(member).stream()
-//                        .flatMap(cg -> petRepository.findByPetId(cg.getPet().getPetId()).stream())
-//                        .toList();
-//
-//        //로그인 한 사용자의 펫이 있는 일정 아이디
-//        List<Long> userPetSchedules =
-//                petRepository.findPetIdsByMember(member.getMemberId())
-//                        .stream()
-//                        .flatMap(petId -> petScheduleRepository.findScheduleIdByPet(petId).stream())
-//                        .toList();
-//
-//
-//        //로그인 한 사용자가 돌보미인 펫의 일정 아이디
-//        List<Long> careGiverPetSchedules =
-//                careGiverRepository.findPetIdsByMember(member.getMemberId())
-//                        .stream()
-//                        .flatMap(petId -> petScheduleRepository.findScheduleIdByPet(petId).stream())
-//                        .toList();
-//
-//        // Set으로 합치기
-//        Set<Long> scheduleIds = new HashSet<>();
-//        scheduleIds.addAll(userPetSchedules);
-//        scheduleIds.addAll(careGiverPetSchedules);
-//
-//        //Set을 Page<dto> 형태로 변환
-//        // set<scheduleId>를 -> list<dto>
-//        List<ScheduleListResponse> scheduleListResponseList =
-//                scheduleIds.stream().map(id -> // 일정 하나당 실행
-//                {
-//                    Optional<Schedule> schedule = scheduleRepository.findById(id);
-//                    List<PetSchedule> petSchedules = petScheduleRepository.findBySchedule(schedule.get());
-//
-//                    List<Long> petIds = petSchedules.stream()
-//                            .filter(ps -> myPetList.contains(ps.getPet())
-//                                    || careGiverPetList.contains(ps.getPet()))
-//                            .map(ps -> ps.getPet().getPetId())
-//                            .toList();
-//                    List<String> petNames = petSchedules.stream()
-//                            .filter(ps -> myPetList.contains(ps.getPet())
-//                                    || careGiverPetList.contains(ps.getPet()))
-//                            .map(ps -> ps.getPet().getPetName())
-//                            .toList();
-//                    //petSchedule을 Set으로 바꾸고 findBy를 뭐 어케 조건을 걸어서 member caregiver인지
-//                    return schedule.get().toListDto(petSchedules, petIds, petNames);
-//                }).toList();
-//
-//
-//        // 자기의 펫이지만 돌보미로 등로된 사용자가 만든 일정은 안 뜬다.
-//        return new PageImpl<>(scheduleListResponseList, pageable, scheduleListResponseList.size());
-//    }
+    public Page<ScheduleListResponse> scheduleList(
+            final MemberAdapter memberAdapter, final Pageable pageable) {
+
+        Member member = getMemberByMemberAdapter(memberAdapter);
+
+        List<Schedule> ownScheduleList =
+                scheduleRepository.findByMember(member);
+
+        List<Schedule> scheduleList =
+                scheduleRepository.findByAllSchedule(member.getMemberId());
+
+        List<Schedule> ownPetScheduleList =
+                scheduleRepository.findByPetSchedule(member.getMemberId());
+
+        Set<Schedule> distinctSchedule = new HashSet<>();
+        distinctSchedule.addAll(ownScheduleList);
+        distinctSchedule.addAll(scheduleList);
+        distinctSchedule.addAll(ownPetScheduleList);
+
+        List<ScheduleListResponse> responseList = distinctSchedule.stream().map(schedule -> {
+            List<Pet> petList = schedule.getPetSchedules().stream()
+                    .map(PetSchedule::getPet)
+                    .filter(pet -> petRepository.existsByPetIdAndMember(pet.getPetId(), member) ||
+                            careGiverRepository.existsByPetIdAndMember(pet.getPetId(), member.getMemberId()))
+                    .toList();
+            return schedule.toListDto(petList);
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(responseList);
+    }
 //
 //    public ScheduleDetailResponse scheduleDetail(
 //            final MemberAdapter memberAdapter, final Long scheduleId) {
