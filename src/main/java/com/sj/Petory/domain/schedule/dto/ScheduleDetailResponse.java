@@ -4,6 +4,7 @@ import com.sj.Petory.domain.schedule.type.PriorityType;
 import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -24,15 +25,14 @@ public class ScheduleDetailResponse {
     private long noticeAt;
 
     private PriorityType priority;
-    private ScheduleStatus status;
+    private ScheduleStatus status; //
 
     private List<Long> petId;
     private List<String> petName;
 
     private boolean isAllDay;
-    private LocalTime scheduleAt;
+    private LocalDateTime scheduleAt;
 
     private boolean repeatYn;
     private RepeatPatternDto.Response repeatPattern;
-    private List<String> selectedDates;
 }

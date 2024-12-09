@@ -12,6 +12,7 @@ import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
 import com.sj.Petory.domain.schedule.entity.SelectDate;
 import com.sj.Petory.domain.schedule.repository.*;
+import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.ScheduleException;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -42,7 +44,7 @@ public class ScheduleService {
     private final PetRepository petRepository;
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
-
+    private final SelectDateRepository selectDateRepository;
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
 
@@ -92,7 +94,7 @@ public class ScheduleService {
                 request.toScheduleEntity(member, category));
 
         if (!request.getIsAllDay()) {
-            schedule.setScheduleAt(request.getScheduleAt());
+            schedule.setScheduleTime(request.getScheduleTime());
         }
         List<SelectDate> dates = new ArrayList<>();
 
@@ -105,12 +107,12 @@ public class ScheduleService {
 
             dates = createDateToRepeat(request.getRepeatPattern()).stream()
                     .map(date -> toSelectDateEntity(schedule, date,
-                            schedule.getScheduleAt(), request.getIsAllDay())).toList();
+                            schedule.getScheduleTime(), request.getIsAllDay())).toList();
         }
         if (!request.getRepeatYn()) {
             dates = request.getSelectedDates().stream()
                     .map(datestr -> toSelectDateEntity(schedule, LocalDate.parse(datestr),
-                            schedule.getScheduleAt(), request.getIsAllDay())).toList();
+                            schedule.getScheduleTime(), request.getIsAllDay())).toList();
         }
         schedule.setSelectedDates(dates);
 
@@ -165,6 +167,7 @@ public class ScheduleService {
                 .schedule(schedule)
                 .selectedDate(
                         ScheduleAtConverter.convertToDateTime(date, time, isAllDay))
+                .status(ScheduleStatus.ONGOING)
                 .build();
     }
 
@@ -287,7 +290,8 @@ public class ScheduleService {
 
     public ScheduleDetailResponse scheduleDetail(
             final MemberAdapter memberAdapter,
-            final Long scheduleId) {
+            final Long scheduleId,
+            final LocalDateTime scheduleAt) {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
 
@@ -305,18 +309,16 @@ public class ScheduleService {
         ScheduleDetailResponse scheduleDetailResponse =
                 schedule.toDetailDto(petList);
 
-        if (!schedule.isAllDay()) {
-            scheduleDetailResponse.setScheduleAt(schedule.getScheduleAt());
-        }
+        scheduleDetailResponse.setScheduleAt(scheduleAt);
 
         if (schedule.isRepeatYn()) {
             scheduleDetailResponse.setRepeatPattern(
                     schedule.getRepeatPattern().toDto());
         }
-        scheduleDetailResponse.setSelectedDates(
-                    schedule.getSelectedDates().stream()
-                            .map(selectDate -> String.valueOf(selectDate.getSelectedDate()))
-                            .collect(Collectors.toList()));
+        SelectDate selectDate = selectDateRepository.findByScheduleAndSelectedDate(schedule, scheduleAt)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.DATE_NOT_FOUND));
+
+        scheduleDetailResponse.setStatus(selectDate.getStatus());
 
         return scheduleDetailResponse;
     }
@@ -349,4 +351,20 @@ public class ScheduleService {
 //
 //        return true;
 //    }
+
+    @Transactional
+    public boolean scheduleStatus(
+            final MemberAdapter memberAdapter
+            , final Long scheduleId
+            , final String status) {
+
+        Member member = getMemberByMemberAdapter(memberAdapter);
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+//        schedule.setStatus(ScheduleStatus.valueOf(status));
+
+        return true;
+    }
 }
