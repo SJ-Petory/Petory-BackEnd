@@ -32,6 +32,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class ScheduleService {
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
     private final SelectDateRepository selectDateRepository;
+
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
 
@@ -294,10 +296,10 @@ public class ScheduleService {
             final LocalDateTime scheduleAt) {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
-
-
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        isValidMemberSchedule(member, schedule);
 
         List<Pet> petList = schedule.getPetSchedules().stream()
                 .map(PetSchedule::getPet)
@@ -321,6 +323,25 @@ public class ScheduleService {
         scheduleDetailResponse.setStatus(selectDate.getStatus());
 
         return scheduleDetailResponse;
+    }
+
+    private void isValidMemberSchedule(Member member, Schedule schedule) {
+
+        boolean isOwn =
+                scheduleRepository.existsByScheduleIdAndMember(schedule.getScheduleId(), member);
+
+        boolean isCareGiver = schedule.getPetSchedules().stream()
+                .anyMatch(ps ->
+                        careGiverRepository.existsByPetIdAndMember(
+                                ps.getPet().getPetId(), member.getMemberId()));
+
+        boolean myPet = schedule.getPetSchedules().stream()
+                .anyMatch(ps ->
+                        petRepository.existsByPetIdAndMember(ps.getPet().getPetId(), member));
+
+        if (!isOwn && !isCareGiver && !myPet) {
+            throw new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND);
+        }
     }
 //
 //    @Transactional
