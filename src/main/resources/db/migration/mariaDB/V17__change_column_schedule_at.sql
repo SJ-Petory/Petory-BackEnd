@@ -1,0 +1,1 @@
+ALTER TABLE schedule CHANGE COLUMN schedule_at schedule_time TIME NULL;

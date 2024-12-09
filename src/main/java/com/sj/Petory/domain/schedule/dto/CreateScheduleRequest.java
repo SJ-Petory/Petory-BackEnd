@@ -7,7 +7,6 @@ import com.sj.Petory.domain.schedule.entity.RepeatPattern;
 import com.sj.Petory.domain.schedule.entity.Schedule;
 import com.sj.Petory.domain.schedule.entity.ScheduleCategory;
 import com.sj.Petory.domain.schedule.type.PriorityType;
-import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -28,7 +27,7 @@ public class CreateScheduleRequest {
 
     @NotNull
     private Boolean isAllDay;
-    private LocalTime scheduleAt;
+    private LocalTime scheduleTime;
 
     @NotNull
     private Boolean repeatYn;
@@ -54,7 +53,6 @@ public class CreateScheduleRequest {
                 .noticeYn(this.isNoticeYn())
                 .noticeAt(this.getNoticeAt())
                 .priority(PriorityType.valueOf(this.getPriority()))
-                .status(ScheduleStatus.ONGOING)
                 .build();
     }
 

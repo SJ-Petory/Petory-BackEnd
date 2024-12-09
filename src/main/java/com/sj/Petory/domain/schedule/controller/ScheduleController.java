@@ -3,12 +3,17 @@ package com.sj.Petory.domain.schedule.controller;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.service.ScheduleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/schedules")
@@ -56,10 +61,11 @@ public class ScheduleController {
     @GetMapping("/{scheduleId}")
     public ResponseEntity<ScheduleDetailResponse> scheduleDetail(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("scheduleId") Long scheduleId) {
+            , @PathVariable("scheduleId") Long scheduleId
+            , @RequestParam("scheduleAt") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime scheduleAt) {
 
         return ResponseEntity.ok(
-                scheduleService.scheduleDetail(memberAdapter, scheduleId));
+                scheduleService.scheduleDetail(memberAdapter, scheduleId, scheduleAt));
     }
 //
 //    @PatchMapping("/{scheduleId}")
@@ -71,4 +77,15 @@ public class ScheduleController {
 //        return ResponseEntity.ok(
 //                scheduleService.scheduleUpdate(memberAdapter, scheduleId, request));
 //    }
+
+    @PatchMapping("/{scheduleId}")
+    public ResponseEntity<Boolean> scheduleStatus(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("scheduleId") Long scheduleId
+            , @RequestBody @Valid ScheduleStatusRequest request) {
+
+        return ResponseEntity.ok(
+                scheduleService.scheduleStatus(
+                        memberAdapter, scheduleId, request));
+    }
 }

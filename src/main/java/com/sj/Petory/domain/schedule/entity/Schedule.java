@@ -4,17 +4,13 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.schedule.dto.ScheduleDetailResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
-import com.sj.Petory.domain.schedule.dto.ScheduleUpdateRequest;
 import com.sj.Petory.domain.schedule.type.PriorityType;
-import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -52,8 +48,8 @@ public class Schedule {
     @Column(name = "is_all_day")
     private boolean isAllDay;
 
-    @Column(name = "schedule_at ")
-    private LocalTime scheduleAt;
+    @Column(name = "schedule_time")
+    private LocalTime scheduleTime;
 
     @Column(name = "repeat_yn")
     private boolean repeatYn;
@@ -74,10 +70,6 @@ public class Schedule {
     @Enumerated(EnumType.STRING)
     private PriorityType priority;
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private ScheduleStatus status;
-
     @OneToOne(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private RepeatPattern repeatPattern;
 
@@ -96,13 +88,12 @@ public class Schedule {
                 .scheduleId(this.getScheduleId())
                 .title(this.getScheduleTitle())
                 .priority(this.getPriority())
-                .status(this.getStatus())
                 .petId(petList.stream().map(Pet::getPetId)
                         .collect(Collectors.toList()))
                 .petName(petList.stream().map(Pet::getPetName)
                         .collect(Collectors.toList()))
-                .selectedDates(this.getSelectedDates().stream()
-                        .map(SelectDate::getSelectedDate).toList())
+                .dateInfo(this.getSelectedDates().stream()
+                        .map(SelectDate::toDateInfo).toList())
                 .build();
     }
 
@@ -118,7 +109,6 @@ public class Schedule {
                 .noticeYn(this.isNoticeYn())
                 .noticeAt(this.getNoticeAt())
                 .priority(this.getPriority())
-                .status(this.getStatus())
                 .isAllDay(this.isAllDay())
                 .repeatYn(this.isRepeatYn())
                 .petId(petList.stream().map(Pet::getPetId)
