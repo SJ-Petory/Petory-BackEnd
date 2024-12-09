@@ -3,7 +3,9 @@ package com.sj.Petory.domain.schedule.controller;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.service.ScheduleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,10 +82,10 @@ public class ScheduleController {
     public ResponseEntity<Boolean> scheduleStatus(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @PathVariable("scheduleId") Long scheduleId
-            , @RequestParam("status") String status) {
+            , @RequestBody @Valid ScheduleStatusRequest request) {
 
         return ResponseEntity.ok(
                 scheduleService.scheduleStatus(
-                        memberAdapter, scheduleId, status));
+                        memberAdapter, scheduleId, request));
     }
 }

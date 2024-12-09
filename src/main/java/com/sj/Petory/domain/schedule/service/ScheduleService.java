@@ -317,12 +317,17 @@ public class ScheduleService {
             scheduleDetailResponse.setRepeatPattern(
                     schedule.getRepeatPattern().toDto());
         }
-        SelectDate selectDate = selectDateRepository.findByScheduleAndSelectedDate(schedule, scheduleAt)
-                .orElseThrow(() -> new ScheduleException(ErrorCode.DATE_NOT_FOUND));
+
+        SelectDate selectDate = getSelectDate(scheduleAt, schedule);
 
         scheduleDetailResponse.setStatus(selectDate.getStatus());
 
         return scheduleDetailResponse;
+    }
+
+    private SelectDate getSelectDate(LocalDateTime scheduleAt, Schedule schedule) {
+        return selectDateRepository.findByScheduleAndSelectedDate(schedule, scheduleAt)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.DATE_NOT_FOUND));
     }
 
     private void isValidMemberSchedule(Member member, Schedule schedule) {
@@ -377,14 +382,18 @@ public class ScheduleService {
     public boolean scheduleStatus(
             final MemberAdapter memberAdapter
             , final Long scheduleId
-            , final String status) {
+            , final ScheduleStatusRequest request) {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
 
-//        schedule.setStatus(ScheduleStatus.valueOf(status));
+        isValidMemberSchedule(member, schedule);
+
+        SelectDate selectDate = getSelectDate(request.getScheduleAt(), schedule);
+
+        selectDate.setStatus(ScheduleStatus.valueOf(request.getStatus()));
 
         return true;
     }
