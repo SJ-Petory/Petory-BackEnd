@@ -7,6 +7,7 @@ import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import com.sj.Petory.domain.schedule.type.PriorityType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -55,9 +56,11 @@ public class Schedule {
     private boolean repeatYn;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private List<SelectDate> selectedDates;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private List<PetSchedule> petSchedules;
 
     @Column(name = "notice_yn")
