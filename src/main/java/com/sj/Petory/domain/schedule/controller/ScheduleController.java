@@ -87,4 +87,15 @@ public class ScheduleController {
                 scheduleService.scheduleStatus(
                         memberAdapter, scheduleId, request));
     }
-}
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Boolean> deleteSchedule(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("scheduleId") Long scheduleId
+            , @RequestParam("scheduleAt") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime scheduleAt) {
+
+
+            return ResponseEntity.ok(
+                    scheduleService.deleteSchedule(memberAdapter, scheduleId, scheduleAt));
+        }
+    }

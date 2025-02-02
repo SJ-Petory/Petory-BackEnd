@@ -5,6 +5,7 @@ import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.schedule.dto.ScheduleDetailResponse;
 import com.sj.Petory.domain.schedule.dto.ScheduleListResponse;
 import com.sj.Petory.domain.schedule.type.PriorityType;
+import com.sj.Petory.domain.schedule.type.ScheduleStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -96,6 +97,7 @@ public class Schedule {
                 .petName(petList.stream().map(Pet::getPetName)
                         .collect(Collectors.toList()))
                 .dateInfo(this.getSelectedDates().stream()
+                        .filter(date -> !date.getStatus().equals(ScheduleStatus.DELETED))
                         .map(SelectDate::toDateInfo).toList())
                 .build();
     }
