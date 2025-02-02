@@ -45,6 +45,7 @@ public enum ErrorCode {
     INVALID_REPEAT_PATTERN("유효하지 않은 반복 패턴입니다.", HttpStatus.BAD_REQUEST),
     MISSING_START_OR_END_DATE("시작/종료 일자는 필수 항목입니다.", HttpStatus.BAD_REQUEST),
     DATE_NOT_FOUND("날짜를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_SCHEDULE_ACCESS("일정 접근 권한이 없습니다.", HttpStatus.BAD_REQUEST),
     //s3
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
     FILE_EXTENSION_NOT_ALLOWED("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST),

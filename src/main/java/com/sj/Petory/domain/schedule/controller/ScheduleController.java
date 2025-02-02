@@ -5,7 +5,6 @@ import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.service.ScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -88,4 +87,15 @@ public class ScheduleController {
                 scheduleService.scheduleStatus(
                         memberAdapter, scheduleId, request));
     }
-}
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Boolean> deleteSchedule(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("scheduleId") Long scheduleId
+            , @RequestParam("scheduleAt") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime scheduleAt) {
+
+
+            return ResponseEntity.ok(
+                    scheduleService.deleteSchedule(memberAdapter, scheduleId, scheduleAt));
+        }
+    }
