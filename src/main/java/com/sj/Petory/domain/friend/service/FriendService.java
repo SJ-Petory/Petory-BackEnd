@@ -13,6 +13,8 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.notification.service.NotificationService;
+import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
@@ -38,6 +40,7 @@ public class FriendService {
     private final PetRepository petRepository;
     private final CareGiverRepository careGiverRepository;
     private final MemberEsRepository memberEsRepository;
+    private final NotificationService notificationService;
 
 
     public Page<MemberSearchResponse> searchMember(
@@ -56,8 +59,14 @@ public class FriendService {
 
         validateFriendRequest(sendMember, receiveMember);
 
-        friendRepository.save(
+        FriendInfo friendInfo = friendRepository.save(
                 FriendInfo.friendRequestToEntity(sendMember, receiveMember));
+
+        notificationService.sendNotification(
+                receiveMember,
+                NoticeType.FRIEND_REQUEST,
+                friendInfo.getFriendInfoId(),
+                sendMember.getName() + "님이 친구 요청을 보냈습니다.");
 
         return true;
     }
