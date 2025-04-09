@@ -147,9 +147,10 @@ public class FriendService {
                             .friendStatus(friendStatus)
                             .receiveMember(sendMember)
                             .build());
-        }
 
-        sendNotification(sendMember, NoticeType.FRIEND_PROCESS, friendInfo, receiveMember);
+            sendNotification(sendMember, NoticeType.FRIEND_ACCEPTED, friendInfo, receiveMember);
+        }
+        sendNotification(sendMember, NoticeType.FRIEND_REJECTED, friendInfo, receiveMember);
 
         return true;
     }
