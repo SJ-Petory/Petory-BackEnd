@@ -39,7 +39,7 @@ public class NotificationService {
     public SseEmitter subscribe(
             final String token) {
 
-        Authentication authentication = jwtUtils.getAuthentication(token);
+        Authentication authentication = jwtUtils.getAuthentication(token.substring("Bearer ".length()));
         MemberAdapter memberAdapter = (MemberAdapter) authentication.getPrincipal();
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
