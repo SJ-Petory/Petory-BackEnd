@@ -10,10 +10,12 @@ import com.sj.Petory.domain.notification.repository.NotificationRepository;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
+import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -31,12 +33,16 @@ public class NotificationService {
 
     private final Map<Long, SseEmitter> emitterMap = new HashMap<>();
 
+    private final JwtUtils jwtUtils;
+
     //SSE 구독 (클라이언트가 알림을 수신하기 위해 호출)
     public SseEmitter subscribe(
-            final MemberAdapter memberAdapter) {
+            final String token) {
+
+        Authentication authentication = jwtUtils.getAuthentication(token);
+        MemberAdapter memberAdapter = (MemberAdapter) authentication.getPrincipal();
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
-
 
         SseEmitter emitter = new SseEmitter(3_600_000L);
 

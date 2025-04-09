@@ -21,9 +21,9 @@ public class NotificationController {
 
     @GetMapping("/subscribe")
     public SseEmitter subscribe(
-            @AuthenticationPrincipal MemberAdapter memberAdapter) {
+            @RequestParam("token") String token) {
 
-        return notificationService.subscribe(memberAdapter);
+        return notificationService.subscribe(token);
     }
 
     @GetMapping
