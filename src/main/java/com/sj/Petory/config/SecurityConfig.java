@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/members").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/members").permitAll()
                                 .requestMatchers(
+                                        "/notification/subscribe",
                                         "/members/check-email"
                                         , "/members/check-name"
                                         , "members/login"

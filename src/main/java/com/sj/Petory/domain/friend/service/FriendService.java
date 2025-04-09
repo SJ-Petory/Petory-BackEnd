@@ -63,15 +63,7 @@ public class FriendService {
         FriendInfo friendInfo = friendRepository.save(
                 FriendInfo.friendRequestToEntity(sendMember, receiveMember));
 
-        notificationService.sendNotification(
-                receiveMember,
-                NotificationPayloadDto.builder()
-                        .receiveMemberId(receiveMember.getMemberId())
-                        .noticeType(NoticeType.FRIEND_REQUEST)
-                        .entityId(friendInfo.getFriendInfoId())
-                        .sendMemberId(sendMember.getMemberId())
-                        .sendMemberName(sendMember.getName())
-                        .build());
+        sendNotification(receiveMember, NoticeType.FRIEND_REQUEST, friendInfo, sendMember);
 
         return true;
     }
@@ -157,7 +149,22 @@ public class FriendService {
                             .build());
         }
 
+        sendNotification(sendMember, NoticeType.FRIEND_PROCESS, friendInfo, receiveMember);
+
         return true;
+    }
+
+    private void sendNotification(Member receiveMember, NoticeType friendProcess, FriendInfo friendInfo, Member sendMember) {
+        notificationService.sendNotification(
+                receiveMember,
+                NotificationPayloadDto.builder()
+                        .receiveMemberId(receiveMember.getMemberId())
+                        .noticeType(friendProcess)
+                        .entityId(friendInfo.getFriendInfoId())
+                        .sendMemberId(sendMember.getMemberId())
+                        .sendMemberName(sendMember.getName())
+                        .build()
+        );
     }
 
     public FriendDetailResponse friendDetail(
