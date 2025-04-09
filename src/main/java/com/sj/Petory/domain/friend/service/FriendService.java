@@ -13,6 +13,7 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.notification.dto.NotificationPayloadDto;
 import com.sj.Petory.domain.notification.service.NotificationService;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
@@ -64,9 +65,13 @@ public class FriendService {
 
         notificationService.sendNotification(
                 receiveMember,
-                NoticeType.FRIEND_REQUEST,
-                friendInfo.getFriendInfoId(),
-                sendMember.getName() + "님이 친구 요청을 보냈습니다.");
+                NotificationPayloadDto.builder()
+                        .receiveMemberId(receiveMember.getMemberId())
+                        .noticeType(NoticeType.FRIEND_REQUEST)
+                        .entityId(friendInfo.getFriendInfoId())
+                        .sendMemberId(sendMember.getMemberId())
+                        .sendMemberName(sendMember.getName())
+                        .build());
 
         return true;
     }
