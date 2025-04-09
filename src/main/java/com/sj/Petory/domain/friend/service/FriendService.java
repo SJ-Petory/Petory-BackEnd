@@ -150,7 +150,9 @@ public class FriendService {
 
             sendNotification(sendMember, NoticeType.FRIEND_ACCEPTED, friendInfo, receiveMember);
         }
-        sendNotification(sendMember, NoticeType.FRIEND_REJECTED, friendInfo, receiveMember);
+        if (friendStatus.getStatus().equals("REJECTED")) {
+            sendNotification(sendMember, NoticeType.FRIEND_REJECTED, friendInfo, receiveMember);
+        }
 
         return true;
     }
