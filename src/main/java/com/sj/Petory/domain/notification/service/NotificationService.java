@@ -5,9 +5,9 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.notification.dto.NoticeListResponse;
 import com.sj.Petory.domain.notification.dto.NoticeRedirectResponse;
+import com.sj.Petory.domain.notification.dto.NotificationPayloadDto;
 import com.sj.Petory.domain.notification.entity.Notification;
 import com.sj.Petory.domain.notification.repository.NotificationRepository;
-import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
@@ -98,28 +98,28 @@ public class NotificationService {
 
     public void sendNotification(
             final Member receiveMember,
-            final NoticeType noticeType,
-            final Long entityId,
-            final String message) {
+            final NotificationPayloadDto noticePayLoad) {
 
         // 1. 알림 객체 저장
         notificationRepository.save(
                 Notification.builder()
                         .member(receiveMember)
-                        .noticeType(noticeType)
-                        .entityId(entityId)
+                        .noticeType(noticePayLoad.getNoticeType())
+                        .entityId(noticePayLoad.getEntityId())
                         .isRead(false)
                         .build());
 
         // 2. sse 실시간 알림 전송
-        SseEmitter emitter = emitterMap.get(receiveMember.getMemberId());
+        SseEmitter emitter =
+                emitterMap.get(
+                        noticePayLoad.getReceiveMemberId());
 
         if (emitter != null) {
 
             try {
                 emitter.send(SseEmitter.event()
-                        .name("notification")
-                        .data(message));
+                        .name(String.valueOf(noticePayLoad.getNoticeType()))
+                        .data(noticePayLoad));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
