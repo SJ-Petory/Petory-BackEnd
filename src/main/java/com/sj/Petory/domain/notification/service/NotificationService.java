@@ -42,13 +42,17 @@ public class NotificationService {
         Authentication authentication = jwtUtils.getAuthentication(token.substring("Bearer ".length()));
         MemberAdapter memberAdapter = (MemberAdapter) authentication.getPrincipal();
 
-        Member member = getMemberByEmail(memberAdapter.getEmail());
+        SseEmitter emitter = new SseEmitter(60_000L);
 
-        SseEmitter emitter = new SseEmitter(3_600_000L);
+        Long memberId = memberAdapter.getMemberId();
 
-        emitterMap.put(member.getMemberId(), emitter);
+        if (emitterMap.containsKey(memberId)) {
+            SseEmitter oldEmitter = emitterMap.remove(memberId);
+            oldEmitter.complete();
+        }
+        emitterMap.put(memberId, emitter);
 
-        log.info("SSE 연결 요청 : memberId = {}", member.getMemberId());
+        log.info("SSE 연결 요청 : memberId = {}", memberId);
 
         //SSE 연결 직후 더미 데이터 보내기
         try {
@@ -61,13 +65,13 @@ public class NotificationService {
             emitter.completeWithError(e);
         }
         emitter.onCompletion(() -> {
-            emitterMap.remove(member.getMemberId());
-            log.info("SSE 연결 종료 : memberId = {}", member.getMemberId());
+            emitterMap.remove(memberId);
+            log.info("SSE 연결 종료 : memberId = {}", memberId);
         });
 
         emitter.onTimeout(() -> {
-            emitterMap.remove(member.getMemberId());
-            log.info("SSE 연결 타임아웃 : memberId = {}", member.getMemberId());
+            emitterMap.remove(memberId);
+            log.info("SSE 연결 타임아웃 : memberId = {}", memberId);
         });
 
         return emitter;

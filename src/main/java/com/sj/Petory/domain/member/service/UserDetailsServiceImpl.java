@@ -24,6 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
 
-        return new MemberAdapter(member.getEmail(), member.getPassword());
+        return new MemberAdapter(
+                member.getMemberId(), member.getEmail(), member.getPassword());
     }
 }
