@@ -14,6 +14,7 @@ import java.util.Collection;
 @Builder
 public class MemberAdapter implements UserDetails{
 
+    private final Long memberId;
     private final String email;
     private final String password;
 
