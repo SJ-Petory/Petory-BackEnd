@@ -397,4 +397,42 @@ public class ScheduleService {
 
         return true;
     }
+
+    @Transactional
+    public Boolean deleteSchedule(
+            final MemberAdapter memberAdapter
+            , final Long scheduleId
+            , final LocalDateTime scheduleAt) {
+
+        Member member = getMemberByMemberAdapter(memberAdapter);
+
+        Schedule schedule = validMemberSchedule(member, scheduleId);
+        SelectDate selectDate = getSelectDate(scheduleAt, schedule);
+
+        selectDate.setStatus(ScheduleStatus.DELETED);
+
+        return true;
+    }
+
+
+    private Schedule validMemberSchedule(final Member member, final Long scheduleId) {
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        if (schedule.getMember().getEmail().equals(member.getEmail())) {
+            return schedule;
+        }
+
+        boolean isCaregiver = petScheduleRepository.findBySchedule(schedule).stream()
+                .flatMap(ps -> ps.getPet().getCareGivers().stream())
+                .anyMatch(cg -> cg.getMember().getMemberId().equals(member.getMemberId()));
+
+        if (isCaregiver) {
+            return schedule;
+        }
+
+        throw new ScheduleException(ErrorCode.INVALID_SCHEDULE_ACCESS);
+    }
+
 }

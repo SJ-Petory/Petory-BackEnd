@@ -13,6 +13,9 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.notification.dto.NotificationPayloadDto;
+import com.sj.Petory.domain.notification.service.NotificationService;
+import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
@@ -38,6 +41,7 @@ public class FriendService {
     private final PetRepository petRepository;
     private final CareGiverRepository careGiverRepository;
     private final MemberEsRepository memberEsRepository;
+    private final NotificationService notificationService;
 
 
     public Page<MemberSearchResponse> searchMember(
@@ -56,8 +60,10 @@ public class FriendService {
 
         validateFriendRequest(sendMember, receiveMember);
 
-        friendRepository.save(
+        FriendInfo friendInfo = friendRepository.save(
                 FriendInfo.friendRequestToEntity(sendMember, receiveMember));
+
+        sendNotification(receiveMember, NoticeType.FRIEND_REQUEST, friendInfo, sendMember);
 
         return true;
     }
@@ -141,9 +147,27 @@ public class FriendService {
                             .friendStatus(friendStatus)
                             .receiveMember(sendMember)
                             .build());
+
+            sendNotification(sendMember, NoticeType.FRIEND_ACCEPTED, friendInfo, receiveMember);
+        }
+        if (friendStatus.getStatus().equals("REJECTED")) {
+            sendNotification(sendMember, NoticeType.FRIEND_REJECTED, friendInfo, receiveMember);
         }
 
         return true;
+    }
+
+    private void sendNotification(Member receiveMember, NoticeType friendProcess, FriendInfo friendInfo, Member sendMember) {
+        notificationService.sendNotification(
+                receiveMember,
+                NotificationPayloadDto.builder()
+                        .receiveMemberId(receiveMember.getMemberId())
+                        .noticeType(friendProcess)
+                        .entityId(friendInfo.getFriendInfoId())
+                        .sendMemberId(sendMember.getMemberId())
+                        .sendMemberName(sendMember.getName())
+                        .build()
+        );
     }
 
     public FriendDetailResponse friendDetail(
