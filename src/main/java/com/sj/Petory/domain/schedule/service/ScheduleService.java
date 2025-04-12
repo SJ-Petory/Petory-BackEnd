@@ -398,9 +398,17 @@ public class ScheduleService {
 
         SelectDate selectDate = getSelectDate(request.getScheduleAt(), schedule);
 
+        isValidSchedule(selectDate);
+
         selectDate.setStatus(ScheduleStatus.valueOf(request.getStatus()));
 
         return true;
+    }
+
+    private void isValidSchedule(final SelectDate selectDate) {
+        if (ScheduleStatus.DELETED.equals(selectDate.getStatus())) {
+            throw new ScheduleException(ErrorCode.INVALID_SCHEDULE);
+        }
     }
 
     @Transactional
@@ -413,6 +421,8 @@ public class ScheduleService {
 
         Schedule schedule = validMemberSchedule(member, scheduleId);
         SelectDate selectDate = getSelectDate(scheduleAt, schedule);
+
+        isValidSchedule(selectDate);
 
         selectDate.setStatus(ScheduleStatus.DELETED);
 

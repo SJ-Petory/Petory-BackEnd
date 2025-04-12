@@ -81,3 +81,6 @@ application.yml
 *.yml
 open-api-3.0.1.json
 src/main/resources/db/migration/mysql/
+
+backup-config.sh
+restore-config.sh
