@@ -84,6 +84,11 @@ public class ScheduleService {
 
         createScheduleForPet(request, member);
 
+        if (request.isNoticeYn()) { //알림 여부가 true 이면
+            // 1. 알림 시간 계산 ! notice_at 있을 때 없을 때 나눠서
+//            if (request.getNoticeAt())
+            // 2. ScheduleNotification에 저장
+        }
         return true;
     }
 
