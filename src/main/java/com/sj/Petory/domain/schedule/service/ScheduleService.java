@@ -3,6 +3,11 @@ package com.sj.Petory.domain.schedule.service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.notification.entity.ScheduleNotification;
+import com.sj.Petory.domain.notification.entity.ScheduleNotificationReceiver;
+import com.sj.Petory.domain.notification.repository.ScheduleNotificationReceiverRepository;
+import com.sj.Petory.domain.notification.repository.ScheduleNotificationRepository;
+import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
@@ -46,6 +51,8 @@ public class ScheduleService {
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
     private final SelectDateRepository selectDateRepository;
+    private final ScheduleNotificationRepository scheduleNotificationRepository;
+    private final ScheduleNotificationReceiverRepository scheduleNotificationReceiverRepository;
 
     public boolean createCategory(
             final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
@@ -82,17 +89,53 @@ public class ScheduleService {
             validateMemberAndPet(request, member);
         }
 
-        createScheduleForPet(request, member);
+        List<SelectDate> selectDates = createScheduleForPet(request, member);
+        List<LocalDateTime> noticeTime = new ArrayList<>();
 
+        //* 일정 알림 저장 로직
         if (request.isNoticeYn()) { //알림 여부가 true 이면
             // 1. 알림 시간 계산 ! notice_at 있을 때 없을 때 나눠서
-//            if (request.getNoticeAt())
-            // 2. ScheduleNotification에 저장
+            if (request.getNoticeAt() >= 1) {
+                selectDates.forEach(dates ->
+                        noticeTime.add(
+                                dates.getSelectedDate().minusMinutes(
+                                        request.getNoticeAt())));
+            }
+            //알림 몇 분 전 설정 안했을 때
+            // &&하루종일이면 시간 설정을 하지 않으니까
+            // =>>정시 알림
+            if (request.getNoticeAt() == 0 || request.getIsAllDay()) {
+                selectDates.forEach(dates ->
+                        noticeTime.add(
+                                ScheduleAtConverter.convertToDateTime(
+                                        dates.getSelectedDate(), LocalTime.MIDNIGHT)
+                        )
+                );
+            }
         }
+        List<Member> memberList = new ArrayList<>();
+        memberList.add(member);
+
+        // * pet들의 돌보미들도 memberList에 넣어ㅑ야ㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑ함.....
+        // 2. ScheduleNotification 에 저장
+        ScheduleNotification scheduleNotification =
+                scheduleNotificationRepository.save(
+                        ScheduleNotification.builder()
+                                .entityId(166L) //일정아이디 갖구와야함....
+                                .noticeTimeList(noticeTime)
+                                .build()
+                );
+        // 3. ScheduleNotificationReceiver에도 연관관계설정..
+        scheduleNotificationReceiverRepository.save(
+                ScheduleNotificationReceiver.builder()
+                        .scheduleNotification(scheduleNotification)
+                        .member(member) //뿐만아니라 돌보미들도넣어야함..
+                        .build()
+        );
         return true;
     }
 
-    private void createScheduleForPet(CreateScheduleRequest request, Member member) {
+    private List<SelectDate> createScheduleForPet(CreateScheduleRequest request, Member member) {
         ScheduleCategory category = scheduleCategoryRepository.findByCategoryIdAndMember(
                         request.getCategoryId(), member)
                 .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -132,6 +175,8 @@ public class ScheduleService {
 
             petScheduleRepository.saveAll(petScheduleList);
         }
+
+        return dates;
     }
 
     private void validateRepeatPattern(RepeatPatternDto.Request repeatPattern) {
@@ -378,11 +423,11 @@ public class ScheduleService {
 //        //customRepeatPattern에서 변경된 사항 ,, 변경
 //        //customPattern은 일정이 변경 된다음에 들어가야함.
 //        schedule.updateSchedule(category, request);
-////        petSchedules.updateSchedule(request);
+
+    /// /        petSchedules.updateSchedule(request);
 //
 //        return true;
 //    }
-
     @Transactional
     public boolean scheduleStatus(
             final MemberAdapter memberAdapter
