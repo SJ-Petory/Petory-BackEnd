@@ -23,17 +23,6 @@ public class ScheduleAtConverter {
         return date.atTime(time);
     }
 
-    public static LocalDateTime convertToDateTime(LocalDateTime dateTime, LocalTime time) {
-        if (dateTime == null || time == null) {
-            throw new IllegalArgumentException("DateTime must not be null");
-        }
-        return dateTime
-                .withHour(time.getHour())
-                .withMinute(time.getMinute())
-                .withSecond(time.getSecond())
-                .withNano(time.getNano());
-    }
-
     public static LocalDate convertToDate(int year, int month, int day) {
 
         try {

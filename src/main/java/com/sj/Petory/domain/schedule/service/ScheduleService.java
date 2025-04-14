@@ -7,7 +7,6 @@ import com.sj.Petory.domain.notification.entity.ScheduleNotification;
 import com.sj.Petory.domain.notification.entity.ScheduleNotificationReceiver;
 import com.sj.Petory.domain.notification.repository.ScheduleNotificationReceiverRepository;
 import com.sj.Petory.domain.notification.repository.ScheduleNotificationRepository;
-import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
@@ -37,7 +36,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -85,75 +83,95 @@ public class ScheduleService {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
 
+        Schedule schedule = scheduleRepository.save(//영속성 컨텍스트 등록
+                request.toScheduleEntity(member, getScheduleCategory(request, member)));
+
+        if (!request.getIsAllDay()) { //하루종일 아니면 scheduleTime 설정
+            schedule.setScheduleTime(request.getScheduleTime());
+        }
+        List<SelectDate> selectDates = getSelectDates(schedule, request);
+
+        schedule.setSelectedDates(selectDates);
+        schedule.setRepeatPattern(request.toRepeatPatternEntity(schedule));
+
         if (request.getPetId() != null) {
             validateMemberAndPet(request, member);
+            createScheduleForPet(schedule, request);
         }
 
-        List<SelectDate> selectDates = createScheduleForPet(request, member);
+        List<Member> careGiverList = getCareGiversForPet(request.getPetId());
+
         List<LocalDateTime> noticeTime = new ArrayList<>();
 
-        //* 일정 알림 저장 로직
-        if (request.isNoticeYn()) { //알림 여부가 true 이면
-            // 1. 알림 시간 계산 ! notice_at 있을 때 없을 때 나눠서
-            if (request.getNoticeAt() >= 1) {
-                selectDates.forEach(dates ->
-                        noticeTime.add(
-                                dates.getSelectedDate().minusMinutes(
-                                        request.getNoticeAt())));
-            }
-            //알림 몇 분 전 설정 안했을 때
-            // &&하루종일이면 시간 설정을 하지 않으니까
-            // =>>정시 알림
-            if (request.getNoticeAt() == 0 || request.getIsAllDay()) {
-                selectDates.forEach(dates ->
-                        noticeTime.add(
-                                ScheduleAtConverter.convertToDateTime(
-                                        dates.getSelectedDate(), LocalTime.MIDNIGHT)
-                        )
-                );
-            }
+        if (request.isNoticeYn()) {
+            createScheduleNotification(request, selectDates, noticeTime, careGiverList, member, schedule);
         }
-        List<Member> memberList = new ArrayList<>();
-        memberList.add(member);
 
-        // * pet들의 돌보미들도 memberList에 넣어ㅑ야ㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑ함.....
+        return true;
+    }
+
+    private void createScheduleNotification(
+            CreateScheduleRequest request,
+            List<SelectDate> selectDates,
+            List<LocalDateTime> noticeTime,
+            List<Member> careGiverList,
+            Member member, Schedule schedule) {
+
+        selectDates.forEach(date ->
+                noticeTime.add(
+                        date.getSelectedDate().minusMinutes(
+                                request.getNoticeAt())));
+
+        careGiverList.add(member);
         // 2. ScheduleNotification 에 저장
         ScheduleNotification scheduleNotification =
                 scheduleNotificationRepository.save(
                         ScheduleNotification.builder()
-                                .entityId(166L) //일정아이디 갖구와야함....
+                                .entityId(schedule.getScheduleId())
                                 .noticeTimeList(noticeTime)
                                 .build()
                 );
         // 3. ScheduleNotificationReceiver에도 연관관계설정..
-        scheduleNotificationReceiverRepository.save(
-                ScheduleNotificationReceiver.builder()
-                        .scheduleNotification(scheduleNotification)
-                        .member(member) //뿐만아니라 돌보미들도넣어야함..
-                        .build()
-        );
-        return true;
+        List<ScheduleNotificationReceiver> scheduleNotificationReceivers = new ArrayList<>();
+
+        for (Member receiver : careGiverList) {
+            scheduleNotificationReceivers.add(
+                    ScheduleNotificationReceiver.builder()
+                            .scheduleNotification(scheduleNotification)
+                            .member(receiver)
+                            .isSent(false)
+                            .build()
+            );
+        }
+
+        scheduleNotificationReceiverRepository.saveAll(scheduleNotificationReceivers);
     }
 
-    private List<SelectDate> createScheduleForPet(CreateScheduleRequest request, Member member) {
-        ScheduleCategory category = scheduleCategoryRepository.findByCategoryIdAndMember(
-                        request.getCategoryId(), member)
-                .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
+    private List<Member> getCareGiversForPet(List<Long> petId) {
+        List<Long> membersId =
+                careGiverRepository.findMemberIdsByPet(petId);
 
-        Schedule schedule = scheduleRepository.save(
-                request.toScheduleEntity(member, category));
+        return memberRepository.findAllById(membersId);
 
-        if (!request.getIsAllDay()) {
-            schedule.setScheduleTime(request.getScheduleTime());
-        }
+    }
+
+    private void createScheduleForPet(Schedule schedule, CreateScheduleRequest request) {
+
+        List<PetSchedule> petScheduleList = request.getPetId().stream()
+                .map(petId -> petRepository.findByPetId(petId)
+                        .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND)))
+                .map(pet -> request.toPetScheduleEntity(pet, schedule))
+                .toList();
+
+        petScheduleRepository.saveAll(petScheduleList);
+    }
+
+    private List<SelectDate> getSelectDates(Schedule schedule, CreateScheduleRequest request) {
         List<SelectDate> dates = new ArrayList<>();
 
         if (request.getRepeatYn()) {
 
             validateRepeatPattern(request.getRepeatPattern());
-
-            repeatPatternRepository.save(
-                    request.toRepeatPatternEntity(schedule));
 
             dates = createDateToRepeat(request.getRepeatPattern()).stream()
                     .map(date -> toSelectDateEntity(schedule, date,
@@ -164,19 +182,14 @@ public class ScheduleService {
                     .map(datestr -> toSelectDateEntity(schedule, LocalDate.parse(datestr),
                             schedule.getScheduleTime(), request.getIsAllDay())).toList();
         }
-        schedule.setSelectedDates(dates);
-
-        if (request.getPetId() != null) {
-            List<PetSchedule> petScheduleList = request.getPetId().stream()
-                    .map(petId -> petRepository.findByPetId(petId)
-                            .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND)))
-                    .map(pet -> request.toPetScheduleEntity(pet, schedule))
-                    .toList();
-
-            petScheduleRepository.saveAll(petScheduleList);
-        }
-
         return dates;
+    }
+
+    private ScheduleCategory getScheduleCategory(CreateScheduleRequest request, Member member) {
+
+        return scheduleCategoryRepository.findByCategoryIdAndMember(
+                        request.getCategoryId(), member)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
     private void validateRepeatPattern(RepeatPatternDto.Request repeatPattern) {

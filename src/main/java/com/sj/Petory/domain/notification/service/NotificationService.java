@@ -172,6 +172,7 @@ public class NotificationService {
                         noticePayload.setReceiveMemberId(receiverId);
                         sendNotification(noticePayload);
                     });
+            //isSent 로직
         }
     }
 }
