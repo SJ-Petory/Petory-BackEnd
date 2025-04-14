@@ -159,6 +159,7 @@ public class FriendService {
 
     private void sendNotification(Member receiveMember, NoticeType friendProcess, FriendInfo friendInfo, Member sendMember) {
         notificationService.sendNotification(
+                receiveMember,
                 NotificationPayloadDto.builder()
                         .receiveMemberId(receiveMember.getMemberId())
                         .noticeType(friendProcess)

@@ -117,6 +117,12 @@ public class NotificationService {
                         noticePayLoad.getReceiveMemberId())
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
+        sendNotification(receiveMember, noticePayLoad);
+    }
+    public void sendNotification(
+            final Member receiveMember,
+            final NotificationPayloadDto noticePayLoad) {
+
         // 1. 알림 객체 저장
         notificationRepository.save(
                 Notification.builder()
