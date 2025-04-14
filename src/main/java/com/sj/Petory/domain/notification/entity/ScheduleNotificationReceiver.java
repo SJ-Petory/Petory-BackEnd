@@ -2,7 +2,9 @@ package com.sj.Petory.domain.notification.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CollectionId;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,6 +13,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Schedulenotificationreceiver")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class ScheduleNotificationReceiver {
 
@@ -26,6 +31,9 @@ public class ScheduleNotificationReceiver {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Column(name = "is_sent")
+    private boolean isSent;
 
     @CreatedDate
     @Column(updatable = false)

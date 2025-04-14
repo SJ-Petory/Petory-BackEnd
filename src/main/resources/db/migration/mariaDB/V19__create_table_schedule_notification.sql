@@ -1,5 +1,5 @@
 CREATE TABLE `ScheduleNotification` (
-    `schedule_notification_id`	BIGINT	NOT NULL,
+    `schedule_notification_id`	BIGINT	AUTO_INCREMENT PRIMARY KEY ,
     `receive_member_id`	BIGINT	NOT NULL,
     `notice_type`	VARCHAR(50)	NOT NULL,
     `entity_id`	BIGINT  NOT NULL,
@@ -8,8 +8,3 @@ CREATE TABLE `ScheduleNotification` (
     `created_at`	TIMESTAMP	NOT NULL,
     `updated_at`	TIMESTAMP	NOT NULL
 );
-
-ALTER TABLE `ScheduleNotification` ADD CONSTRAINT `PK_SCHEDULENOTIFICATION` PRIMARY KEY (
-    `schedule_notification_id`
-    );
-
