@@ -92,7 +92,6 @@ public class ScheduleService {
         List<SelectDate> selectDates = getSelectDates(schedule, request);
 
         schedule.setSelectedDates(selectDates);
-        schedule.setRepeatPattern(request.toRepeatPatternEntity(schedule));
 
         if (request.getPetId() != null) {
             validateMemberAndPet(request, member);
@@ -170,6 +169,8 @@ public class ScheduleService {
         List<SelectDate> dates = new ArrayList<>();
 
         if (request.getRepeatYn()) {
+
+            schedule.setRepeatPattern(request.toRepeatPatternEntity(schedule));
 
             validateRepeatPattern(request.getRepeatPattern());
 
