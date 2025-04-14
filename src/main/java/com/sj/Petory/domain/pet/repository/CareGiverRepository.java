@@ -28,11 +28,14 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
 
     Page<CareGiver> findByMember(Member member, Pageable pageable);
 
-    List<CareGiver> findByMember(Member member);
-
     boolean existsByPetAndMember(Pet pet, Member member);
 
     @Query("select cg.pet.id from CareGiver cg" +
             " where cg.member.id = :memberId")
     List<Long> findPetIdsByMember(@Param("memberId") Long memberId);
+
+    @Query("select cg.member.memberId" +
+            " from CareGiver cg" +
+            " where cg.pet.petId in :petIds")
+    List<Long> findMemberIdsByPet(@Param("petIds") List<Long> petIds);
 }
