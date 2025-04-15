@@ -1,6 +1,5 @@
 package com.sj.Petory.domain.notification.dto;
 
-import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import lombok.*;
 
@@ -16,4 +15,5 @@ public class NotificationPayloadDto {
     private Long entityId;
     private Long sendMemberId;
     private String sendMemberName;
+    private Long unReadCount;
 }
