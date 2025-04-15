@@ -44,7 +44,6 @@ public class ScheduleService {
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleCategoryRepository scheduleCategoryRepository;
-    private final RepeatPatternRepository repeatPatternRepository;
     private final PetRepository petRepository;
     private final PetScheduleRepository petScheduleRepository;
     private final CareGiverRepository careGiverRepository;
@@ -84,7 +83,7 @@ public class ScheduleService {
         Member member = getMemberByMemberAdapter(memberAdapter);
 
         Schedule schedule = scheduleRepository.save(//영속성 컨텍스트 등록
-                request.toScheduleEntity(member, getScheduleCategory(request, member)));
+                request.toScheduleEntity(member, getScheduleCategory(request.getCategoryId(), member)));
 
         if (!request.getIsAllDay()) { //하루종일 아니면 scheduleTime 설정
             schedule.setScheduleTime(request.getScheduleTime());
@@ -197,10 +196,10 @@ public class ScheduleService {
         return dates;
     }
 
-    private ScheduleCategory getScheduleCategory(CreateScheduleRequest request, Member member) {
+    private ScheduleCategory getScheduleCategory(long categoryId, Member member) {
 
         return scheduleCategoryRepository.findByCategoryIdAndMember(
-                        request.getCategoryId(), member)
+                        categoryId, member)
                 .orElseThrow(() -> new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
@@ -514,4 +513,14 @@ public class ScheduleService {
         throw new ScheduleException(ErrorCode.INVALID_SCHEDULE_ACCESS);
     }
 
+    public boolean deleteCategory(final MemberAdapter memberAdapter, final Long categoryId) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        if (!scheduleCategoryRepository.existsByCategoryIdAndMember(categoryId, member)) {
+            throw new ScheduleException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+        scheduleCategoryRepository.deleteById(categoryId);
+
+        return true;
+    }
 }
