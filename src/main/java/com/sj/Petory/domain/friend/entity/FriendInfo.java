@@ -30,6 +30,7 @@ public class FriendInfo {
     @JoinColumn(name = "send_member_id")
     private Member sendMember;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "friend_status_id")
     private FriendStatus friendStatus;
@@ -62,7 +63,4 @@ public class FriendInfo {
                 .build();
     }
 
-    public void setFriendStatus(FriendStatus friendStatus) {
-        this.friendStatus = friendStatus;
-    }
 }
