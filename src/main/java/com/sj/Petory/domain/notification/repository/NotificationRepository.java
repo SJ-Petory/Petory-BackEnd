@@ -8,9 +8,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     Page<Notification> findByMember(Member member, Pageable pageable);
+
+    Optional<Notification> findByNoticeIdAndMember(Long noticeId, Member member);
 }
