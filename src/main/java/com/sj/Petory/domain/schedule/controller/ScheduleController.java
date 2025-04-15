@@ -95,7 +95,16 @@ public class ScheduleController {
             , @RequestParam("scheduleAt") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime scheduleAt) {
 
 
-            return ResponseEntity.ok(
-                    scheduleService.deleteSchedule(memberAdapter, scheduleId, scheduleAt));
-        }
+        return ResponseEntity.ok(
+                scheduleService.deleteSchedule(memberAdapter, scheduleId, scheduleAt));
     }
+
+    @DeleteMapping("/category/{categoryId}")
+    public ResponseEntity<Boolean> deleteCategory(
+            @AuthenticationPrincipal MemberAdapter memberAdapter,
+            @PathVariable("categoryId") Long categoryId) {
+
+        return ResponseEntity.ok(
+                scheduleService.deleteCategory(memberAdapter, categoryId));
+    }
+}
