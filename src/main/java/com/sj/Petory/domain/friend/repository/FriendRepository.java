@@ -25,4 +25,6 @@ public interface FriendRepository extends JpaRepository<FriendInfo, Long> {
     Page<FriendInfo> findByReceiveMemberAndFriendStatus(
             Member receiveMember, FriendStatus requestStatus, Pageable pageable);
 
+    long countByFriendStatusStatusAndReceiveMember(String status, Member member);
+
 }

@@ -72,4 +72,11 @@ public class FriendController {
                 friendService.friendDetail(
                         memberAdapter, memberId, pageable));
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getFriendsCount(
+            @AuthenticationPrincipal MemberAdapter memberAdapter) {
+
+        return ResponseEntity.ok(friendService.getFriendsCount(memberAdapter));
+    }
 }
