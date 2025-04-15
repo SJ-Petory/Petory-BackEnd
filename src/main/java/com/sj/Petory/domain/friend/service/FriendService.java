@@ -204,4 +204,12 @@ public class FriendService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    public long getFriendsCount(final MemberAdapter memberAdapter) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        return friendRepository.countByFriendStatusStatusAndReceiveMember(
+                "ACCEPTED", member);
+    }
 }
