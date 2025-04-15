@@ -1,7 +1,6 @@
 package com.sj.Petory.domain.notification.controller;
 
 import com.sj.Petory.domain.notification.dto.NoticeListResponse;
-import com.sj.Petory.domain.notification.dto.NoticeRedirectResponse;
 import com.sj.Petory.domain.notification.service.NotificationService;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class NotificationController {
     }
 
     @PatchMapping("/{noticeId}")
-    public ResponseEntity<NoticeRedirectResponse> markAsRead(
+    public ResponseEntity<Boolean> markAsRead(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @PathVariable Long noticeId) {
 

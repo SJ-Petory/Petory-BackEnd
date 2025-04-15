@@ -4,10 +4,8 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.notification.dto.NoticeListResponse;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,6 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "notification")
 public class Notification {
@@ -38,6 +37,7 @@ public class Notification {
     @Column(name = "entity_id")
     private Long entityId;
 
+    @Setter
     @Column(name = "is_read")
     private boolean isRead;
 

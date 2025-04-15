@@ -4,7 +4,6 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.notification.dto.NoticeListResponse;
-import com.sj.Petory.domain.notification.dto.NoticeRedirectResponse;
 import com.sj.Petory.domain.notification.dto.NotificationPayloadDto;
 import com.sj.Petory.domain.notification.entity.Notification;
 import com.sj.Petory.domain.notification.entity.ScheduleNotification;
@@ -13,8 +12,10 @@ import com.sj.Petory.domain.notification.repository.ScheduleNotificationReceiver
 import com.sj.Petory.domain.notification.repository.ScheduleNotificationRepository;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import com.sj.Petory.exception.MemberException;
+import com.sj.Petory.exception.NoticeException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -106,11 +107,20 @@ public class NotificationService {
         return new PageImpl<>(notifications, pageable, notifications.size());
     }
 
+    @Transactional
+    public boolean markAsRead(
+            final MemberAdapter memberAdapter, final Long noticeId) {
 
-    public NoticeRedirectResponse markAsRead(MemberAdapter memberAdapter, Long noticeId) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
 
+        Notification notification = notificationRepository.findByNoticeIdAndMember(noticeId, member)
+                .orElseThrow(() -> new NoticeException(ErrorCode.INVALID_NOTIFICATION));
 
-        return null;
+        if (!notification.isRead()) {
+            notification.setRead(true);
+        }
+
+        return true;
     }
 
     public void sendNotification(
