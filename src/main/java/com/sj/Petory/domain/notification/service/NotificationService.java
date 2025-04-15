@@ -120,6 +120,20 @@ public class NotificationService {
             notification.setRead(true);
         }
 
+        SseEmitter emitter = emitterMap.get(member.getMemberId());
+
+        if (emitter != null) {
+
+            try {
+                long unReadCount = getNoticeCount(member);
+                emitter.send(SseEmitter.event()
+                        .name("unReadCount")
+                        .data(unReadCount));
+            } catch (IOException e) {
+                log.error("읽음 처리 후 unReadCount 전송실패");
+            }
+        }
+
         return true;
     }
 
@@ -132,6 +146,7 @@ public class NotificationService {
 
         sendNotification(receiveMember, noticePayLoad);
     }
+
     public void sendNotification(
             final Member receiveMember,
             final NotificationPayloadDto noticePayLoad) {
@@ -151,6 +166,7 @@ public class NotificationService {
                         noticePayLoad.getReceiveMemberId());
 
         if (emitter != null) {
+            noticePayLoad.setUnReadCount(getNoticeCount(receiveMember));
 
             try {
                 emitter.send(SseEmitter.event()
@@ -184,5 +200,10 @@ public class NotificationService {
                     });
             //isSent 로직
         }
+    }
+
+    private long getNoticeCount(final Member member) {
+
+        return notificationRepository.countByMemberAndIsRead(member, false);
     }
 }
