@@ -18,6 +18,7 @@ import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -98,9 +99,11 @@ public class NotificationService {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
-        notificationRepository.findByMember(member, pageable);
+        List<NoticeListResponse> notifications =
+                notificationRepository.findByMember(member, pageable)
+                        .stream().map(Notification::toListDto).toList();
 
-        return null;
+        return new PageImpl<>(notifications, pageable, notifications.size());
     }
 
 
@@ -152,10 +155,7 @@ public class NotificationService {
     @Scheduled(fixedRate = 60_000)
     public void checkScheduleNotification() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        //현재 시간을 분 단위까지만 나머진 버림
 
-        //현재 시간기준 알림 울려야 할
-        // scheduleNotification 객체 갖구오기
         List<ScheduleNotification> scheduleNoticeList =
                 scheduleNotificationRepository.findByNoticeTime(now);
 

@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.notification.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.notification.dto.NoticeListResponse;
 import com.sj.Petory.domain.notification.type.NoticeType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,4 +48,14 @@ public class Notification {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public NoticeListResponse toListDto() {
+
+        return NoticeListResponse.builder()
+                .noticeId(this.getNoticeId())
+                .isRead(this.isRead())
+                .noticeType(this.getNoticeType())
+                .createdAt(this.getCreatedAt())
+                .build();
+    }
 }
