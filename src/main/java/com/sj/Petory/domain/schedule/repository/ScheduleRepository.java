@@ -17,8 +17,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     boolean existsByScheduleIdAndMember(Long scheduleId, Member member);
 
-    Optional<Schedule> findByScheduleIdAndMember(Long scheduleId, Member member);
-
     List<Schedule> findByMember(Member member);
 
     @Query("select distinct cg.member.id from CareGiver cg" +

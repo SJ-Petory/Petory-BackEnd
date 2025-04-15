@@ -93,17 +93,24 @@ public class ScheduleService {
 
         schedule.setSelectedDates(selectDates);
 
+        List<Member> careGiverList = new ArrayList<>();
+        Set<Member> scheduleMember = new HashSet<>(); // 일정과 연관된 모든 사람
+
+        scheduleMember.add(member);
+
         if (request.getPetId() != null) {
             validateMemberAndPet(request, member);
             createScheduleForPet(schedule, request);
+            careGiverList = getCareGiversForPet(request.getPetId());
         }
-
-        List<Member> careGiverList = getCareGiversForPet(request.getPetId());
+        scheduleMember.addAll(careGiverList);
+        scheduleMember.addAll(getOwnMembersForPet(request.getPetId()));
 
         List<LocalDateTime> noticeTime = new ArrayList<>();
 
         if (request.isNoticeYn()) {
-            createScheduleNotification(request, selectDates, noticeTime, careGiverList, member, schedule);
+            createScheduleNotification(
+                    request, selectDates, noticeTime, scheduleMember, schedule);
         }
 
         return true;
@@ -113,15 +120,14 @@ public class ScheduleService {
             CreateScheduleRequest request,
             List<SelectDate> selectDates,
             List<LocalDateTime> noticeTime,
-            List<Member> careGiverList,
-            Member member, Schedule schedule) {
+            Set<Member> scheduleMembers,
+            Schedule schedule) {
 
         selectDates.forEach(date ->
                 noticeTime.add(
                         date.getSelectedDate().minusMinutes(
                                 request.getNoticeAt())));
 
-        careGiverList.add(member);
         // 2. ScheduleNotification 에 저장
         ScheduleNotification scheduleNotification =
                 scheduleNotificationRepository.save(
@@ -131,10 +137,10 @@ public class ScheduleService {
                                 .build()
                 );
         // 3. ScheduleNotificationReceiver에도 연관관계설정..
-        List<ScheduleNotificationReceiver> scheduleNotificationReceivers = new ArrayList<>();
+        List<ScheduleNotificationReceiver> notificationReceivers = new ArrayList<>();
 
-        for (Member receiver : careGiverList) {
-            scheduleNotificationReceivers.add(
+        for (Member receiver : scheduleMembers) { //펫의 주인
+            notificationReceivers.add(
                     ScheduleNotificationReceiver.builder()
                             .scheduleNotification(scheduleNotification)
                             .member(receiver)
@@ -143,14 +149,19 @@ public class ScheduleService {
             );
         }
 
-        scheduleNotificationReceiverRepository.saveAll(scheduleNotificationReceivers);
+        scheduleNotificationReceiverRepository.saveAll(notificationReceivers);
     }
 
     private List<Member> getCareGiversForPet(List<Long> petId) {
-        List<Long> membersId =
-                careGiverRepository.findMemberIdsByPet(petId);
 
-        return memberRepository.findAllById(membersId);
+        return memberRepository.findAllById(
+                careGiverRepository.findMemberIdsByPet(petId));
+    }
+
+    private List<Member> getOwnMembersForPet(List<Long> petId) {
+
+        return memberRepository.findAllById(
+                petRepository.findMemberIdsByPet(petId));
 
     }
 
@@ -315,12 +326,6 @@ public class ScheduleService {
     public Member getMemberByMemberAdapter(final MemberAdapter memberAdapter) {
 
         return getMemberByEmail(memberAdapter.getUsername());
-    }
-
-
-    private Pet getPetById(long petId) {
-        return petRepository.findById(petId)
-                .orElseThrow(() -> new PetException(ErrorCode.PET_NOT_FOUND));
     }
 
     public Page<ScheduleListResponse> scheduleList(

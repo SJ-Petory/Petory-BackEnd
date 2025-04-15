@@ -21,5 +21,4 @@ public interface ScheduleNotificationRepository extends JpaRepository<ScheduleNo
         WHERE snt.notice_time = :targetTime
         """, nativeQuery = true)
     List<ScheduleNotification> findByNoticeTime(@Param("targetTime") LocalDateTime targetTime);
-    // 이렇게 List 조회 불가 NativeQUery 써야함
 }
