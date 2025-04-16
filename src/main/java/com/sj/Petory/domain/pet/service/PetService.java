@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -188,5 +189,26 @@ public class PetService {
                 .stream().map(Breed::toListDto).toList();
 
         return new PageImpl<>(breedList, pageable, breedList.size());
+    }
+
+    @Transactional
+    public boolean deleteCareGiver(
+            final MemberAdapter memberAdapter,
+            final Long petId, final Long careGiverId) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        petRepository.findByPetIdAndMember(petId, member)
+                .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
+
+        Member careGiver = getMemberById(careGiverId);
+        Pet pet = getPetById(petId);
+
+        careGiverRepository.findByPetAndMember(pet, careGiver)
+                .orElseThrow(() -> new PetException(ErrorCode.UNMATCHED_PET_CAREGIVER));
+
+        careGiverRepository.deleteByPetAndMember(pet, careGiver);
+
+        return true;
     }
 }

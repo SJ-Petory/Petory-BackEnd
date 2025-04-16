@@ -73,8 +73,18 @@ public class PetController {
     @GetMapping("/breed/{speciesId}")
     public ResponseEntity<Page<BreedListResponse>> getBreedListForSpecies(
             @PathVariable("speciesId") Long speciesId
-            ,Pageable pageable) {
+            , Pageable pageable) {
 
         return ResponseEntity.ok(petService.getBreedListForSpecies(speciesId, pageable));
+    }
+
+    @DeleteMapping(value = "/{petId}", params = "careGiverId")
+    public ResponseEntity<Boolean> deleteCareGiver(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("petId") Long petId
+            , @RequestParam("careGiverId") Long careGiverId) {
+
+        return ResponseEntity.ok(petService.deleteCareGiver(
+                memberAdapter, petId, careGiverId));
     }
 }

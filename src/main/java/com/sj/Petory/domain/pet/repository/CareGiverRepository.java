@@ -38,4 +38,6 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
             " from CareGiver cg" +
             " where cg.pet.petId in :petIds")
     List<Long> findMemberIdsByPet(@Param("petIds") List<Long> petIds);
+
+    void deleteByPetAndMember(Pet pet, Member careGiver);
 }

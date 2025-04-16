@@ -35,6 +35,9 @@ public enum ErrorCode {
 
     ALREADY_REGISTERED_MEMBER("이미 돌보미로 등록된 회원입니다.", HttpStatus.BAD_REQUEST),
 
+    //caregiver
+    UNMATCHED_PET_CAREGIVER("돌보는 펫 정보가 없습니다.", HttpStatus.BAD_REQUEST),
+
     //schedule
     DUPLICATED_CATEGORY_NAME("중복된 이름입니다.", HttpStatus.BAD_REQUEST),
     CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
