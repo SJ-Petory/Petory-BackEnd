@@ -51,7 +51,7 @@ public class SecurityConfig {
                                         "/members/check-email"
                                         , "/members/check-name"
                                         , "members/login"
-                                        , "/pets/species", "/pets/breed"
+                                        , "/pets/species", "/pets/breed/**"
                                         , "/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                                 .requestMatchers("/oauth/kakao/**").permitAll()

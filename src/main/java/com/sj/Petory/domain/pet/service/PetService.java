@@ -6,10 +6,7 @@ import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
-import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
-import com.sj.Petory.domain.pet.dto.PetRegister;
-import com.sj.Petory.domain.pet.dto.SpeciesListResponse;
-import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
+import com.sj.Petory.domain.pet.dto.*;
 import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.CareGiver;
 import com.sj.Petory.domain.pet.entity.Pet;
@@ -180,5 +177,16 @@ public class PetService {
                         .map(Species::toListDto).toList();
 
         return new PageImpl<>(speciesList, pageable, speciesList.size());
+    }
+
+    public Page<BreedListResponse> getBreedListForSpecies(
+            final Long speciesId, final Pageable pageable) {
+
+        List<BreedListResponse> breedList = breedRepository.findBySpecies(
+                        speciesRepository.findById(speciesId)
+                                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND)))
+                .stream().map(Breed::toListDto).toList();
+
+        return new PageImpl<>(breedList, pageable, breedList.size());
     }
 }

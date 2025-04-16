@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.pet.entity;
 
+import com.sj.Petory.domain.pet.dto.BreedListResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,12 @@ public class Breed {
 
     @Column(name = "breed_name")
     private String breedName;
+
+    public BreedListResponse toListDto() {
+
+        return BreedListResponse.builder()
+                .breedId(this.getBreedId())
+                .breedName(this.getBreedName())
+                .build();
+    }
 }
