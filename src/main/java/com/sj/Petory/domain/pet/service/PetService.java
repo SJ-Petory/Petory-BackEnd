@@ -8,6 +8,7 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
 import com.sj.Petory.domain.pet.dto.PetRegister;
+import com.sj.Petory.domain.pet.dto.SpeciesListResponse;
 import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
 import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.CareGiver;
@@ -24,10 +25,12 @@ import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -168,5 +171,14 @@ public class PetService {
                         breedRepository.findByBreedId(careGiver.getPet().getBreed())
                                 .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND))
                 ));
+    }
+
+    public Page<SpeciesListResponse> getSpeciesList(final Pageable pageable) {
+
+        List<SpeciesListResponse> speciesList =
+                speciesRepository.findAll().stream()
+                        .map(Species::toListDto).toList();
+
+        return new PageImpl<>(speciesList, pageable, speciesList.size());
     }
 }

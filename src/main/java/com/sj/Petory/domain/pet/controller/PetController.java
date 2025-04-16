@@ -3,6 +3,7 @@ package com.sj.Petory.domain.pet.controller;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
 import com.sj.Petory.domain.pet.dto.PetRegister;
+import com.sj.Petory.domain.pet.dto.SpeciesListResponse;
 import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
 import com.sj.Petory.domain.pet.service.PetService;
 import jakarta.validation.Valid;
@@ -64,5 +65,11 @@ public class PetController {
 
         return ResponseEntity.ok(
                 petService.caregiverPetList(memberAdapter, pageable));
+    }
+
+    @GetMapping("/species")
+    public ResponseEntity<Page<SpeciesListResponse>> getSpeciesList(Pageable pageable) {
+
+        return ResponseEntity.ok(petService.getSpeciesList(pageable));
     }
 }
