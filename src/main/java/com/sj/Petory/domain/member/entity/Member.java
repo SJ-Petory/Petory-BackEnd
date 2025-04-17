@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.entity;
 
+import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.UpdateMemberRequest;
 import com.sj.Petory.domain.member.type.MemberStatus;
@@ -56,6 +57,15 @@ public class Member {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public MemberDocument toDocument() {
+
+        return MemberDocument.builder()
+                .memberId(this.getMemberId())
+                .email(this.getEmail())
+                .name(this.getName())
+                .build();
+    }
 
     public MemberSearchResponse toDto() {
         return MemberSearchResponse.builder()

@@ -3,6 +3,7 @@ package com.sj.Petory.OAuth.service;
 import com.sj.Petory.OAuth.dto.ExtraUserInfo;
 import com.sj.Petory.OAuth.dto.KakaoTokenResponse;
 import com.sj.Petory.OAuth.dto.UserInfoResponse;
+import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.entity.Member;
@@ -22,6 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class KakaoLoginService {
 
+    private final MemberEsRepository memberEsRepository;
     @Value("${kakao.client_id}")
     private String clientId;
 
@@ -77,8 +79,8 @@ public class KakaoLoginService {
                 .bodyToMono(UserInfoResponse.class)
                 .block();
 
-        memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
-
+        Member member = memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
+        memberEsRepository.save(member.toDocument());
 
         return SignIn.Response.toResponse(
                 jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK")
