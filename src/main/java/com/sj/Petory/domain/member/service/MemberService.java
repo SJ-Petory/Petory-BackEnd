@@ -30,7 +30,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final PostRepository postRepository;
-    private final SpeciesRepository speciesRepository;
     private final BreedRepository breedRepository;
 
     private final MemberEsRepository memberEsRepository;

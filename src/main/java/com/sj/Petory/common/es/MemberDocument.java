@@ -24,13 +24,4 @@ public class MemberDocument {
 
     private String name;
     private String email;
-    private String image;
-
-    public MemberSearchResponse toDto() {
-        return MemberSearchResponse.builder()
-                .id(this.memberId)
-                .name(this.getName())
-                .image(this.getImage())
-                .build();
-    }
 }

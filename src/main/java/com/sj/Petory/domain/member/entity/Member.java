@@ -57,6 +57,14 @@ public class Member {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public MemberSearchResponse toDto() {
+        return MemberSearchResponse.builder()
+                .id(this.memberId)
+                .name(this.getName())
+                .image(this.getImage())
+                .build();
+    }
+
     public Member updateInfo(final UpdateMemberRequest request) {
         if (StringUtils.hasText(request.getName())) {
             this.name = request.getName();
