@@ -10,9 +10,6 @@
     "email": {
       "type": "text",
       "analyzer": "member_search_analyzer"
-    },
-    "image": {
-      "type": "text"
     }
   }
 }

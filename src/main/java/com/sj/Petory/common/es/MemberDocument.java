@@ -1,16 +1,14 @@
 package com.sj.Petory.common.es;
 
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -24,13 +22,13 @@ public class MemberDocument {
 
     private String name;
     private String email;
-    private String image;
 
-    public MemberSearchResponse toDto() {
-        return MemberSearchResponse.builder()
-                .id(this.memberId)
-                .name(this.getName())
-                .image(this.getImage())
+    public MemberDocument updateName(String newName) {
+
+        return MemberDocument.builder()
+                .memberId(this.getMemberId())
+                .name(newName)
+                .email(this.getEmail())
                 .build();
     }
 }

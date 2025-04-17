@@ -23,16 +23,19 @@ import com.sj.Petory.exception.FriendException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FriendService {
 
     private final FriendRepository friendRepository;
@@ -47,8 +50,12 @@ public class FriendService {
     public Page<MemberSearchResponse> searchMember(
             final String keyword, final Pageable pageable) {
 
+
         return memberEsRepository.findByNameOrEmail(keyword, keyword, pageable)
-                .map(MemberDocument::toDto);
+                .map(doc -> {
+                    return memberRepository.findById(doc.getMemberId())
+                            .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+                }).map(Member::toDto);
     }
 
     public Boolean friendRequest(

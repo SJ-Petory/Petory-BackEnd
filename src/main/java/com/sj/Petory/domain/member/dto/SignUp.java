@@ -45,7 +45,6 @@ public class SignUp {
                     .memberId(member.getMemberId())
                     .name(member.getName())
                     .email(member.getEmail())
-                    .image(member.getImage())
                     .build();
         }
     }

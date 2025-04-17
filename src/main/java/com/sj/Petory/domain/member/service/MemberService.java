@@ -4,11 +4,12 @@ import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.*;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.member.event.MemberDeletedEvent;
+import com.sj.Petory.domain.member.event.MemberUpdatedEvent;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.member.type.MemberStatus;
 import com.sj.Petory.domain.pet.repository.BreedRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
-import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
@@ -16,6 +17,7 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +32,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final PostRepository postRepository;
-    private final SpeciesRepository speciesRepository;
     private final BreedRepository breedRepository;
 
     private final MemberEsRepository memberEsRepository;
@@ -39,6 +40,7 @@ public class MemberService {
 
     private final JwtUtils jwtUtils;
     private final AmazonS3Service amazonS3Service;
+    private final ApplicationEventPublisher eventPublisher;
 
     public boolean signUp(final SignUp.Request request) {
 
@@ -122,7 +124,13 @@ public class MemberService {
     public boolean updateMember(final MemberAdapter memberAdapter, final UpdateMemberRequest request) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
-        checkNameDuplicate(request.getName());
+        String name = request.getName();
+        if (name != null) {
+            checkNameDuplicate(name);
+
+            eventPublisher.publishEvent(
+                    new MemberUpdatedEvent(member.getMemberId(), name));
+        }
 
         if (StringUtils.hasText(request.getPassword())) {
             request.setPassword(
@@ -138,6 +146,8 @@ public class MemberService {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         validateDeleteMember(member);
+
+        eventPublisher.publishEvent(new MemberDeletedEvent(member.getMemberId()));
 
         member.updateStatus(MemberStatus.DELETED);
 
