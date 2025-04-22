@@ -17,17 +17,21 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
@@ -125,18 +129,30 @@ public class MemberService {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         String name = request.getName();
+
         if (name != null) {
             checkNameDuplicate(name);
-
-            eventPublisher.publishEvent(
-                    new MemberUpdatedEvent(member.getMemberId(), name));
         }
-
         if (StringUtils.hasText(request.getPassword())) {
             request.setPassword(
                     passwordEncoder.encode(request.getPassword()));
         }
         member.updateInfo(request);
+
+        if (name != null) {
+            log.info("DB 저장 직후 afterCommit 등록");
+
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+                @Override
+                public void afterCommit() {
+                    log.info("after commit에서 이벤트 발생");
+                    eventPublisher.publishEvent(
+                            new MemberUpdatedEvent(member.getMemberId(), name));
+                }
+            });
+        }
+
 
         return true;
     }
@@ -147,7 +163,12 @@ public class MemberService {
 
         validateDeleteMember(member);
 
-        eventPublisher.publishEvent(new MemberDeletedEvent(member.getMemberId()));
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                eventPublisher.publishEvent(new MemberDeletedEvent(member.getMemberId()));
+            }
+        });
 
         member.updateStatus(MemberStatus.DELETED);
 
