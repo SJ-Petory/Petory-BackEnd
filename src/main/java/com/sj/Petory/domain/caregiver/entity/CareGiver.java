@@ -1,7 +1,8 @@
 package com.sj.Petory.domain.caregiver.entity;
 
+import com.sj.Petory.domain.caregiver.dto.CareGiverResponse;
 import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
+import com.sj.Petory.domain.pet.dto.ICarePetListResponse;
 import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
 import jakarta.persistence.*;
@@ -51,9 +52,9 @@ public class CareGiver {
                 .build();
     }
 
-    public CareGiverPetResponse toDto(Breed breed) {
+    public ICarePetListResponse toDto(Breed breed) {
         Pet pet = this.getPet();
-        return CareGiverPetResponse.builder()
+        return ICarePetListResponse.builder()
                 .petId(pet.getPetId())
                 .name(pet.getPetName())
                 .image(pet.getPetImage())
@@ -64,4 +65,13 @@ public class CareGiver {
                 .memo(pet.getMemo())
                 .build();
     }
+
+    public CareGiverResponse toDto() {
+
+        return CareGiverResponse.builder()
+                .memberId(this.getId())
+                .memberName(this.getMember().getName())
+                .build();
+    }
+
 }

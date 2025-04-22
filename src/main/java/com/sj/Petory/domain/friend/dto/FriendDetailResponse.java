@@ -16,5 +16,5 @@ public class FriendDetailResponse {
     private String image;
 
     private List<PetInfo> myPets;
-    private List<PetInfo> careGivePets;
+    private List<PetInfo> careGiversPets;
 }

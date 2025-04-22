@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.caregiver.service;
 
+import com.sj.Petory.domain.caregiver.dto.CareGiverResponse;
 import com.sj.Petory.domain.friend.entity.FriendStatus;
 import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
@@ -15,6 +16,8 @@ import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,5 +114,18 @@ public class CareGiverService {
     private Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public Page<CareGiverResponse> getCareGiverForPet(
+            final MemberAdapter memberAdapter
+            , final Long petId, final Pageable pageable) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+        Pet pet = getPetById(petId);
+
+        validatePetMember(petId, member);
+
+        return careGiverRepository.findByPet(pet, pageable)
+                .map(CareGiver::toDto);
     }
 }

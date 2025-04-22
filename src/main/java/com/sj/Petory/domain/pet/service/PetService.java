@@ -101,7 +101,7 @@ public class PetService {
                 .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
     }
 
-    public Page<CareGiverPetResponse> caregiverPetList(
+    public Page<ICarePetListResponse> getPetsICareFor(
             final MemberAdapter memberAdapter
             , final Pageable pageable) {
 

@@ -40,4 +40,6 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     List<Long> findMemberIdsByPet(@Param("petIds") List<Long> petIds);
 
     void deleteByPetAndMember(Pet pet, Member careGiver);
+
+    Page<CareGiver> findByPet(Pet pet, Pageable pageable);
 }
