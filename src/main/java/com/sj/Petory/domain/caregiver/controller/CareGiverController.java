@@ -1,0 +1,36 @@
+package com.sj.Petory.domain.caregiver.controller;
+
+import com.sj.Petory.domain.caregiver.service.CareGiverService;
+import com.sj.Petory.domain.member.dto.MemberAdapter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/caregivers")
+public class CareGiverController {
+
+    private final CareGiverService careGiverService;
+
+    @PostMapping("/{petId}")
+    public ResponseEntity<Boolean> CareGiverRegister(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("petId") long petId
+            , @RequestParam("memberId") long memberId) {
+
+        return ResponseEntity.ok(
+                careGiverService.careGiverRegister(memberAdapter, petId, memberId));
+    }
+
+    @DeleteMapping(value = "/{petId}", params = "careGiverId")
+    public ResponseEntity<Boolean> deleteCareGiver(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("petId") Long petId
+            , @RequestParam("careGiverId") Long careGiverId) {
+
+        return ResponseEntity.ok(careGiverService.deleteCareGiver(
+                memberAdapter, petId, careGiverId));
+    }
+}

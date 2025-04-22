@@ -45,15 +45,7 @@ public class PetController {
                 petService.petDelete(memberAdapter, petId));
     }
 
-    @PostMapping("/{petId}")
-    public ResponseEntity<Boolean> CareGiverRegister(
-            @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("petId") long petId
-            , @RequestParam("memberId") long memberId) {
 
-        return ResponseEntity.ok(
-                petService.careGiverRegister(memberAdapter, petId, memberId));
-    }
 
     @GetMapping("/caregiver")
     public ResponseEntity<Page<CareGiverPetResponse>> careGiverPetList(
@@ -76,15 +68,5 @@ public class PetController {
             , Pageable pageable) {
 
         return ResponseEntity.ok(petService.getBreedListForSpecies(speciesId, pageable));
-    }
-
-    @DeleteMapping(value = "/{petId}", params = "careGiverId")
-    public ResponseEntity<Boolean> deleteCareGiver(
-            @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("petId") Long petId
-            , @RequestParam("careGiverId") Long careGiverId) {
-
-        return ResponseEntity.ok(petService.deleteCareGiver(
-                memberAdapter, petId, careGiverId));
     }
 }

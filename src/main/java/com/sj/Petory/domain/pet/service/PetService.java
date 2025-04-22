@@ -46,7 +46,7 @@ public class PetService {
     public boolean registerPet(
             final MemberAdapter memberAdapter,
             final PetRegister.Request request) {
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
 
         Species species = speciesRepository.findBySpeciesId(
                         request.getSpeciesId())
@@ -65,18 +65,13 @@ public class PetService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public Member getMember(final MemberAdapter memberAdapter) {
-
-        return getMemberByEmail(memberAdapter.getUsername());
-    }
-
     @Transactional
     public boolean petUpdate(
             final MemberAdapter memberAdapter
             , final long petId
             , final UpdatePetRequest request) {
 
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
 
         validatePetMember(petId, member);
 
@@ -96,7 +91,7 @@ public class PetService {
     public boolean petDelete(
             final MemberAdapter memberAdapter, final long petId) {
 
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
         Pet pet = getPetById(petId);
 
         validatePetMember(petId, member);
@@ -111,58 +106,11 @@ public class PetService {
                 .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
     }
 
-    public boolean careGiverRegister(
-            final MemberAdapter memberAdapter
-            , final long petId
-            , final long memberId) {
-
-        Member member = getMember(memberAdapter);
-        Member friend = getMemberById(memberId);
-        Pet pet = getPetById(petId);
-
-        validateFriend(member, friend);
-
-        validatePetMember(petId, member);
-
-        validateGareGiver(friend, pet);
-
-        careGiverRepository.save(CareGiver.toEntity(friend, pet));
-
-        return true;
-    }
-
-    private void validateGareGiver(Member friend, Pet pet) {
-        careGiverRepository.findByPetAndMember(pet, friend)
-                .ifPresent(info ->
-                {
-                    throw new PetException(ErrorCode.ALREADY_REGISTERED_MEMBER);
-                });
-    }
-
-    private void validateFriend(Member member, Member friend) {
-        if (Objects.equals(member.getMemberId(), friend.getMemberId())) {
-            throw new PetException(ErrorCode.REQUEST_MYSELF_NOT_ALLOWED);
-        }
-        friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
-                        member, friend, getFriendStatus("ACCEPTED"))
-                .orElseThrow(() -> new PetException(ErrorCode.FRIEND_INFO_NOT_FOUND));
-    }
-
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    private FriendStatus getFriendStatus(String status) {
-        return friendStatusRepository.findByStatus(status)
-                .orElseThrow(() -> new FriendException(ErrorCode.STATUS_NOT_ALLOWED));
-    }
-
     public Page<CareGiverPetResponse> caregiverPetList(
             final MemberAdapter memberAdapter
             , final Pageable pageable) {
 
-        Member member = getMember(memberAdapter);
+        Member member = getMemberByEmail(memberAdapter.getEmail());
 
         return careGiverRepository.findByMember(member, pageable)
                 .map(careGiver -> careGiver.toDto(
@@ -191,24 +139,5 @@ public class PetService {
         return new PageImpl<>(breedList, pageable, breedList.size());
     }
 
-    @Transactional
-    public boolean deleteCareGiver(
-            final MemberAdapter memberAdapter,
-            final Long petId, final Long careGiverId) {
 
-        Member member = getMemberByEmail(memberAdapter.getEmail());
-
-        petRepository.findByPetIdAndMember(petId, member)
-                .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
-
-        Member careGiver = getMemberById(careGiverId);
-        Pet pet = getPetById(petId);
-
-        careGiverRepository.findByPetAndMember(pet, careGiver)
-                .orElseThrow(() -> new PetException(ErrorCode.UNMATCHED_PET_CAREGIVER));
-
-        careGiverRepository.deleteByPetAndMember(pet, careGiver);
-
-        return true;
-    }
 }
