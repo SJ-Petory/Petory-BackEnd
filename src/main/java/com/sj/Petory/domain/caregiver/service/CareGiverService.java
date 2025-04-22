@@ -88,14 +88,14 @@ public class CareGiverService {
     @Transactional
     public boolean deleteCareGiver(
             final MemberAdapter memberAdapter,
-            final Long petId, final Long careGiverId) {
+            final Long petId, final Long memberId) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         petRepository.findByPetIdAndMember(petId, member)
                 .orElseThrow(() -> new PetException(ErrorCode.PET_MEMBER_UNMATCHED));
 
-        Member careGiver = getMemberById(careGiverId);
+        Member careGiver = getMemberById(memberId);
         Pet pet = getPetById(petId);
 
         careGiverRepository.findByPetAndMember(pet, careGiver)

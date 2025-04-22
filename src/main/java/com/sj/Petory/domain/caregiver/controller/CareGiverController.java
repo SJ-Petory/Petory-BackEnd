@@ -17,10 +17,10 @@ public class CareGiverController {
 
     private final CareGiverService careGiverService;
 
-    @PostMapping("/{petId}")
+    @PostMapping
     public ResponseEntity<Boolean> CareGiverRegister(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("petId") long petId
+            , @RequestParam("petId") long petId
             , @RequestParam("memberId") long memberId) {
 
         return ResponseEntity.ok(
@@ -38,13 +38,13 @@ public class CareGiverController {
                         memberAdapter, petId, pageable));
     }
 
-    @DeleteMapping(value = "/{petId}", params = "careGiverId")
+    @DeleteMapping
     public ResponseEntity<Boolean> deleteCareGiver(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @PathVariable("petId") Long petId
-            , @RequestParam("careGiverId") Long careGiverId) {
+            , @RequestParam("petId") Long petId
+            , @RequestParam("memberId") Long memberId) {
 
         return ResponseEntity.ok(careGiverService.deleteCareGiver(
-                memberAdapter, petId, careGiverId));
+                memberAdapter, petId, memberId));
     }
 }
