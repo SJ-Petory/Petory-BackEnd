@@ -1,7 +1,7 @@
-package com.sj.Petory.domain.pet.repository;
+package com.sj.Petory.domain.caregiver.repository;
 
 import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.domain.pet.entity.CareGiver;
+import com.sj.Petory.domain.caregiver.entity.CareGiver;
 import com.sj.Petory.domain.pet.entity.Pet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

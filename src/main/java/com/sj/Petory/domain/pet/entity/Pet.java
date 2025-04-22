@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.pet.entity;
 
+import com.sj.Petory.domain.caregiver.entity.CareGiver;
 import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.pet.dto.UpdatePetRequest;
@@ -15,7 +16,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;

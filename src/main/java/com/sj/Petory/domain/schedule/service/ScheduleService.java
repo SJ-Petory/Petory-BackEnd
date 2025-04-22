@@ -8,7 +8,7 @@ import com.sj.Petory.domain.notification.entity.ScheduleNotificationReceiver;
 import com.sj.Petory.domain.notification.repository.ScheduleNotificationReceiverRepository;
 import com.sj.Petory.domain.notification.repository.ScheduleNotificationRepository;
 import com.sj.Petory.domain.pet.entity.Pet;
-import com.sj.Petory.domain.pet.repository.CareGiverRepository;
+import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.schedule.dto.*;
 import com.sj.Petory.domain.schedule.entity.PetSchedule;
