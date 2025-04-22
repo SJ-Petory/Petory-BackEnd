@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CareGiverPetResponse {
+public class ICarePetListResponse {
     private long petId;
     private String name;
     private String image;

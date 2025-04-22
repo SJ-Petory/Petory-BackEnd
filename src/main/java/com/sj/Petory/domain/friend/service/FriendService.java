@@ -201,7 +201,7 @@ public class FriendService {
                                 careGiverRepository.findByPetAndMember(mypet, friend).isPresent())
                         .map(mypet -> new PetInfo(mypet.getPetId(), mypet.getPetName(), mypet.getPetImage()))
                         .collect(Collectors.toList()))
-                .careGivePets(petRepository.findByMemberAndStatus(friend, PetStatus.ACTIVE, pageable)
+                .careGiversPets(petRepository.findByMemberAndStatus(friend, PetStatus.ACTIVE, pageable)
                         .stream()
                         .filter(friendpet ->
                                 careGiverRepository.findByPetAndMember(friendpet, member).isPresent())

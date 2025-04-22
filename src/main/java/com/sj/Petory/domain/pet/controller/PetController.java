@@ -48,12 +48,12 @@ public class PetController {
 
 
     @GetMapping("/caregiver")
-    public ResponseEntity<Page<CareGiverPetResponse>> careGiverPetList(
+    public ResponseEntity<Page<ICarePetListResponse>> getPetsICareFor(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , Pageable pageable) {
 
         return ResponseEntity.ok(
-                petService.caregiverPetList(memberAdapter, pageable));
+                petService.getPetsICareFor(memberAdapter, pageable));
     }
 
     @GetMapping("/species")
