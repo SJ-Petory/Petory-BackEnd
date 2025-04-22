@@ -11,12 +11,11 @@ import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.notification.dto.NotificationPayloadDto;
 import com.sj.Petory.domain.notification.service.NotificationService;
 import com.sj.Petory.domain.notification.type.NoticeType;
-import com.sj.Petory.domain.pet.repository.CareGiverRepository;
+import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.exception.FriendException;
@@ -29,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 

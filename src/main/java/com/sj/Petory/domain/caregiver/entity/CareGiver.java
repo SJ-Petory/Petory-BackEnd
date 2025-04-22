@@ -1,8 +1,9 @@
-package com.sj.Petory.domain.pet.entity;
+package com.sj.Petory.domain.caregiver.entity;
 
-import com.sj.Petory.domain.friend.dto.PetInfo;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.pet.dto.CareGiverPetResponse;
+import com.sj.Petory.domain.pet.entity.Breed;
+import com.sj.Petory.domain.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,5 @@
 package com.sj.Petory.domain.pet.service;
 
-import com.sj.Petory.domain.friend.entity.FriendStatus;
 import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
@@ -8,15 +7,13 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.dto.*;
 import com.sj.Petory.domain.pet.entity.Breed;
-import com.sj.Petory.domain.pet.entity.CareGiver;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.entity.Species;
 import com.sj.Petory.domain.pet.repository.BreedRepository;
-import com.sj.Petory.domain.pet.repository.CareGiverRepository;
+import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
-import com.sj.Petory.exception.FriendException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
@@ -24,12 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
