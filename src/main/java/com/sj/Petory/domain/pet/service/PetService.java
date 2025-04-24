@@ -1,5 +1,7 @@
 package com.sj.Petory.domain.pet.service;
 
+import com.sj.Petory.common.s3.AmazonS3Service;
+import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
 import com.sj.Petory.domain.friend.repository.FriendRepository;
 import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
@@ -10,7 +12,6 @@ import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.entity.Species;
 import com.sj.Petory.domain.pet.repository.BreedRepository;
-import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
@@ -34,9 +35,8 @@ public class PetService {
     private final PetRepository petRepository;
     private final SpeciesRepository speciesRepository;
     private final BreedRepository breedRepository;
-    private final FriendRepository friendRepository;
-    private final FriendStatusRepository friendStatusRepository;
     private final CareGiverRepository careGiverRepository;
+    private final AmazonS3Service amazonS3Service;
 
     public boolean registerPet(
             final MemberAdapter memberAdapter,
@@ -50,7 +50,8 @@ public class PetService {
         Breed breed = breedRepository.findByBreedId(request.getBreedId())
                 .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND));
 
-        petRepository.save(request.toEntity(member, species, breed));
+        String imageUrl = amazonS3Service.upload(request.getImage());
+        petRepository.save(request.toEntity(member, species, breed, imageUrl));
 
         return true;
     }

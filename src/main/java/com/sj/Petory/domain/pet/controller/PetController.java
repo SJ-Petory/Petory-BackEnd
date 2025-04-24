@@ -2,6 +2,7 @@ package com.sj.Petory.domain.pet.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.pet.dto.*;
+import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class PetController {
     @PostMapping
     public ResponseEntity<Boolean> registerPet(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @RequestBody @Valid PetRegister.Request request) {
+            , @ModelAttribute @Valid PetRegister.Request request) {
 
         return ResponseEntity.ok(
                 petService.registerPet(memberAdapter, request));

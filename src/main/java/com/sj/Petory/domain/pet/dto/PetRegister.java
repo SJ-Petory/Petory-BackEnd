@@ -9,6 +9,7 @@ import com.sj.Petory.domain.pet.type.PetStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public class PetRegister {
 
@@ -34,13 +35,14 @@ public class PetRegister {
         @NotNull
         private PetGender gender;
 
-        private String image;
+        private MultipartFile image;
         private String memo;
 
         public Pet toEntity(
                 final Member member
                 , final Species species
-                , final Breed breed) {
+                , final Breed breed
+                , final String imageUrl) {
 
             return Pet.builder()
                     .member(member)
@@ -49,7 +51,7 @@ public class PetRegister {
                     .breed(breed.getBreedId())
                     .petGender(this.getGender())
                     .petAge(this.getAge())
-                    .petImage(this.getImage())
+                    .petImage(imageUrl)
                     .memo(this.getMemo())
                     .status(PetStatus.ACTIVE)
                     .build();
