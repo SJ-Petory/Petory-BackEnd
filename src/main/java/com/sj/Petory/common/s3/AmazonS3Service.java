@@ -104,4 +104,29 @@ public class AmazonS3Service {
         }
         return fileExtension;
     }
+
+    public void delete(String imageUrl) {
+        try {
+            String key = extractKeyFromUrl(imageUrl);
+            amazonS3.deleteObject(bucketName, key);
+            log.info("deleted success : {}", key);
+        } catch (Exception e) {
+            log.error("Failed to delete file from S3", e);
+            throw new S3Exception(ErrorCode.IMAGE_DELETE_FAIL); // 필요 시 새 에러코드 정의
+        }
+    }
+
+    private String extractKeyFromUrl(String imageUrl) throws MalformedURLException {
+        URL url = new URL(imageUrl);
+        return url.getPath().substring(1);
+    }
+
+    public String updateImage(String oldImageUrl, MultipartFile newImage) {
+
+        if (oldImageUrl != null) {
+            delete(oldImageUrl);
+        }
+
+        return upload(newImage);
+    }
 }

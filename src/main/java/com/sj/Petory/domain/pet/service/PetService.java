@@ -73,7 +73,8 @@ public class PetService {
 
         Pet pet = getPetById(petId);
 
-        pet.updateInfo(request);
+        String newImage = amazonS3Service.updateImage(pet.getPetImage(), request.getImage());
+        pet.updateInfo(request, newImage);
 
         return true;
     }

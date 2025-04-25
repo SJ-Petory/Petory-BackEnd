@@ -90,15 +90,15 @@ public class Pet {
                 .build();
     }
 
-    public void updateInfo(final UpdatePetRequest request) {
+    public void updateInfo(final UpdatePetRequest request, String newImage) {
         if (StringUtils.hasText(request.getName())) {
             this.petName = request.getName();
         }
         if (request.getAge() != 0) {
             this.petAge = request.getAge();
         }
-        if (StringUtils.hasText(request.getImage())) {
-            this.petImage = request.getImage();
+        if (StringUtils.hasText(newImage)) {
+            this.petImage = newImage;
         }
         if (StringUtils.hasText(request.getMemo())) {
             this.memo = request.getMemo();
