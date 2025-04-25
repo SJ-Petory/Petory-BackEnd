@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.pet.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -11,6 +12,6 @@ public class UpdatePetRequest {
 
     private String name;
     private long age;
-    private String image;
+    private MultipartFile image;
     private String memo;
 }

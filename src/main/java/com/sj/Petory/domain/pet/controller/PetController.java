@@ -28,11 +28,11 @@ public class PetController {
                 petService.registerPet(memberAdapter, request));
     }
 
-    @PatchMapping("/{petId}")
+    @PatchMapping(value = "/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> petUpdate(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @PathVariable("petId") long petId
-            , @RequestBody UpdatePetRequest request) {
+            , @ModelAttribute UpdatePetRequest request) {
 
         return ResponseEntity.ok(
                 petService.petUpdate(memberAdapter, petId, request));

@@ -54,7 +54,7 @@ public enum ErrorCode {
     FILE_EMPTY("유효하지 않은 파일입니다.", HttpStatus.BAD_REQUEST),
     FILE_EXTENSION_NOT_ALLOWED("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST),
     IMAGE_UPLOAD_FAIL("이미지 업로드가 실패 하였습니다.", HttpStatus.BAD_REQUEST),
-
+    IMAGE_DELETE_FAIL("이미지 삭제 실패", HttpStatus.BAD_REQUEST),
     //notice
     INVALID_NOTIFICATION("유효하지 않은 알림입니다.", HttpStatus.BAD_REQUEST);
     private final String description;
