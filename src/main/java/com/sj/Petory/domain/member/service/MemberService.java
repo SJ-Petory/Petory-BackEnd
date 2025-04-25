@@ -182,15 +182,15 @@ public class MemberService {
     }
 
     @Transactional
-    public String imageUpload(
+    public boolean imageUpload(
             final MemberAdapter memberAdapter, final MultipartFile image) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
-        String imageUrl = amazonS3Service.upload(image);
+        String imageUrl = amazonS3Service.updateImage(member.getImage(), image);
 
         member.updateImage(imageUrl);
 
-        return imageUrl;
+        return true;
     }
 }

@@ -110,7 +110,7 @@ public class AmazonS3Service {
             String key = extractKeyFromUrl(imageUrl);
             amazonS3.deleteObject(bucketName, key);
             log.info("deleted success : {}", key);
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Failed to delete file from S3", e);
             throw new S3Exception(ErrorCode.IMAGE_DELETE_FAIL); // 필요 시 새 에러코드 정의
         }
@@ -122,7 +122,10 @@ public class AmazonS3Service {
     }
 
     public String updateImage(String oldImageUrl, MultipartFile newImage) {
-        delete(oldImageUrl);
+
+        if (oldImageUrl != null) {
+            delete(oldImageUrl);
+        }
 
         return upload(newImage);
     }
