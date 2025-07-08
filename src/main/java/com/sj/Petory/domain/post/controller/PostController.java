@@ -6,10 +6,7 @@ import com.sj.Petory.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,10 +15,10 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/posts")
+    @PostMapping(value = "/posts", consumes = "multipart/form-data")
     public ResponseEntity<Boolean> createPost(
             @AuthenticationPrincipal MemberAdapter memberAdapter,
-            @RequestBody CreatePostRequest createPostRequest) {
+            @ModelAttribute CreatePostRequest createPostRequest) {
 
         return ResponseEntity.ok(postService.createPost(memberAdapter, createPostRequest));
     }
