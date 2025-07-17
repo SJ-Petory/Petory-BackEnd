@@ -118,7 +118,7 @@ public class MemberService {
     public Page<PostResponse> getMembersPosts(
             final MemberAdapter memberAdapter
             , final Pageable pageable) {
-
+        //게시글 status true인 애들만 !
         return postRepository.findByMember(
                         getMemberByEmail(memberAdapter.getEmail()), pageable)
                 .map(Post::toDto);

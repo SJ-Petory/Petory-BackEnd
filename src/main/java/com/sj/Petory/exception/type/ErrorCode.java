@@ -56,7 +56,12 @@ public enum ErrorCode {
     IMAGE_UPLOAD_FAIL("이미지 업로드가 실패 하였습니다.", HttpStatus.BAD_REQUEST),
     IMAGE_DELETE_FAIL("이미지 삭제 실패", HttpStatus.BAD_REQUEST),
     //notice
-    INVALID_NOTIFICATION("유효하지 않은 알림입니다.", HttpStatus.BAD_REQUEST);
+    INVALID_NOTIFICATION("유효하지 않은 알림입니다.", HttpStatus.BAD_REQUEST),
+
+    //post
+    INVALID_POST_CATEGORY("유효하지 않은 게시글 카테고리 입니다.", HttpStatus.BAD_REQUEST),
+    ;
+
     private final String description;
     private final HttpStatus httpStatus;
 }
