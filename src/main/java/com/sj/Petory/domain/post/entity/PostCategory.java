@@ -1,7 +1,6 @@
 package com.sj.Petory.domain.post.entity;
 
-import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.domain.post.entity.Post;
+import com.sj.Petory.domain.post.dto.PostCategoryResponse;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,7 +10,6 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -26,4 +24,10 @@ public class PostCategory {
     private List<Post> postList;
 
     private String categoryName;
+
+    public PostCategoryResponse toDto() {
+        return new PostCategoryResponse(
+                this.getPostCategoryId(),
+                this.getCategoryName());
+    }
 }
