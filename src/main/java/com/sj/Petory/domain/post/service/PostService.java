@@ -4,13 +4,16 @@ import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.post.dto.AllPostResponse;
 import com.sj.Petory.domain.post.dto.CreatePostRequest;
 import com.sj.Petory.domain.post.dto.PostImageDto;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.entity.PostCategory;
 import com.sj.Petory.domain.post.entity.PostImage;
 import com.sj.Petory.domain.post.repository.PostCategoryRepository;
+import com.sj.Petory.domain.post.repository.PostImageRepository;
 import com.sj.Petory.domain.post.repository.PostRepository;
+import com.sj.Petory.domain.post.type.PostStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PostException;
 import com.sj.Petory.exception.type.ErrorCode;
@@ -30,6 +33,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostCategoryRepository postCategoryRepository;
     private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
     private final AmazonS3Service s3Service;
 
     @Transactional
@@ -51,7 +55,7 @@ public class PostService {
         List<PostImageDto> postImageDtoList = new ArrayList<>();
         createPostRequest.getImage().forEach(
                 img -> postImageDtoList.add(
-                new PostImageDto(s3Service.upload(img))));
+                        new PostImageDto(s3Service.upload(img))));
 
         //postImage 엔티티 저장 -> post에서 걍 저장해버림
         post.setPostImageList(postImageDtoList.stream().map(
@@ -67,5 +71,18 @@ public class PostService {
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public List<AllPostResponse> getPostList() {
+
+        return postRepository.findByStatus(PostStatus.ACTIVE).stream()
+                .map(post -> AllPostResponse.builder()
+                        .member(post.getMember().toPostMemberDto())
+                        .post(post.toDto())
+                        .postImageList(
+                                post.getPostImageList().stream().map(PostImage::toDto)
+                                        .toList())
+                        .build()
+                ).collect(Collectors.toList());
     }
 }

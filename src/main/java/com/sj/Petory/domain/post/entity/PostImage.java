@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.post.entity;
 
+import com.sj.Petory.domain.post.dto.PostImageDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,4 +23,9 @@ public class PostImage {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    public PostImageDto toDto() {
+
+        return new PostImageDto(imageUrl);
+    }
 }
