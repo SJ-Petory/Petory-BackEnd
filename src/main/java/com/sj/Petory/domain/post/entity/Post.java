@@ -63,6 +63,7 @@ public class Post {
                 .postId(this.postId)
                 .title(this.postTitle)
                 .content(this.postContent)
+                .createdAt(this.createdAt)
                 .build();
     }
 }
