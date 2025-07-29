@@ -23,5 +23,7 @@ public class AllPostResponse {
     private List<PostImageDto> postImageList;
 
     //댓글 수
+    private long commentTotal;
     //공감 수
+    private long sympathyTotal;
 }

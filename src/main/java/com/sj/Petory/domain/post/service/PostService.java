@@ -4,6 +4,7 @@ import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.post.comment.CommentRepository;
 import com.sj.Petory.domain.post.dto.AllPostResponse;
 import com.sj.Petory.domain.post.dto.CreatePostRequest;
 import com.sj.Petory.domain.post.dto.PostImageDto;
@@ -13,6 +14,7 @@ import com.sj.Petory.domain.post.entity.PostImage;
 import com.sj.Petory.domain.post.repository.PostCategoryRepository;
 import com.sj.Petory.domain.post.repository.PostImageRepository;
 import com.sj.Petory.domain.post.repository.PostRepository;
+import com.sj.Petory.domain.post.sympathy.SympathyRepository;
 import com.sj.Petory.domain.post.type.PostStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PostException;
@@ -35,6 +37,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final AmazonS3Service s3Service;
+    private final CommentRepository commentRepository;
+    private final SympathyRepository sympathyRepository;
 
     @Transactional
     public Boolean createPost(
@@ -80,8 +84,11 @@ public class PostService {
                         .member(post.getMember().toPostMemberDto())
                         .post(post.toDto())
                         .postImageList(
-                                post.getPostImageList().stream().map(PostImage::toDto)
+                                post.getPostImageList().stream()
+                                        .map(PostImage::toDto)
                                         .toList())
+                        .commentTotal(commentRepository.countAllByPost(post))
+                        .sympathyTotal(sympathyRepository.countAllByPost(post))
                         .build()
                 ).collect(Collectors.toList());
     }
