@@ -1,17 +1,15 @@
-package com.sj.Petory.domain.member.dto;
+package com.sj.Petory.domain.post.dto;
 
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostResponse {
+public class PostInfo {
+
     private long postId;
     private String title;
     private String content;
-    private LocalDateTime createdAt;
 }
