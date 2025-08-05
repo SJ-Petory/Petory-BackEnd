@@ -10,6 +10,4 @@ import lombok.*;
 public class UpdateMemberRequest {
 
     private String name;
-    private String password;
-    private String image;
 }
