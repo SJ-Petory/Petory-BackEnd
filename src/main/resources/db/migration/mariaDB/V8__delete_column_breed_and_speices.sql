@@ -1,2 +1,0 @@
-ALTER TABLE Pet DROP species;
-ALTER TABLE Pet DROP breed;

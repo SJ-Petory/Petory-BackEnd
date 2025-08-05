@@ -1,1 +1,0 @@
-ALTER TABLE CustomRepeatPattern MODIFY COLUMN custom_repeat_id BIGINT NOT NULL AUTO_INCREMENT;

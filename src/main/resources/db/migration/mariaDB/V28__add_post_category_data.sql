@@ -1,1 +1,0 @@
-INSERT INTO postcategory(post_category_id, category_name) values(1, 'test');

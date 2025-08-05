@@ -1,1 +1,0 @@
-ALTER TABLE schedulenotification drop column notice_time;
