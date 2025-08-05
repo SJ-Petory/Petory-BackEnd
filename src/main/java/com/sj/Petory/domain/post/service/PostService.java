@@ -101,8 +101,7 @@ public class PostService {
             , final long postId, final MemberAdapter memberAdapter) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+        Post post = getPostByPostId(postId);
 
         validatePostMember(post, member);
 
@@ -149,5 +148,24 @@ public class PostService {
 
             throw new PostException(ErrorCode.UNMATCHED_POST_MEMBER);
         }
+    }
+
+    @Transactional
+    public boolean deletePost(
+            final long postId, final MemberAdapter memberAdapter) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+        Post post = getPostByPostId(postId);
+
+        validatePostMember(post, member);
+
+        post.setStatus(PostStatus.DELETED);
+
+        return true;
+    }
+
+    private Post getPostByPostId(long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
     }
 }

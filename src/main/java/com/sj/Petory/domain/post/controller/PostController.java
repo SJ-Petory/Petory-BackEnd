@@ -44,4 +44,14 @@ public class PostController {
                 postService.updatePost(
                         request, postId, memberAdapter));
     }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Boolean> deletePost(
+            @PathVariable("postId") long postId
+            , @AuthenticationPrincipal MemberAdapter memberAdapter) {
+
+        return ResponseEntity.ok(
+                postService.deletePost(
+                        postId, memberAdapter));
+    }
 }
