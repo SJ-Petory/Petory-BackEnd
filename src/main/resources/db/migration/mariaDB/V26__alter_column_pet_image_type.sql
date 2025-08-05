@@ -1,0 +1,1 @@
+ALTER TABLE Pet MODIFY COLUMN pet_image varchar(300);
