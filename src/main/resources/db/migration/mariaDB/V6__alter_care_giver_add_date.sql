@@ -1,2 +1,0 @@
-ALTER TABLE caregiver ADD COLUMN created_at TIMESTAMP;
-ALTER TABLE caregiver ADD COLUMN updated_at TIMESTAMP;

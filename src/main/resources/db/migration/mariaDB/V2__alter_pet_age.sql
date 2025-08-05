@@ -1,1 +1,0 @@
-ALTER TABLE pet MODIFY pet_age BIGINT;

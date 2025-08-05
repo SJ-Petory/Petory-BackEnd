@@ -1,1 +1,0 @@
-ALTER TABLE `Pet` ADD `breed_id` BIGINT NOT NULL;
