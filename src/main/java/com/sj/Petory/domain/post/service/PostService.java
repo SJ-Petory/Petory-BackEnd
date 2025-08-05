@@ -106,10 +106,8 @@ public class PostService {
 
         validatePostMember(post, member);
 
-        //title, content 부터 세팅하고
         post.update(request);
 
-        //postCategory 업데이트 따로해서 post 객체에 저장하는 식으로
         if (ObjectUtils.isNotEmpty(request.getCategoryId())) {
             post.setPostCategory(
                     postCategoryRepository.findById(
@@ -117,7 +115,6 @@ public class PostService {
                             () -> new PostException(ErrorCode.INVALID_POST_CATEGORY)));
         }
 
-        //삭제 이미지 s3에서 삭제
         if (!request.getDeleteImageIds().isEmpty()) {
             postImageRepository.findAllById(request.getDeleteImageIds()).stream()
                     .filter(img -> post.getPostImageList().contains(img))
@@ -127,12 +124,7 @@ public class PostService {
                     });
         }
 
-        // 새로 업로드할 이미지
         if (request.getNewImages().stream().anyMatch(img -> !img.isEmpty())){
-            //이게 왜 실행 ?
-            for (int i = 0; i < request.getNewImages().size(); i++)
-                log.info(String.valueOf(request.getNewImages().get(i).getName()));
-            log.info("이게 왜 실행댐?");
             request.getNewImages().stream()
                     .filter(img -> !img.isEmpty())
                     .forEach(

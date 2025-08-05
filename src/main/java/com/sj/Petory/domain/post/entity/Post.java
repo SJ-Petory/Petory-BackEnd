@@ -77,7 +77,6 @@ public class Post {
     }
 
     public void addPostImage(PostImage image) {
-        image.setPost(this);
         postImageList.add(image);
     }
 
