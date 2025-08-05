@@ -3,6 +3,7 @@ package com.sj.Petory.domain.post.entity;
 import com.sj.Petory.domain.post.dto.PostImageDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Builder
@@ -19,13 +20,14 @@ public class PostImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post postId;
+    private Post post;
 
     @Column(name = "image_url")
     private String imageUrl;
 
     public PostImageDto toDto() {
 
-        return new PostImageDto(imageUrl);
+        return new PostImageDto(
+                postImageId, imageUrl);
     }
 }

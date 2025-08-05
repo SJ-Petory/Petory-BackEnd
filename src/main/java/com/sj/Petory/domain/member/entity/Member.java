@@ -76,18 +76,10 @@ public class Member {
                 .build();
     }
 
-    public Member updateInfo(final UpdateMemberRequest request) {
+    public void updateInfo(final UpdateMemberRequest request) {
         if (StringUtils.hasText(request.getName())) {
             this.name = request.getName();
         }
-        if (StringUtils.hasText(request.getPassword())) {
-            this.password = request.getPassword();
-        }
-        if (StringUtils.hasText(request.getImage())) {
-            this.image = request.getImage();
-        }
-
-        return this;
     }
 
     public void updateStatus(final MemberStatus memberStatus) {

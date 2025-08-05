@@ -3,6 +3,7 @@ package com.sj.Petory.domain.post.controller;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.post.dto.AllPostResponse;
 import com.sj.Petory.domain.post.dto.CreatePostRequest;
+import com.sj.Petory.domain.post.dto.UpdatePostRequest;
 import com.sj.Petory.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -28,9 +29,19 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AllPostResponse>> getPostList(
-            @AuthenticationPrincipal MemberAdapter memberAdapter) {
+    public ResponseEntity<List<AllPostResponse>> getPostList() {
 
         return ResponseEntity.ok(postService.getPostList());
+    }
+
+    @PatchMapping(path = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Boolean> updatePost(
+            @PathVariable("postId") long postId
+            , @ModelAttribute UpdatePostRequest request
+            , @AuthenticationPrincipal MemberAdapter memberAdapter) {
+
+        return ResponseEntity.ok(
+                postService.updatePost(
+                        request, postId, memberAdapter));
     }
 }

@@ -20,7 +20,7 @@ public class AllPostResponse {
     //게시글 정보
     private PostResponse post;
 
-    private List<PostImageDto> postImageList;
+    private List<PostImageDto> postImageDtoList;
 
     //댓글 수
     private long commentTotal;

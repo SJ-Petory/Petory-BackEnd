@@ -133,10 +133,10 @@ public class MemberService {
         if (name != null) {
             checkNameDuplicate(name);
         }
-        if (StringUtils.hasText(request.getPassword())) {
-            request.setPassword(
-                    passwordEncoder.encode(request.getPassword()));
-        }
+//        if (StringUtils.hasText(request.getPassword())) {
+//            request.setPassword(
+//                    passwordEncoder.encode(request.getPassword()));
+//        }
         member.updateInfo(request);
 
         if (name != null) {

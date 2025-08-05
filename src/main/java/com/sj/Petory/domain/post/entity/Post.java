@@ -2,7 +2,9 @@ package com.sj.Petory.domain.post.entity;
 
 import com.sj.Petory.domain.member.dto.PostResponse;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.post.dto.UpdatePostRequest;
 import com.sj.Petory.domain.post.type.PostStatus;
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -27,6 +29,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
     private long postId;
 
     @ManyToOne
@@ -43,8 +46,8 @@ public class Post {
     @Column(name = "post_content")
     private String postContent;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> postImageList;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> postImageList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -65,5 +68,24 @@ public class Post {
                 .content(this.postContent)
                 .createdAt(this.createdAt)
                 .build();
+    }
+    public void clearPostImages() {
+        for (PostImage image : postImageList) {
+            image.setPost(null);
+        }
+        postImageList.clear();
+    }
+
+    public void addPostImage(PostImage image) {
+        postImageList.add(image);
+    }
+
+    public void update(UpdatePostRequest request) {
+        if (!StringUtils.isEmpty(request.getTitle())) {
+            this.setPostTitle(request.getTitle());
+        }
+        if (!StringUtils.isEmpty(request.getContent())) {
+            this.setPostContent(request.getContent());
+        }
     }
 }
