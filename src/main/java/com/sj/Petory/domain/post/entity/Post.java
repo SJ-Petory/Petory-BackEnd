@@ -63,10 +63,11 @@ public class Post {
 
     public PostResponse toDto() {
         return PostResponse.builder()
-                .postId(this.postId)
-                .title(this.postTitle)
-                .content(this.postContent)
-                .createdAt(this.createdAt)
+                .categoryId(this.getPostCategory().getPostCategoryId())
+                .postId(this.getPostId())
+                .title(this.getPostTitle())
+                .content(this.getPostContent())
+                .createdAt(this.getCreatedAt())
                 .build();
     }
     public void clearPostImages() {
