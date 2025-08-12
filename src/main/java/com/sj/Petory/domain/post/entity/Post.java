@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +71,7 @@ public class Post {
                 .createdAt(this.getCreatedAt())
                 .build();
     }
+
     public void clearPostImages() {
         for (PostImage image : postImageList) {
             image.setPost(null);
@@ -88,5 +90,16 @@ public class Post {
         if (!StringUtils.isEmpty(request.getContent())) {
             this.setPostContent(request.getContent());
         }
+    }
+
+    public PostDocument toDocument() {
+        return PostDocument.builder()
+                .postId(this.getPostId())
+                .title(this.getPostTitle())
+                .content(this.getPostContent())
+                .createdAt(this.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .memberId(this.getMember().getMemberId())
+                .categoryId(this.getPostCategory().getPostCategoryId())
+                .build();
     }
 }

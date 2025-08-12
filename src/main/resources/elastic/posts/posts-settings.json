@@ -1,0 +1,15 @@
+{
+  "analysis": {
+    "analyzer": {
+      "post_search_analyzer": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "lowercase",
+          "nori_readingform",
+          "nori_part_of_speech"
+        ]
+      }
+    }
+  }
+}

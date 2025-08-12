@@ -1,18 +1,23 @@
 package com.sj.Petory.domain.post.service;
 
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.post.comment.CommentRepository;
-import com.sj.Petory.domain.post.dto.AllPostResponse;
-import com.sj.Petory.domain.post.dto.CreatePostRequest;
-import com.sj.Petory.domain.post.dto.PostImageDto;
-import com.sj.Petory.domain.post.dto.UpdatePostRequest;
+import com.sj.Petory.domain.post.dto.*;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.entity.PostCategory;
+import com.sj.Petory.domain.post.entity.PostDocument;
 import com.sj.Petory.domain.post.entity.PostImage;
 import com.sj.Petory.domain.post.repository.PostCategoryRepository;
+import com.sj.Petory.domain.post.repository.PostEsRepository;
 import com.sj.Petory.domain.post.repository.PostImageRepository;
 import com.sj.Petory.domain.post.repository.PostRepository;
 import com.sj.Petory.domain.post.sympathy.SympathyRepository;
@@ -23,11 +28,14 @@ import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -41,6 +49,10 @@ public class PostService {
     private final AmazonS3Service s3Service;
     private final CommentRepository commentRepository;
     private final SympathyRepository sympathyRepository;
+    private final PostEsRepository postEsRepository;
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchClient elasticsearchClient;
+
 
     @Transactional
     public Boolean createPost(
@@ -71,6 +83,9 @@ public class PostService {
                     return postImage;
                 }).collect(Collectors.toList()));
 
+        //postDocument 저장
+        postEsRepository.save(post.toDocument());
+
         return true;
     }
 
@@ -79,10 +94,10 @@ public class PostService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public List<AllPostResponse> getPostList() {
+    public List<PostListResponse> getPostList() {
 
         return postRepository.findByStatus(PostStatus.ACTIVE).stream()
-                .map(post -> AllPostResponse.builder()
+                .map(post -> PostListResponse.builder()
                         .member(post.getMember().toPostMemberDto())
                         .post(post.toDto())
                         .postImageDtoList(
@@ -123,7 +138,7 @@ public class PostService {
                     });
         }
 
-        if (request.getNewImages().stream().anyMatch(img -> !img.isEmpty())){
+        if (request.getNewImages().stream().anyMatch(img -> !img.isEmpty())) {
             request.getNewImages().stream()
                     .filter(img -> !img.isEmpty())
                     .forEach(
@@ -167,5 +182,54 @@ public class PostService {
     private Post getPostByPostId(long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+    }
+
+    public PostSearchResponse searchPost(
+            final String keyword) throws IOException {
+
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index("posts")
+                .query(q -> q
+                        .multiMatch(mm -> mm
+                                .query(keyword)
+                                .fields("title^3", "content")
+                        )
+                )
+        );
+
+        SearchResponse<PostDocument> posts = elasticsearchClient.search(
+                searchRequest, PostDocument.class);
+        System.out.println(posts.hits().hits().size());
+        List<PostSearchResponse.PostWrapper> postWrappers = posts.hits().hits().stream()
+                .map(hit -> {
+                    PostDocument doc = hit.source();
+
+                    //멤버 정보 세팅
+                    assert doc != null;
+                    Member memberEntity = memberRepository.findById(doc.getMemberId()).orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+                    PostSearchResponse.Member member = PostSearchResponse.Member.builder()
+                            .id(memberEntity.getMemberId())
+                            .name(memberEntity.getName())
+                            .image(memberEntity.getImage())
+                            .build();
+
+                    Post postEntity = postRepository.findById(doc.getPostId()).orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+                    PostSearchResponse.Post post = PostSearchResponse.Post.builder()
+                            .id(postEntity.getPostId())
+                            .title(postEntity.getPostTitle())
+                            .content(postEntity.getPostContent())
+                            .postImage(postEntity.getPostImageList().stream().map(PostImage::toDto).toList())
+                            .commentTotal(commentRepository.countAllByPost(postEntity))
+                            .sympathyTotal(sympathyRepository.countAllByPost(postEntity))
+                            .build();
+
+                    return PostSearchResponse.PostWrapper.builder()
+                            .member(member)
+                            .post(post)
+                            .build();
+                }).toList();
+
+        return PostSearchResponse.builder()
+                .posts(postWrappers).build();
     }
 }

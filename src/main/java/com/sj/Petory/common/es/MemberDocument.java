@@ -1,6 +1,5 @@
 package com.sj.Petory.common.es;
 
-import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -12,8 +11,8 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setting(settingPath = "/elastic/member-settings.json")
-@Mapping(mappingPath = "/elastic/member-mappings.json")
+@Setting(settingPath = "/elastic/members/member-settings.json")
+@Mapping(mappingPath = "/elastic/members/member-mappings.json")
 @Document(indexName = "member")
 public class MemberDocument {
 

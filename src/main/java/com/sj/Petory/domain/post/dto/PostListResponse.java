@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AllPostResponse {
+public class PostListResponse {
 
     //게시글 작성자 정보
     private PostMemberInfo member;

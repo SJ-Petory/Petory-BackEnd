@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "postId": {
+      "type": "long"
+    },
+    "title" : {
+      "type": "text",
+      "analyzer": "post_search_analyzer"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "post_search_analyzer"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "memberId": {
+      "type": "long"
+    },
+    "categoryId": {
+      "type": "long"
+    }
+  }
+}
