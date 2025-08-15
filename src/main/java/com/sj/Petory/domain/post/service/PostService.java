@@ -199,29 +199,25 @@ public class PostService {
 
         SearchResponse<PostDocument> posts = elasticsearchClient.search(
                 searchRequest, PostDocument.class);
-        System.out.println(posts.hits().hits().size());
+
         List<PostSearchResponse.PostWrapper> postWrappers = posts.hits().hits().stream()
                 .map(hit -> {
                     PostDocument doc = hit.source();
 
                     //멤버 정보 세팅
                     assert doc != null;
-                    Member memberEntity = memberRepository.findById(doc.getMemberId()).orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-                    PostSearchResponse.Member member = PostSearchResponse.Member.builder()
-                            .id(memberEntity.getMemberId())
-                            .name(memberEntity.getName())
-                            .image(memberEntity.getImage())
-                            .build();
 
-                    Post postEntity = postRepository.findById(doc.getPostId()).orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
-                    PostSearchResponse.Post post = PostSearchResponse.Post.builder()
-                            .id(postEntity.getPostId())
-                            .title(postEntity.getPostTitle())
-                            .content(postEntity.getPostContent())
-                            .postImage(postEntity.getPostImageList().stream().map(PostImage::toDto).toList())
-                            .commentTotal(commentRepository.countAllByPost(postEntity))
-                            .sympathyTotal(sympathyRepository.countAllByPost(postEntity))
-                            .build();
+                    PostSearchResponse.Member member =
+                            PostSearchResponse.toMemberResponse(
+                                    memberRepository.findById(doc.getMemberId())
+                                            .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND)));
+
+                    Post postEntity = postRepository.findById(doc.getPostId())
+                            .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+
+                    PostSearchResponse.Post post = PostSearchResponse.toPostResponse(postEntity);
+                    post.setCommentTotal(commentRepository.countAllByPost(postEntity));
+                    post.setSympathyTotal(sympathyRepository.countAllByPost(postEntity));
 
                     return PostSearchResponse.PostWrapper.builder()
                             .member(member)
