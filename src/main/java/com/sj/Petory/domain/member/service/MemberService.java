@@ -13,6 +13,7 @@ import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
+import com.sj.Petory.domain.post.type.PostStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
@@ -121,6 +122,7 @@ public class MemberService {
         //게시글 status true인 애들만 !
         return postRepository.findByMember(
                         getMemberByEmail(memberAdapter.getEmail()), pageable)
+                //.stream().filter(post -> post.getStatus() == PostStatus.ACTIVE)
                 .map(Post::toDto);
     }
 

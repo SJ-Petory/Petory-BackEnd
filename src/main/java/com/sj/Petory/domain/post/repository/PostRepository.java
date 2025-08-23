@@ -21,4 +21,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     boolean existsByPostIdAndMember(long postId, Member member);
+
+    List<Post> findAllByStatus(PostStatus postStatus);
 }
