@@ -195,6 +195,15 @@ public class PostService {
                                 .fields("title^3", "content")
                         )
                 )
+                .highlight(h -> h
+                        .fields("title", f -> f
+                                .preTags("<em>")
+                                .postTags("</em>"))
+                        .fields("content", f -> f
+                                .preTags("<em>")
+                                .postTags("</em>"))
+                )
+
         );
 
         SearchResponse<PostDocument> posts = elasticsearchClient.search(
@@ -219,6 +228,16 @@ public class PostService {
                     post.setCommentTotal(commentRepository.countAllByPost(postEntity));
                     post.setSympathyTotal(sympathyRepository.countAllByPost(postEntity));
 
+        Map<String, List<String>> highlight = hit.highlight();
+
+        if (highlight != null) {
+            if (highlight.containsKey("title")) {
+                post.setTitle(highlight.get("title").get(0));
+            }
+            if (highlight.containsKey("content")) {
+                post.setContent(highlight.get("content").get(0));
+            }
+        }
                     return PostSearchResponse.PostWrapper.builder()
                             .member(member)
                             .post(post)
