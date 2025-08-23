@@ -2,6 +2,7 @@ package com.sj.Petory.domain.post.service;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -195,6 +196,12 @@ public class PostService {
                                 .fields("title^3", "content")
                         )
                 )
+                .sort(so -> so
+                        .field(f -> f.field("commentCount").order(SortOrder.Desc)))
+                .sort(so -> so
+                        .field(f -> f.field("sympathyCount").order(SortOrder.Desc)))
+                .sort(so -> so
+                        .field(f -> f.field("createdAt").order(SortOrder.Desc)))
                 .highlight(h -> h
                         .fields("title", f -> f
                                 .preTags("<em>")

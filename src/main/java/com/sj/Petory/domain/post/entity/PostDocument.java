@@ -31,4 +31,7 @@ public class PostDocument {
 
     private Long memberId;
     private Long categoryId;
+
+    private Long commentCount;
+    private Long sympathyCount;
 }
