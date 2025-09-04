@@ -3,6 +3,7 @@ package com.sj.Petory.domain.post.dto;
 import com.sj.Petory.domain.post.entity.PostImage;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -48,6 +49,7 @@ public class PostSearchResponse {
         private List<PostImageDto> postImage;
         private long commentTotal;
         private long sympathyTotal;
+        private LocalDateTime createdAt;
     }
 
     public static PostSearchResponse.Member toMemberResponse(
@@ -69,6 +71,7 @@ public class PostSearchResponse {
                 .title(postEntity.getPostTitle())
                 .content(postEntity.getPostContent())
                 .postImage(postEntity.getPostImageList().stream().map(PostImage::toDto).toList())
+                .createdAt(postEntity.getCreatedAt())
                 .build();
     }
 }
