@@ -11,7 +11,9 @@ import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.post.comment.Comment;
 import com.sj.Petory.domain.post.comment.CommentRepository;
+import com.sj.Petory.domain.post.comment.CommentStatus;
 import com.sj.Petory.domain.post.dto.*;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.entity.PostCategory;
@@ -177,6 +179,9 @@ public class PostService {
 
         post.setStatus(PostStatus.DELETED);
 
+        for (Comment comment : post.getCommentList()) {
+            comment.updateStatus(CommentStatus.DELETED);
+        }
         return true;
     }
 
@@ -229,22 +234,23 @@ public class PostService {
                                             .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND)));
 
                     Post postEntity = postRepository.findById(doc.getPostId())
-                            .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+                            .filter(post -> PostStatus.ACTIVE.equals(post.getStatus()))
+                            .orElse(null);
 
                     PostSearchResponse.Post post = PostSearchResponse.toPostResponse(postEntity);
                     post.setCommentTotal(commentRepository.countAllByPost(postEntity));
                     post.setSympathyTotal(sympathyRepository.countAllByPost(postEntity));
 
-        Map<String, List<String>> highlight = hit.highlight();
+                    Map<String, List<String>> highlight = hit.highlight();
 
-        if (highlight != null) {
-            if (highlight.containsKey("title")) {
-                post.setTitle(highlight.get("title").get(0));
-            }
-            if (highlight.containsKey("content")) {
-                post.setContent(highlight.get("content").get(0));
-            }
-        }
+                    if (highlight != null) {
+                        if (highlight.containsKey("title")) {
+                            post.setTitle(highlight.get("title").get(0));
+                        }
+                        if (highlight.containsKey("content")) {
+                            post.setContent(highlight.get("content").get(0));
+                        }
+                    }
                     return PostSearchResponse.PostWrapper.builder()
                             .member(member)
                             .post(post)

@@ -1,0 +1,1 @@
+ALTER TABLE comment add column status VARCHAR(50) NOT NULL;
