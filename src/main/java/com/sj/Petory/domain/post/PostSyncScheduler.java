@@ -28,21 +28,23 @@ public class PostSyncScheduler {
     public void postSync() throws IOException {
         List<Post> posts = postRepository.findAllByStatus(PostStatus.ACTIVE);
 
-        List<PostDocument> documents = posts.stream().map(post -> {
-            long commentCount = commentRepository.countAllByPost(post);
-            long sympathyCount = sympathyRepository.countAllByPost(post);
+        List<PostDocument> documents = posts.stream()
+                .filter(post -> PostStatus.ACTIVE.equals(post.getStatus()))
+                .map(post -> {
+                    long commentCount = commentRepository.countAllByPost(post);
+                    long sympathyCount = sympathyRepository.countAllByPost(post);
 
-            return PostDocument.builder()
-                    .postId(post.getPostId())
-                    .title(post.getPostTitle())
-                    .content(post.getPostContent())
-                    .createdAt(post.getCreatedAt().toString())
-                    .memberId(post.getMember().getMemberId())
-                    .categoryId(post.getPostCategory().getPostCategoryId())
-                    .commentCount(commentCount)
-                    .sympathyCount(sympathyCount)
-                    .build();
-        }).toList();
+                    return PostDocument.builder()
+                            .postId(post.getPostId())
+                            .title(post.getPostTitle())
+                            .content(post.getPostContent())
+                            .createdAt(post.getCreatedAt().toString())
+                            .memberId(post.getMember().getMemberId())
+                            .categoryId(post.getPostCategory().getPostCategoryId())
+                            .commentCount(commentCount)
+                            .sympathyCount(sympathyCount)
+                            .build();
+                }).toList();
 
         // Bulk Update
         BulkRequest.Builder br = new BulkRequest.Builder();

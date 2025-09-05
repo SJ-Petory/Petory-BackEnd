@@ -2,6 +2,7 @@ package com.sj.Petory.domain.post.entity;
 
 import com.sj.Petory.domain.member.dto.PostResponse;
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.post.comment.Comment;
 import com.sj.Petory.domain.post.dto.UpdatePostRequest;
 import com.sj.Petory.domain.post.type.PostStatus;
 import io.micrometer.common.util.StringUtils;
@@ -53,6 +54,9 @@ public class Post {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private PostStatus status;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false)
