@@ -31,6 +31,7 @@ import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,9 +98,9 @@ public class PostService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public List<PostListResponse> getPostList() {
+    public List<PostListResponse> getPostList(Pageable pageable) {
 
-        return postRepository.findByStatus(PostStatus.ACTIVE).stream()
+        return postRepository.findByStatus(PostStatus.ACTIVE, pageable).stream()
                 .map(post -> PostListResponse.builder()
                         .member(post.getMember().toPostMemberDto())
                         .post(post.toDto())

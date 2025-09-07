@@ -8,6 +8,7 @@ import com.sj.Petory.domain.post.dto.PostSearchResponse;
 import com.sj.Petory.domain.post.dto.UpdatePostRequest;
 import com.sj.Petory.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,9 +33,9 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostListResponse>> getPostList() {
+    public ResponseEntity<List<PostListResponse>> getPostList(Pageable pageable) {
 
-        return ResponseEntity.ok(postService.getPostList());
+        return ResponseEntity.ok(postService.getPostList(pageable));
     }
 
     @PatchMapping(path = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
