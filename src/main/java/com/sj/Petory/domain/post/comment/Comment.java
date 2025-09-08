@@ -34,7 +34,8 @@ public class Comment {
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
 
-    public void updateStatus(CommentStatus status) {
-        this.status = status;
+    public void softDelete() {
+
+        this.status = CommentStatus.DELETED;
     }
 }

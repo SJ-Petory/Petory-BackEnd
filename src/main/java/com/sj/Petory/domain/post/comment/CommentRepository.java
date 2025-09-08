@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    long countAllByPost(Post post);
+    long countAllByPostAndStatus(Post post, CommentStatus commentStatus);
 }

@@ -108,4 +108,9 @@ public class Post {
                 .categoryId(this.getPostCategory().getPostCategoryId())
                 .build();
     }
+
+    public void softDelete() {
+
+        this.status = PostStatus.DELETED;
+    }
 }
