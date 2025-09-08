@@ -5,8 +5,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
@@ -19,6 +17,8 @@ import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.entity.PostCategory;
 import com.sj.Petory.domain.post.entity.PostDocument;
 import com.sj.Petory.domain.post.entity.PostImage;
+import com.sj.Petory.domain.post.event.PostDeletedEvent;
+import com.sj.Petory.domain.post.event.PostUpdatedEvent;
 import com.sj.Petory.domain.post.repository.PostCategoryRepository;
 import com.sj.Petory.domain.post.repository.PostEsRepository;
 import com.sj.Petory.domain.post.repository.PostImageRepository;
@@ -31,6 +31,8 @@ import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +55,8 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final SympathyRepository sympathyRepository;
     private final PostEsRepository postEsRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
     private final ElasticsearchClient elasticsearchClient;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional
@@ -97,9 +99,9 @@ public class PostService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public List<PostListResponse> getPostList() {
+    public List<PostListResponse> getPostList(Pageable pageable) {
 
-        return postRepository.findByStatus(PostStatus.ACTIVE).stream()
+        return postRepository.findByStatus(PostStatus.ACTIVE, pageable).stream()
                 .map(post -> PostListResponse.builder()
                         .member(post.getMember().toPostMemberDto())
                         .post(post.toDto())
@@ -107,7 +109,7 @@ public class PostService {
                                 post.getPostImageList().stream()
                                         .map(PostImage::toDto)
                                         .toList())
-                        .commentTotal(commentRepository.countAllByPost(post))
+                        .commentTotal(commentRepository.countAllByPostAndStatus(post, CommentStatus.ACTIVE))
                         .sympathyTotal(sympathyRepository.countAllByPost(post))
                         .build()
                 ).collect(Collectors.toList());
@@ -153,6 +155,13 @@ public class PostService {
                             });
         }
 
+        eventPublisher.publishEvent(
+                new PostUpdatedEvent(
+                        post.getPostId(),
+                        post.getPostTitle(),
+                        post.getPostContent(),
+                        post.getPostCategory().getPostCategoryId()));
+
         return true;
     }
 
@@ -177,11 +186,13 @@ public class PostService {
 
         validatePostMember(post, member);
 
-        post.setStatus(PostStatus.DELETED);
+        post.softDelete();
 
-        for (Comment comment : post.getCommentList()) {
-            comment.updateStatus(CommentStatus.DELETED);
-        }
+        post.getCommentList().forEach(Comment::softDelete);
+
+        eventPublisher.publishEvent(
+                new PostDeletedEvent(post.getPostId()));
+
         return true;
     }
 
@@ -238,7 +249,7 @@ public class PostService {
                             .orElse(null);
 
                     PostSearchResponse.Post post = PostSearchResponse.toPostResponse(postEntity);
-                    post.setCommentTotal(commentRepository.countAllByPost(postEntity));
+                    post.setCommentTotal(commentRepository.countAllByPostAndStatus(postEntity, CommentStatus.ACTIVE));
                     post.setSympathyTotal(sympathyRepository.countAllByPost(postEntity));
 
                     Map<String, List<String>> highlight = hit.highlight();

@@ -8,6 +8,7 @@ import com.sj.Petory.domain.post.type.PostStatus;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -48,6 +49,7 @@ public class Post {
     @Column(name = "post_content")
     private String postContent;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImageList = new ArrayList<>();
 
@@ -105,5 +107,10 @@ public class Post {
                 .memberId(this.getMember().getMemberId())
                 .categoryId(this.getPostCategory().getPostCategoryId())
                 .build();
+    }
+
+    public void softDelete() {
+
+        this.status = PostStatus.DELETED;
     }
 }

@@ -19,9 +19,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findByMember(Member member, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"member", "postImageList"})
-    List<Post> findByStatus(PostStatus postStatus);
-
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findByStatus(PostStatus postStatus, Pageable pageble);
 
     boolean existsByPostIdAndMember(long postId, Member member);
 
