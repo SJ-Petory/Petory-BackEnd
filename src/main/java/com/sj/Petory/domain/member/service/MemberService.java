@@ -144,15 +144,8 @@ public class MemberService {
         if (name != null) {
             log.info("DB 저장 직후 afterCommit 등록");
 
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-                @Override
-                public void afterCommit() {
-                    log.info("after commit에서 이벤트 발생");
-                    eventPublisher.publishEvent(
-                            new MemberUpdatedEvent(member.getMemberId(), name));
-                }
-            });
+            eventPublisher.publishEvent(
+                    new MemberUpdatedEvent(member.getMemberId(), name));
         }
 
 
@@ -165,14 +158,10 @@ public class MemberService {
 
         validateDeleteMember(member);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                eventPublisher.publishEvent(new MemberDeletedEvent(member.getMemberId()));
-            }
-        });
+        member.softDelete();
 
-        member.updateStatus(MemberStatus.DELETED);
+        eventPublisher.publishEvent(
+                new MemberDeletedEvent(member.getMemberId()));
 
         return true;
     }

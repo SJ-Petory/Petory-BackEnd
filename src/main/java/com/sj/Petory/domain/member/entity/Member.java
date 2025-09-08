@@ -5,6 +5,8 @@ import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.PostMemberInfo;
 import com.sj.Petory.domain.member.dto.UpdateMemberRequest;
 import com.sj.Petory.domain.member.type.MemberStatus;
+import com.sj.Petory.domain.post.comment.Comment;
+import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +19,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -51,6 +55,12 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
+    @OneToMany(mappedBy = "member")
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Comment> comments = new ArrayList<>();
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -82,8 +92,13 @@ public class Member {
         }
     }
 
-    public void updateStatus(final MemberStatus memberStatus) {
-        this.status = memberStatus;
+    public void softDelete() {
+
+        this.status = MemberStatus.DELETED;
+
+        posts.forEach(Post::softDelete);
+        comments.forEach(Comment::softDelete);
+
     }
 
     public void updateImage(final String imageUrl) {
