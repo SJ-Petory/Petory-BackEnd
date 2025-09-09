@@ -65,8 +65,10 @@ public enum ErrorCode {
 
     //comment
     COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    UNMATCHED_COMMENT_MEMBER("자신의 댓글만 접근 가능합니다.", HttpStatus.BAD_REQUEST)
-    ;
+    UNMATCHED_COMMENT_MEMBER("자신의 댓글만 접근 가능합니다.", HttpStatus.BAD_REQUEST),
+
+    //sympathy
+    INVALID_SYMPATHY_TYPE("유효하지 않은 공감 타입입니다.", HttpStatus.BAD_REQUEST);
 
     private final String description;
     private final HttpStatus httpStatus;

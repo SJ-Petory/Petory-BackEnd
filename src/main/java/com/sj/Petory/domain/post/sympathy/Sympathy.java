@@ -3,9 +3,15 @@ package com.sj.Petory.domain.post.sympathy;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Builder
 @Table(name = "sympathy")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Sympathy {
 
     @Id

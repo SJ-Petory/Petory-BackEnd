@@ -36,12 +36,7 @@ public class CommentService {
         Post post = getPostById(request.getPostId());
 
         commentRepository.save(
-                Comment.builder()
-                        .post(post)
-                        .member(member)
-                        .content(request.getContent())
-                        .status(CommentStatus.ACTIVE)
-                        .build());
+                request.toEntity(post, member));
 
         return true;
     }
