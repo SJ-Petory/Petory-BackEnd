@@ -66,15 +66,37 @@ public class CommentService {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
-        Comment comment = commentRepository.findByCommentIdAndStatus(commentId, CommentStatus.ACTIVE)
-                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+        Comment comment = getComment(commentId);
 
-        if (!Objects.equals(comment.getMember().getMemberId(), member.getMemberId())) {
-            throw new CommentException(ErrorCode.UNMATCHED_COMMENT_MEMBER);
-        }
+        checkCommentMember(comment, member);
 
         if (StringUtils.hasText(request.getContent()))
             comment.updateContent(request.getContent());
+
+        return true;
+    }
+
+    private Comment getComment(long commentId) {
+        return commentRepository.findByCommentIdAndStatus(commentId, CommentStatus.ACTIVE)
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private static void checkCommentMember(Comment comment, Member member) {
+        if (!Objects.equals(comment.getMember().getMemberId(), member.getMemberId())) {
+            throw new CommentException(ErrorCode.UNMATCHED_COMMENT_MEMBER);
+        }
+    }
+
+    @Transactional
+    public Boolean deleteComment(final MemberAdapter memberAdapter, final long commentId) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+
+        Comment comment = getComment(commentId);
+
+        checkCommentMember(comment, member);
+
+        comment.softDelete();
 
         return true;
     }
