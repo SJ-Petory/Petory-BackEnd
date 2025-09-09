@@ -61,7 +61,11 @@ public enum ErrorCode {
     //post
     INVALID_POST("유효하지 않은 게시글 입니다.", HttpStatus.BAD_REQUEST),
     INVALID_POST_CATEGORY("유효하지 않은 게시글 카테고리 입니다.", HttpStatus.BAD_REQUEST),
-    UNMATCHED_POST_MEMBER("자신의 게시글만 접근 가능합니다.", HttpStatus.BAD_REQUEST)
+    UNMATCHED_POST_MEMBER("자신의 게시글만 접근 가능합니다.", HttpStatus.BAD_REQUEST),
+
+    //comment
+    COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    UNMATCHED_COMMENT_MEMBER("자신의 댓글만 접근 가능합니다.", HttpStatus.BAD_REQUEST)
     ;
 
     private final String description;

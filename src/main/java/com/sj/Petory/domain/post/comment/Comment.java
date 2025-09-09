@@ -5,12 +5,16 @@ import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@DynamicUpdate
 @Table(name = "comment")
 public class Comment {
 
@@ -37,5 +41,10 @@ public class Comment {
     public void softDelete() {
 
         this.status = CommentStatus.DELETED;
+    }
+
+    public void updateContent(String content) {
+
+        this.content = content;
     }
 }

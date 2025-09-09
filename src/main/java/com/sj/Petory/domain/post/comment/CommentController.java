@@ -4,10 +4,7 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +20,15 @@ public class CommentController {
 
         return ResponseEntity.ok(commentService.commentRegister(
                 memberAdapter, request));
+    }
+
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<Boolean> updateComment(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("commentId") long commentId
+            , @RequestBody CommentUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                commentService.updateComment(memberAdapter, commentId, request));
     }
 }
