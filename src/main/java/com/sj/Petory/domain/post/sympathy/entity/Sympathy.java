@@ -1,27 +1,24 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.sympathy.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
+import com.sj.Petory.domain.post.sympathy.type.SympathyType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Builder
+@Table(name = "sympathy")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@DynamicUpdate
-@Table(name = "comment")
-public class Comment {
+public class Sympathy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
-    private long commentId;
+    @Column(name = "sympathy_id")
+    private long sympathyId;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -31,20 +28,11 @@ public class Comment {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private CommentStatus status;
+    @Column(name = "type")
+    private SympathyType type;
 
-    public void softDelete() {
-
-        this.status = CommentStatus.DELETED;
-    }
-
-    public void updateContent(String content) {
-
-        this.content = content;
+    public void setType(SympathyType type) {
+        this.type = type;
     }
 }

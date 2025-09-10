@@ -7,13 +7,9 @@ import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.member.type.MemberStatus;
-import com.sj.Petory.domain.post.comment.CommentRepository;
 import com.sj.Petory.domain.post.repository.PostEsRepository;
-import com.sj.Petory.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,7 +18,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component

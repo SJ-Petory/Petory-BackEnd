@@ -1,6 +1,8 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.comment.dto;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.post.comment.entity.Comment;
+import com.sj.Petory.domain.post.comment.type.CommentStatus;
 import com.sj.Petory.domain.post.entity.Post;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,8 +1,13 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.comment.sevice;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.post.comment.entity.Comment;
+import com.sj.Petory.domain.post.comment.dto.CommentRegisterRequest;
+import com.sj.Petory.domain.post.comment.type.CommentStatus;
+import com.sj.Petory.domain.post.comment.dto.CommentUpdateRequest;
+import com.sj.Petory.domain.post.comment.repository.CommentRepository;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
 import com.sj.Petory.domain.post.type.PostStatus;
@@ -14,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Objects;
