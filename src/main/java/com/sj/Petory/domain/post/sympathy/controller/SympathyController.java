@@ -1,6 +1,8 @@
-package com.sj.Petory.domain.post.sympathy;
+package com.sj.Petory.domain.post.sympathy.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.post.sympathy.dto.SympathyRegister;
+import com.sj.Petory.domain.post.sympathy.sevice.SympathyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +24,15 @@ public class SympathyController {
         return ResponseEntity.ok(
                 sympathyService.sympathyRegister(
                         memberAdapter, postId, request));
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Boolean> deleteSympathy(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("postId") Long postId) {
+
+        return ResponseEntity.ok(
+                sympathyService.deleteSympathy(memberAdapter, postId));
     }
 
 }

@@ -1,15 +1,20 @@
-package com.sj.Petory.domain.post.sympathy;
+package com.sj.Petory.domain.post.sympathy.sevice;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
+import com.sj.Petory.domain.post.sympathy.dto.SympathyRegister;
+import com.sj.Petory.domain.post.sympathy.entity.Sympathy;
+import com.sj.Petory.domain.post.sympathy.type.SympathyType;
+import com.sj.Petory.domain.post.sympathy.repository.SympathyRepository;
 import com.sj.Petory.domain.post.type.PostStatus;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PostException;
 import com.sj.Petory.exception.SympathyException;
 import com.sj.Petory.exception.type.ErrorCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +26,7 @@ public class SympathyService {
     private final SympathyRepository sympathyRepository;
     private final PostRepository postRepository;
 
-
+    @Transactional
     public Boolean sympathyRegister(
             final MemberAdapter memberAdapter,
             final Long postId, final SympathyRegister request) {
@@ -37,8 +42,17 @@ public class SympathyService {
             throw new SympathyException(ErrorCode.INVALID_SYMPATHY_TYPE);
         }
 
-        sympathyRepository.save(
-                request.toEntity(post, member, type));
+        sympathyRepository.findByPostAndMember(post, member)
+                .ifPresentOrElse(sympathy -> sympathy.setType(type),
+                        () -> {
+                            Sympathy newSympathy =
+                                    Sympathy.builder()
+                                            .member(member)
+                                            .post(post)
+                                            .type(type)
+                                            .build();
+                            sympathyRepository.save(newSympathy);
+                        });
 
         return true;
     }
@@ -53,5 +67,15 @@ public class SympathyService {
 
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public Boolean deleteSympathy(MemberAdapter memberAdapter, Long postId) {
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+        Post post = getPostById(postId);
+
+        sympathyRepository.findByPostAndMember(post, member)
+                .orElseThrow();
+
+        return null;
     }
 }

@@ -1,7 +1,8 @@
-package com.sj.Petory.domain.post.sympathy;
+package com.sj.Petory.domain.post.sympathy.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
+import com.sj.Petory.domain.post.sympathy.type.SympathyType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +31,8 @@ public class Sympathy {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private SympathyType type;
+
+    public void setType(SympathyType type) {
+        this.type = type;
+    }
 }
