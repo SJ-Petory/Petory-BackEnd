@@ -1,4 +1,4 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.comment.dto;
 
 import lombok.Getter;
 import lombok.Setter;

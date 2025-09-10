@@ -1,4 +1,4 @@
-package com.sj.Petory.domain.post.sympathy;
+package com.sj.Petory.domain.post.sympathy.type;
 
 import lombok.RequiredArgsConstructor;
 

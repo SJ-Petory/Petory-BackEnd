@@ -2,7 +2,7 @@ package com.sj.Petory.domain.post.entity;
 
 import com.sj.Petory.domain.member.dto.PostResponse;
 import com.sj.Petory.domain.member.entity.Member;
-import com.sj.Petory.domain.post.comment.Comment;
+import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.dto.UpdatePostRequest;
 import com.sj.Petory.domain.post.type.PostStatus;
 import io.micrometer.common.util.StringUtils;

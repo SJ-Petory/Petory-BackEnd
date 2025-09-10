@@ -5,7 +5,7 @@ import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.PostMemberInfo;
 import com.sj.Petory.domain.member.dto.UpdateMemberRequest;
 import com.sj.Petory.domain.member.type.MemberStatus;
-import com.sj.Petory.domain.post.comment.Comment;
+import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,9 @@
-package com.sj.Petory.domain.post.sympathy;
+package com.sj.Petory.domain.post.sympathy.dto;
 
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.entity.Post;
+import com.sj.Petory.domain.post.sympathy.entity.Sympathy;
+import com.sj.Petory.domain.post.sympathy.type.SympathyType;
 import lombok.Getter;
 import lombok.Setter;
 

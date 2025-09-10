@@ -1,6 +1,7 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.comment.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.post.comment.type.CommentStatus;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

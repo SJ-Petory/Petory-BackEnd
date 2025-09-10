@@ -1,6 +1,9 @@
-package com.sj.Petory.domain.post.comment;
+package com.sj.Petory.domain.post.comment.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.post.comment.dto.CommentRegisterRequest;
+import com.sj.Petory.domain.post.comment.sevice.CommentService;
+import com.sj.Petory.domain.post.comment.dto.CommentUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
