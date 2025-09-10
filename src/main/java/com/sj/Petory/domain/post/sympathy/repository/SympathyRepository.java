@@ -14,4 +14,6 @@ public interface SympathyRepository extends JpaRepository<Sympathy, Long> {
     long countAllByPost(Post post);
 
     Optional<Sympathy> findByPostAndMember(Post post, Member member);
+
+    void deleteByPostAndMember(Post post, Member member);
 }

@@ -68,7 +68,8 @@ public enum ErrorCode {
     UNMATCHED_COMMENT_MEMBER("자신의 댓글만 접근 가능합니다.", HttpStatus.BAD_REQUEST),
 
     //sympathy
-    INVALID_SYMPATHY_TYPE("유효하지 않은 공감 타입입니다.", HttpStatus.BAD_REQUEST);
+    INVALID_SYMPATHY_TYPE("유효하지 않은 공감 타입입니다.", HttpStatus.BAD_REQUEST),
+    SYMPATHY_NOT_FOUND("공감 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
 
     private final String description;
     private final HttpStatus httpStatus;

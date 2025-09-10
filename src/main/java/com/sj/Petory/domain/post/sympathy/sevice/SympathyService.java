@@ -69,13 +69,13 @@ public class SympathyService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
+    @Transactional
     public Boolean deleteSympathy(MemberAdapter memberAdapter, Long postId) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
         Post post = getPostById(postId);
+        
+        sympathyRepository.deleteByPostAndMember(post, member);
 
-        sympathyRepository.findByPostAndMember(post, member)
-                .orElseThrow();
-
-        return null;
+        return true;
     }
 }
