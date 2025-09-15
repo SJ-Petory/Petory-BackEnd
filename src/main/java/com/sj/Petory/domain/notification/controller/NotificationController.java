@@ -18,6 +18,11 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @PostMapping("/test-schedule")
+    public void testSchedule() {
+        notificationService.checkScheduleNotification();
+    }
+
     @GetMapping("/subscribe")
     public SseEmitter subscribe(
             @RequestParam("token") String token) {
