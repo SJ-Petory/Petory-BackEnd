@@ -178,7 +178,8 @@ public class NotificationService {
         }
     }
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedDelay = 60_000)
+    @Transactional
     public void checkScheduleNotification() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
 
@@ -193,11 +194,20 @@ public class NotificationService {
                     .entityId(sn.getEntityId())
                     .build();
 
-            scheduleNotificationReceiverRepository.findByScheduleNotification(sn.getScheduleNotificationId())
-                    .forEach(receiverId -> {
-                        noticePayload.setReceiveMemberId(receiverId);
-                        sendNotification(noticePayload);
-                    });
+//            scheduleNotificationReceiverRepository.findByScheduleNotification(sn.getScheduleNotificationId())
+//                    .forEach(receiverId -> {
+//                        noticePayload.setReceiveMemberId(receiverId);
+//                        sendNotification(noticePayload);
+//                    });
+
+            List<Long> receivers =
+                    scheduleNotificationReceiverRepository.findByScheduleNotification(
+                            sn.getScheduleNotificationId());
+            for (Long receiverId : receivers) {
+                noticePayload.setReceiveMemberId(receiverId);
+                sendNotification(noticePayload);
+            }
+
             //isSent 로직
         }
     }
