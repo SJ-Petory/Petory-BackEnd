@@ -20,6 +20,9 @@ pipeline { // 파이프라인 전체를 관리하는 에이전트로 도커를 �
 
         // 2단계: Docker 이미지 빌드하기
         stage('Build') {
+            agent {
+                docker { image 'docker:24.0.5' }
+            }
             steps {
                 echo "===== Start Build Docker Image ====="
                 // Dockerfile이 있는 현재 위치에서 이미지를 빌드
@@ -30,6 +33,9 @@ pipeline { // 파이프라인 전체를 관리하는 에이전트로 도커를 �
 
         // 3단계: Docker Hub에 이미지 업로드하기
         stage('Push to Docker Hub') {
+            agent {
+                docker { image 'docker:24.0.5' }
+            }
             steps {
                 echo "===== Start Push to Docker Hub ====="
                 // 위에서 등록한 Docker Hub 자격 증명을 사용하여 로그인하고 이미지를 push
