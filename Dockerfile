@@ -5,7 +5,7 @@ COPY . .
 RUN ./gradlew build -x test
 
 # 2. 실행(Run) 단계: 빌드된 .jar 파일만 가져와서 최소한의 환경으로 실행
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jre
 WORKDIR /app
 # 빌드 단계에서 생성된 .jar 파일을 복사
 COPY --from=builder /app/build/libs/*.jar ./app.jar
