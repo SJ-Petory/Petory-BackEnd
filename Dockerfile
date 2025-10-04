@@ -2,6 +2,7 @@
 FROM eclipse-temurin:17-jdk-jammy as builder
 WORKDIR /app
 COPY . .
+RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
 # 2. 실행(Run) 단계
