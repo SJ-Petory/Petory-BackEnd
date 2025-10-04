@@ -43,11 +43,19 @@ pipeline {
             }
         }
 
-        // 4단계: EC2에 배포하기 (마지막 단계!)
+        // 4단계: EC2에 배포하기
         stage('Deploy') {
             steps {
-                echo "배포 단계는 곧 구현될 예정입니다."
+                echo "===== EC2 서버에 배포합니다 ====="
+                sh """
+                    docker stop petory-backend || true
+                    docker rm petory-backend || true
+                    docker pull ${DOCKER_IMAGE_NAME}:latest
+                    docker run -d -p 8080:8080 --name petory-backend --restart always ${DOCKER_IMAGE_NAME}:latest
+                """
+                echo "===== 배포 완료 ====="
             }
         }
+
     }
 }
