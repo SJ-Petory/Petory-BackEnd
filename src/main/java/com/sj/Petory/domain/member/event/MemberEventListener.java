@@ -42,6 +42,11 @@ public class MemberEventListener {
                             .build();
                 }).toList();
 
+        if (documents.isEmpty()) {
+            System.out.println("✅ Member ES 동기화 대상 없음");
+            return;
+        }
+
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         documents.forEach(doc ->

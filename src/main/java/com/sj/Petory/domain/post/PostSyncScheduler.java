@@ -55,6 +55,10 @@ public class PostSyncScheduler {
                             .build();
                 }).toList();
 
+        if (documents.isEmpty()) {
+            System.out.println("✅ POST ES 동기화 대상 없음");
+            return;
+        }
         // Bulk Update
         BulkRequest.Builder br = new BulkRequest.Builder();
 
