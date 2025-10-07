@@ -1,8 +1,14 @@
 # 1. 빌드(Build) 단계
 FROM eclipse-temurin:17-jdk-jammy as builder
 WORKDIR /app
-COPY . .
-RUN chmod +x ./gradlew
+COPY build.gradle settings.gradle ./
+COPY gradlew ./gradlew
+COPY gradle ./gradlele
+
+RUN ./gradlew dependencies
+
+COPY src ./src
+
 RUN ./gradlew build -x test
 
 # 2. 실행(Run) 단계
