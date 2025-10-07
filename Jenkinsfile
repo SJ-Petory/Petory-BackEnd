@@ -16,6 +16,8 @@ pipeline {
             steps {
                 // 자격 증명을 사용하여 비공개 저장소에 접근합니다.
                 git branch: 'develop', url: 'https://github.com/SJ-Petory/Petory-BackEnd.git', credentialsId: 'github-credentials'
+
+                sh 'git submodule update --init --recursive'
             }
         }
 
@@ -48,10 +50,8 @@ pipeline {
             steps {
                 echo "===== EC2 서버에 배포합니다 ====="
                 sh """
-                    docker stop petory-backend || true
-                    docker rm petory-backend || true
-                    docker pull ${DOCKER_IMAGE_NAME}:latest
-                    docker run -d -p 8080:8080 --name petory-backend --restart always ${DOCKER_IMAGE_NAME}:latest
+                    docker-compose -f docker-compose.prod.yml pull petory-backend
+                    docker-compose -f docker-compose.prod.yml up -d --force-recreate petory-backend
                 """
                 echo "===== 배포 완료 ====="
             }
