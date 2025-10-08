@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.post.sympathy.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.post.sympathy.dto.PostSympathiesResponse;
 import com.sj.Petory.domain.post.sympathy.dto.SympathyRegister;
 import com.sj.Petory.domain.post.sympathy.sevice.SympathyService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,14 @@ public class SympathyController {
         return ResponseEntity.ok(
                 sympathyService.sympathyRegister(
                         memberAdapter, postId, request));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostSympathiesResponse> getSympathies(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("postId") Long postId) {
+
+        return ResponseEntity.ok(sympathyService.getSympathies(memberAdapter, postId));
     }
 
     @DeleteMapping("/{postId}")
