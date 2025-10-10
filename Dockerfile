@@ -23,6 +23,7 @@ RUN ./gradlew dependencies
 # Gradle이 빌드 시점에 서브모듈의 리소스(설정 파일 등)를 올바르게 포함하도록 합니다.
 COPY . .
 
+RUN chmod +x ./gradlew
 # 테스트를 제외하고 애플리케이션을 빌드하여 실행 가능한 JAR 파일을 생성합니다.
 RUN ./gradlew bootJar -x test
 
