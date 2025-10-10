@@ -10,6 +10,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew dependencies
 
 COPY src ./src
+COPY config ./config
 
 RUN ./gradlew build -x test
 
@@ -17,5 +18,7 @@ RUN ./gradlew build -x test
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar ./app.jar
+COPY --from=builder /app/config/application-prod.yml ./config/application-prod.yml
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
