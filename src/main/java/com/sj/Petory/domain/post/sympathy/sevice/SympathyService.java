@@ -5,6 +5,7 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.repository.PostRepository;
+import com.sj.Petory.domain.post.sympathy.dto.PostSympathiesResponse;
 import com.sj.Petory.domain.post.sympathy.dto.SympathyRegister;
 import com.sj.Petory.domain.post.sympathy.entity.Sympathy;
 import com.sj.Petory.domain.post.sympathy.type.SympathyType;
@@ -77,5 +78,10 @@ public class SympathyService {
         sympathyRepository.deleteByPostAndMember(post, member);
 
         return true;
+    }
+
+    public PostSympathiesResponse getSympathies(MemberAdapter memberAdapter, Long postId) {
+
+        return null;
     }
 }
