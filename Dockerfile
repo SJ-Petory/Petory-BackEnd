@@ -17,4 +17,4 @@ RUN ./gradlew bootJar -x test
 EXPOSE 8080
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "build/libs/Petory-BackEnd-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "build/libs/Petory-0.0.1-SNAPSHOT.jar"]
