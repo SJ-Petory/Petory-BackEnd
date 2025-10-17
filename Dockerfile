@@ -9,7 +9,7 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
-RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
+RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
 
 #소스 복사
 COPY . .
