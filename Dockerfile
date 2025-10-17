@@ -12,7 +12,7 @@ COPY settings.gradle .
 RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
 
 #소스 복사
-COPY . .
+COPY src ./src
 
 # 실제 빌드
 RUN chmod +x ./gradlew && ./gradlew bootJar -x test --no-daemon
