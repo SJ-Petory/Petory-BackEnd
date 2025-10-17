@@ -4,14 +4,12 @@ FROM eclipse-temurin:17-jdk-jammy
 # 작업 디렉토리 설정
 WORKDIR /app
 
-RUN chmod +x ./gradlew
-
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
-RUN ./gradlew dependencies --no-daemon
+RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
 
 #소스 복사
 COPY . .
