@@ -15,7 +15,7 @@ RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
 COPY . .
 
 # 실제 빌드
-RUN ./gradlew bootJar -x test --no-daemon
+RUN chmod +x ./gradlew && ./gradlew bootJar -x test --no-daemon
 
 # 포트 노출
 EXPOSE 8080
