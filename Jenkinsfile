@@ -1,61 +1,113 @@
-// Jenkins Declarative Pipeline for Custom Jenkins Image
 pipeline {
-    // 모든 작업은 도커 CLI가 내장된 기본 젠킨스 에이전트에서 실행됩니다.
     agent any
 
-    // 파이프라인 전체에서 사용할 환경 변수 설정
     environment {
-        DOCKERHUB_USERNAME = 'sonii26'
-        DOCKER_IMAGE_NAME = "${DOCKERHUB_USERNAME}/petory-backend"
+        GITHUB_REPO = 'https://github.com/SJ-Petory/Petory-BackEnd.git'
+        DOCKER_USERNAME = 'sonii26'
+        IMAGE_NAME = "${DOCKER_USERNAME}/petory-backend"
+        IMAGE_TAG = "latest"
     }
 
-    // 파이프라인의 각 실행 단계를 정의
     stages {
-        // 1단계: Git 저장소에서 코드를 가져오기
-        stage('Checkout') {
+        stage("Check out") {
             steps {
-                // 자격 증명을 사용하여 비공개 저장소에 접근합니다.
-                git branch: 'develop', url: 'https://github.com/SJ-Petory/Petory-BackEnd.git', credentialsId: 'github-credentials'
+                script {
+                    echo "Git Checkout start ---"
 
-                sh 'git submodule update --init --recursive'
-            }
-        }
+                    deleteDir()
 
-        // 2단계: Docker 이미지를 빌드하기
-        stage('Build') {
-            steps {
-                echo "===== Docker 이미지를 빌드합니다 ====="
-                // 이제 젠킨스 컨테이너 자체가 docker 명령어를 알고 있으므로 바로 실행합니다.
-                // sudo는 필요 없습니다.
-                sh "docker build -t ${DOCKER_IMAGE_NAME} ."
-                echo "===== 이미지 빌드를 완료했습니다 ====="
-            }
-        }
+                    withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
 
-        // 3단계: Docker Hub에 이미지 업로드하기
-        stage('Push to Docker Hub') {
-            steps {
-                echo "===== Docker Hub로 이미지를 푸시합니다 ====="
-                // 저장된 Docker Hub 자격 증명을 사용하여 로그인하고 푸시합니다.
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
-                    sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
-                    sh "docker push ${DOCKER_IMAGE_NAME}"
+                    echo "Cloning main repository using local key..."
+                    sh "git clone -b develop ${GITHUB_REPO} ."
+
+                    sh "git config submodule.\"src/main/resources/config\".url https://${GIT_USER}:${GIT_TOKEN}@github.com/SJ-Petory/config.git"
+
+                    sh "git submodule update --init --recursive"
+
+                    echo "Git Checkout finished ---"
                 }
-                echo "===== 이미지 푸시를 완료했습니다 ====="
             }
         }
-
-        // 4단계: EC2에 배포하기
-        stage('Deploy') {
+        }
+        stage("Build Docker Image") {
             steps {
-                echo "===== EC2 서버에 배포합니다 ====="
-                sh """
-                    docker-compose -f docker-compose.prod.yml pull petory-backend
-                    docker-compose -f docker-compose.prod.yml up -d --force-recreate petory-backend
-                """
-                echo "===== 배포 완료 ====="
+                script {
+                    echo "Build Docker Image start ---"
+
+                    sh "docker build -t ${env.IMAGE_NAME}:${BUILD_NUMBER} ."
+                    echo "Build Docker Image finished ---"
+                 }
             }
         }
+        stage("Push Docker Hub") {
+            steps {
+                script {
+                    echo "Push Docker hub start ---"
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USER --password-stdin"
+                    }
+                    //빌드 번호 태그된 버전 푸시
+                    sh "docker push ${env.IMAGE_NAME}:${BUILD_NUMBER}"
 
+                    sh "docker tag ${env.IMAGE_NAME}:${BUILD_NUMBER} ${env.IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${env.IMAGE_NAME}:${IMAGE_TAG}"
+                    echo "Push Docker hub finished ---"
+                }
+            }
+        }
+        stage("Deploy") {
+                steps {
+                    withCredentials([
+                        string(credentialsId: 'db-config', variable: 'DB_CONFIG_FILE'),
+                        string(credentialsId: 'aws-s3-key', variable: 'AWS_KEY_FILE'),
+                        string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_ENV'),
+                        string(credentialsId: 'kakao-client-id', variable: 'KAKAO_CLIENT_ID_ENV')
+                    ]) {
+                    script {
+                        def db = readJSON text: DB_CONFIG_FILE
+                        def aws = readJSON text: AWS_KEY_FILE
+
+                            sh """
+                                cd /home/ec2-user/petory
+
+                                echo "IMAGE_TAG=${env.IMAGE_NAME}:latest" > .env
+                                echo "DB_HOST=${db.DB_HOST}" >> .env
+                                echo "DB_PORT=${db.DB_PORT}" >> .env
+                                echo "DB_NAME=${db.DB_NAME}" >> .env
+                                echo "DB_USERNAME=${db.DB_USERNAME}" >> .env
+                                echo "DB_PASSWORD=${db.DB_PASSWORD}" >> .env
+                                echo "AWS_ACCESS_KEY=${aws.ACK}" >> .env
+                                echo "AWS_SECRET_KEY=${aws.SCK}" >> .env
+                                echo "JWT_SECRET=${JWT_SECRET_ENV}" >> .env
+                                echo "KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID_ENV}" >> .env
+
+                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose pull
+                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose up -d
+
+                                # docker pull ${env.IMAGE_NAME}:latest
+                                # docker compose up -d
+
+                            """
+
+                    }
+                }
+            }
+        }
     }
-}
+    post {
+            always {
+                // 파이프라인 종료 후 정리 작업
+                script {
+                    echo "Pipeline finished. Cleaning up..."
+                    // Docker Hub 로그아웃
+                    sh 'docker logout'
+                    // 빌드에 사용된 로컬 이미지 삭제 (선택 사항)
+                    sh "docker rmi ${env.IMAGE_NAME}:${BUILD_NUMBER} || true"
+                    sh "docker rmi ${env.IMAGE_NAME}:latest || true"
+
+                    sh "docker image prune -f"
+                }
+            }
+        }
+    }
