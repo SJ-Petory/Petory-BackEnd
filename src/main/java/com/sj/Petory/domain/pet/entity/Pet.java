@@ -97,9 +97,8 @@ public class Pet {
         if (request.getAge() != 0) {
             this.petAge = request.getAge();
         }
-        if (StringUtils.hasText(newImage)) {
-            this.petImage = newImage;
-        }
+        this.petImage = newImage;
+
         if (StringUtils.hasText(request.getMemo())) {
             this.memo = request.getMemo();
         }
