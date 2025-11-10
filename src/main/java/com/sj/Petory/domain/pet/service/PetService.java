@@ -24,8 +24,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +52,10 @@ public class PetService {
         Breed breed = breedRepository.findByBreedId(request.getBreedId())
                 .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND));
 
-        String imageUrl = amazonS3Service.upload(request.getImage());
+        String imageUrl = "";
+        if (Objects.nonNull(request.getImage()) && !request.getImage().isEmpty()) {
+            imageUrl = amazonS3Service.upload(request.getImage());
+        }
         petRepository.save(request.toEntity(member, species, breed, imageUrl));
 
         return true;
@@ -73,7 +78,9 @@ public class PetService {
 
         Pet pet = getPetById(petId);
 
-        String newImage = amazonS3Service.updateImage(pet.getPetImage(), request.getImage());
+        String newImage = amazonS3Service.updateImage(
+                pet.getPetImage(), request.getImage());
+
         pet.updateInfo(request, newImage);
 
         return true;

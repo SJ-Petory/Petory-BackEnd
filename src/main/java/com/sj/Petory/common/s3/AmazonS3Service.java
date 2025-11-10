@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -123,10 +124,16 @@ public class AmazonS3Service {
 
     public String updateImage(String oldImageUrl, MultipartFile newImage) {
 
-        if (oldImageUrl != null) {
+        String imageUrl = "";
+
+        if (StringUtils.isNotBlank(oldImageUrl)) {
             delete(oldImageUrl);
         }
 
-        return upload(newImage);
+        if (Objects.nonNull(newImage) && !newImage.isEmpty()) {
+            imageUrl = upload(newImage);
+        }
+
+        return imageUrl;
     }
 }
