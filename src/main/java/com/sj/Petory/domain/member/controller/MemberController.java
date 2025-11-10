@@ -78,7 +78,7 @@ public class MemberController {
     }
 
     @PatchMapping("/image")
-    public ResponseEntity<?> s3ImageUpload(
+    public ResponseEntity<?> s3Image(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @RequestPart(value = "image", required = false) MultipartFile image) {
 
