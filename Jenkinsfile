@@ -82,8 +82,9 @@ pipeline {
                                 echo "JWT_SECRET=${JWT_SECRET_ENV}" >> .env
                                 echo "KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID_ENV}" >> .env
 
-                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose pull
-                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose up -d nginx petory-backend
+                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose -f /home/ec2-user/docker-compose.yml --env-file ./.env pull
+                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose -f /home/ec2-user/docker-compose.yml --env-file ./.env up -d nginx petory-backend
+                               """
 
                                 # docker pull ${env.IMAGE_NAME}:latest
                                 # docker compose up -d
