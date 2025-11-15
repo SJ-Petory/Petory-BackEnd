@@ -84,7 +84,7 @@ pipeline {
 
                                 IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose -f /home/ec2-user/docker-compose.yml --env-file ./.env pull
                                 IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose -f /home/ec2-user/docker-compose.yml --env-file ./.env up -d nginx petory-backend
-                               """
+
 
                                 # docker pull ${env.IMAGE_NAME}:latest
                                 # docker compose up -d
