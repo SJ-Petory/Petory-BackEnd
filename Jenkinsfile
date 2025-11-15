@@ -69,8 +69,7 @@ pipeline {
                         def aws = readJSON text: AWS_KEY_FILE
 
                             sh """
-                                cd /home/ec2-user
-
+                            
                                 echo "IMAGE_TAG=${env.IMAGE_NAME}:latest" > .env
                                 echo "DB_HOST=${db.DB_HOST}" >> .env
                                 echo "DB_PORT=${db.DB_PORT}" >> .env
