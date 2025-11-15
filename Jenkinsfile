@@ -83,7 +83,7 @@ pipeline {
                                 echo "KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID_ENV}" >> .env
 
                                 IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose pull
-                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose up -d
+                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose up -d nginx petory-backend
 
                                 # docker pull ${env.IMAGE_NAME}:latest
                                 # docker compose up -d
