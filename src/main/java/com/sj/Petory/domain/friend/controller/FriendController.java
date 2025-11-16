@@ -79,4 +79,12 @@ public class FriendController {
 
         return ResponseEntity.ok(friendService.getFriendsCount(memberAdapter));
     }
+
+    @DeleteMapping("/{friendId}")
+    public ResponseEntity<Boolean> friendDelete(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("friendId") Long friendId) {
+
+        return ResponseEntity.ok(friendService.friendDelete(memberAdapter, friendId));
+    }
 }
