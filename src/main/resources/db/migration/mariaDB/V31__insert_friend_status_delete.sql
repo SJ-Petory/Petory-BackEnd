@@ -1,0 +1,1 @@
+INSERT INTO friendstatus VALUES (NULL, 'DELETED');

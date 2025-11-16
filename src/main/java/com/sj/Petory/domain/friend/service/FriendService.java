@@ -217,4 +217,25 @@ public class FriendService {
         return friendRepository.countByFriendStatusStatusAndReceiveMember(
                 "ACCEPTED", member);
     }
+
+    @Transactional
+    public boolean friendDelete(final MemberAdapter memberAdapter, final Long friendId) {
+
+        Member member = getMemberByEmail(memberAdapter.getEmail());
+        Member friend = getMemberById(friendId);
+        FriendStatus status = getFriendStatus("ACCEPTED");
+
+        FriendInfo friendInfo = friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
+                        member, friend, status)
+                .orElseThrow(() -> new FriendException(ErrorCode.FRIEND_INFO_NOT_FOUND));
+
+        FriendInfo friendInfo1 = friendRepository.findBySendMemberAndReceiveMemberAndFriendStatus(
+                        friend, member, status)
+                .orElseThrow(() -> new FriendException(ErrorCode.FRIEND_INFO_NOT_FOUND));
+
+        friendInfo.setFriendStatus(getFriendStatus("DELETED"));
+        friendInfo1.setFriendStatus(getFriendStatus("DELETED"));
+
+        return true;
+    }
 }
