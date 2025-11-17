@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/community/sympathy")
+@RequestMapping("/api/community/sympathy")
 public class SympathyController {
 
     private final SympathyService sympathyService;

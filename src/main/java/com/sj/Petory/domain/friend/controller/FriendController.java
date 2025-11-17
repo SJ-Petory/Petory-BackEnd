@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/api/friends")
 @RequiredArgsConstructor
 public class FriendController {
 

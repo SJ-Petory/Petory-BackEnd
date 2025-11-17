@@ -47,12 +47,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/members").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/members").permitAll()
                                 .requestMatchers(
-                                        "/notification/subscribe",
+                                        "/api/notification/subscribe",
                                         "/api/members/check-email"
                                         , "/api/members/check-name"
-                                        , "/members/login"
-                                        , "/pets/species", "/pets/breed/**"
-                                        , "/h2-console/**"
+                                        , "/api/members/login"
+                                        , "/api/pets/species", "/api/pets/breed/**"
+                                        , "/api/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                                 .requestMatchers("/oauth/kakao/**").permitAll()
                                 .anyRequest().authenticated()
