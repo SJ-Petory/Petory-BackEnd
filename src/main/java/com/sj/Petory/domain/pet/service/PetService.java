@@ -2,9 +2,8 @@ package com.sj.Petory.domain.pet.service;
 
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.caregiver.repository.CareGiverRepository;
-import com.sj.Petory.domain.friend.repository.FriendRepository;
-import com.sj.Petory.domain.friend.repository.FriendStatusRepository;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.pet.dto.*;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -144,4 +142,20 @@ public class PetService {
     }
 
 
+    public Page<PetResponse> getRegisterPetList(
+            final MemberAdapter memberAdapter, final Long memberId, final Pageable pageable) {
+
+        getMemberByEmail(memberAdapter.getEmail());
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<PetResponse> petResponseList = petRepository.findByMember(member)
+                .stream().map(pet -> pet.toDto(
+                        breedRepository.findByBreedId(pet.getBreed())
+                                .orElseThrow(() -> new MemberException(ErrorCode.BREED_NOT_FOUND))
+                )).toList();
+
+        return new PageImpl<>(petResponseList, pageable, petResponseList.size());
+    }
 }
