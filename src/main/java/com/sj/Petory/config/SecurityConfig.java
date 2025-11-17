@@ -48,9 +48,9 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/members").permitAll()
                                 .requestMatchers(
                                         "/notification/subscribe",
-                                        "/members/check-email"
-                                        , "/members/check-name"
-                                        , "members/login"
+                                        "/api/members/check-email"
+                                        , "/api/members/check-name"
+                                        , "/members/login"
                                         , "/pets/species", "/pets/breed/**"
                                         , "/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
