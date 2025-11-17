@@ -1,8 +1,8 @@
 package com.sj.Petory.domain.pet.controller;
 
 import com.sj.Petory.domain.member.dto.MemberAdapter;
+import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.pet.dto.*;
-import com.sj.Petory.domain.pet.entity.Pet;
 import com.sj.Petory.domain.pet.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,6 @@ public class PetController {
     }
 
 
-
     @GetMapping("/caregiver")
     public ResponseEntity<Page<ICarePetListResponse>> getPetsICareFor(
             @AuthenticationPrincipal MemberAdapter memberAdapter
@@ -70,5 +69,15 @@ public class PetController {
             , Pageable pageable) {
 
         return ResponseEntity.ok(petService.getBreedListForSpecies(speciesId, pageable));
+    }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<Page<PetResponse>> getRegisterPetList(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("memberId") Long memberId
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(petService.getRegisterPetList(
+                memberAdapter, memberId, pageable));
     }
 }
