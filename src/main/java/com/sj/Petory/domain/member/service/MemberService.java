@@ -187,4 +187,14 @@ public class MemberService {
 
         return true;
     }
+
+    public OtherMemberInfoResponse getOtherMember(final MemberAdapter memberAdapter, final Long memberId) {
+
+        getMemberByEmail(memberAdapter.getEmail());
+
+        Member otherMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return OtherMemberInfoResponse.fromEntity(otherMember);
+    }
 }

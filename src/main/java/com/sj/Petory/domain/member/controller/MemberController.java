@@ -102,4 +102,13 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.deleteMember(memberAdapter));
     }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<OtherMemberInfoResponse> getOtherMember(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("memberId") Long memberId) {
+
+        return ResponseEntity.ok(
+                memberService.getOtherMember(memberAdapter, memberId));
+    }
 }
