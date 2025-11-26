@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdatePostRequest {
+public class  UpdatePostRequest {
 
     private Long categoryId;
     private String title;

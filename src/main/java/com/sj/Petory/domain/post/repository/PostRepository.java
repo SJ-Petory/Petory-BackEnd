@@ -5,6 +5,7 @@ import com.sj.Petory.domain.post.entity.Post;
 import com.sj.Petory.domain.post.type.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -25,4 +26,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     boolean existsByPostIdAndMember(long postId, Member member);
 
     List<Post> findAllByStatus(PostStatus postStatus);
+
+    Page<Post> findByMemberAndStatus(Member member, PostStatus postStatus, Pageable pageable);
 }
