@@ -120,10 +120,9 @@ public class MemberService {
     public Page<PostResponse> getMembersPosts(
             final MemberAdapter memberAdapter
             , final Pageable pageable) {
-        //게시글 status true인 애들만 !
-        return postRepository.findByMember(
-                        getMemberByEmail(memberAdapter.getEmail()), pageable)
-                //.stream().filter(post -> post.getStatus() == PostStatus.ACTIVE)
+
+        return postRepository.findByMemberAndStatus(
+                        getMemberByEmail(memberAdapter.getEmail()), PostStatus.ACTIVE, pageable)
                 .map(Post::toDto);
     }
 
@@ -196,5 +195,19 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
         return OtherMemberInfoResponse.fromEntity(otherMember);
+    }
+
+    public MemberPostResponse getPostsByMemberId(final MemberAdapter memberAdapter, final Long memberId, final Pageable pageable) {
+        getMemberByEmail(memberAdapter.getEmail());
+
+        Member postMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberPostResponse.builder()
+                .member(postMember.toPostMemberDto())
+                .posts(postRepository.findByMemberAndStatus(postMember, PostStatus.ACTIVE, pageable)
+                .map(Post::toDto)
+                .toList())
+                .build();
     }
 }

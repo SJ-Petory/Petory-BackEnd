@@ -111,4 +111,14 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.getOtherMember(memberAdapter, memberId));
     }
+
+    @GetMapping("/{memberId}/posts")
+    public ResponseEntity<MemberPostResponse> getPostsByMemberId(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("memberId") Long memberId
+            , Pageable pageable) {
+
+        return ResponseEntity.ok(memberService.getPostsByMemberId(
+                memberAdapter, memberId, pageable));
+    }
 }
