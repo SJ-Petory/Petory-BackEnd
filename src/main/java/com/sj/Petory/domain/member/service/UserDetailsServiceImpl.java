@@ -23,8 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-
-        return new MemberAdapter(
-                member.getMemberId(), member.getEmail(), member.getPassword());
+        return MemberAdapter.builder()
+                .memberId(member.getMemberId())
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .role(member.getRole())
+                .build();
     }
 }

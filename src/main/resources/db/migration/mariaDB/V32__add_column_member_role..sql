@@ -1,0 +1,1 @@
+ALTER TABLE member add column role VARCHAR(50) NOT NULL;

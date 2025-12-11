@@ -5,6 +5,7 @@ import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.PostMemberInfo;
 import com.sj.Petory.domain.member.dto.UpdateMemberRequest;
 import com.sj.Petory.domain.member.type.MemberStatus;
+import com.sj.Petory.domain.member.type.Role;
 import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
@@ -60,6 +61,10 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
