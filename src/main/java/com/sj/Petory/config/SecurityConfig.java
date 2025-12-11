@@ -44,17 +44,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) ->
 
                         authz
-                                .requestMatchers(HttpMethod.GET, "/members").authenticated()
-                                .requestMatchers(HttpMethod.POST, "/members").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/members").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
                                 .requestMatchers(
                                         "/api/notification/subscribe",
                                         "/api/members/check-email"
                                         , "/api/members/check-name"
                                         , "/api/members/login"
+                                        , "/api/members/guest"
                                         , "/api/pets/species", "/api/pets/breed/**"
                                         , "/api/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                                 .requestMatchers("/oauth/kakao/**").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가

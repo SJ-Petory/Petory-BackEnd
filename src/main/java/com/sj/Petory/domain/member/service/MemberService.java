@@ -83,8 +83,8 @@ public class MemberService {
         validatedPassword(request, member);
 
         return SignIn.Response.toResponse(
-                jwtUtils.generateToken(request.getEmail(), "ATK")
-                , jwtUtils.generateToken(request.getEmail(), "RTK"));
+                jwtUtils.generateToken(request.getEmail(), "ATK", member.getRole().getKey())
+                , jwtUtils.generateToken(request.getEmail(), "RTK",member.getRole().getKey()));
 
     }
 

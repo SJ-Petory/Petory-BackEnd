@@ -24,6 +24,7 @@ import java.util.Date;
 public class JwtUtils {
     private static final String TOKEN_TYPE = "token_type";
     private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String ROLE = "role";
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -36,10 +37,12 @@ public class JwtUtils {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    public String generateToken(final String email, final String tokenType) {
+    public String generateToken(
+            final String email, final String tokenType, final String role) {
 
         Claims claims = Jwts.claims().setSubject(email);
         claims.put(TOKEN_TYPE, tokenType);
+        claims.put(ROLE, role);
 
         Date now = new Date();
         Date expiredDate = setExpired(tokenType, now);
