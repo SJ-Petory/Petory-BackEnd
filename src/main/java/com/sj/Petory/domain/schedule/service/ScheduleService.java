@@ -52,7 +52,7 @@ public class ScheduleService {
     private final ScheduleNotificationReceiverRepository scheduleNotificationReceiverRepository;
 
     public boolean createCategory(
-            final MemberAdapter memberAdapter, final CreateCategoryRequest request) {
+            final MemberAdapter memberAdapter, final CreateScheduleCategoryRequest request) {
 
         Member member = getMemberByMemberAdapter(memberAdapter);
 
