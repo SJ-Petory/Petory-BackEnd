@@ -57,6 +57,8 @@ public class SecurityConfig {
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                                 .requestMatchers("/oauth/kakao/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/community/category").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/community/category").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가

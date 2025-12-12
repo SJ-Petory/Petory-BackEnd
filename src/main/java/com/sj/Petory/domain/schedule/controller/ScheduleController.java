@@ -24,7 +24,7 @@ public class ScheduleController {
     @PostMapping("/category")
     public ResponseEntity<Boolean> createCategory(
             @AuthenticationPrincipal MemberAdapter memberAdapter
-            , @RequestBody CreateCategoryRequest request) {
+            , @RequestBody CreateScheduleCategoryRequest request) {
 
         return ResponseEntity.ok(
                 scheduleService.createCategory(memberAdapter, request));

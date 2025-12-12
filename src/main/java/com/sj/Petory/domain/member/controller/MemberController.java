@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.member.controller;
 
 import com.sj.Petory.domain.member.dto.*;
+import com.sj.Petory.domain.member.service.GuestService;
 import com.sj.Petory.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final GuestService guestService;
 
     @PostMapping
     public ResponseEntity<Boolean> signUp(
@@ -48,6 +50,12 @@ public class MemberController {
             @RequestBody @Valid SignIn.Request request) {
 
         return ResponseEntity.ok(memberService.signIn(request));
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<SignIn.Response> signInGuest() {
+
+        return ResponseEntity.ok(guestService.signInGuest());
     }
 
     @GetMapping

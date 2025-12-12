@@ -2,8 +2,7 @@ package com.sj.Petory.domain.member.repository;
 
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.type.MemberStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.sj.Petory.domain.member.type.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +19,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
 
     List<Member> findAllByStatus(MemberStatus memberStatus);
+
+    Optional<Member> findByMemberIdAndRole(long id, Role role);
 }

@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateCategoryRequest {
+public class CreateScheduleCategoryRequest {
 
     private String name;
 
