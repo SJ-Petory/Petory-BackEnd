@@ -34,4 +34,13 @@ public class PostCategoryController {
         return ResponseEntity.ok(postCategoryService.createPostCategory(
                 memberAdapter, request));
     }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<Boolean> deletePostCategory(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("categoryId") long categoryId) {
+
+        return ResponseEntity.ok(postCategoryService.deletePostCategory(
+                memberAdapter, categoryId));
+    }
 }

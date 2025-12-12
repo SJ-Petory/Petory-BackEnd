@@ -31,7 +31,7 @@ public class PostCategoryService {
                 .collect(Collectors.toList());
     }
 
-    public boolean createPostCategory(
+    public Boolean createPostCategory(
             final MemberAdapter memberAdapter, final CreatePostCategoryRequest request) {
 
         getAdminById(memberAdapter.getMemberId());
@@ -55,5 +55,16 @@ public class PostCategoryService {
 
         return memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
                 .orElseThrow(() -> new AdminException(ErrorCode.NOT_ADMIN_USER));
+    }
+
+    public Boolean deletePostCategory(MemberAdapter memberAdapter, long categoryId) {
+        getAdminById(memberAdapter.getMemberId());
+
+        if (!postCategoryRepository.existsById(categoryId)) {
+            throw new PostException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+
+        postCategoryRepository.deleteById(categoryId);
+        return true;
     }
 }
