@@ -41,9 +41,7 @@ public class GuestService {
                 .role(Role.GUEST).build();
 
         memberRepository.save(guest);
-
-        //토큰 발급
-
+        
         return SignIn.Response.toResponse(
                 jwtUtils.generateToken(guestEmail, "ATK", guest.getRole().getKey())
                 , jwtUtils.generateToken(guestEmail, "RTK", guest.getRole().getKey()));
