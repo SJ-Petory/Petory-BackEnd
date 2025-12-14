@@ -80,4 +80,13 @@ public class PetController {
         return ResponseEntity.ok(petService.getRegisterPetList(
                 memberAdapter, memberId, pageable));
     }
+
+    @PostMapping("/species")
+    public ResponseEntity<Boolean> registerSpecies(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody CreateSpeciesRequest request) {
+
+        return ResponseEntity.ok(petService.registerSpecies(
+                memberAdapter, request));
+    }
 }

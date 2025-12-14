@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface SpeciesRepository extends JpaRepository<Species, Long> {
 
     Optional<Species> findBySpeciesId(Long speciesId);
+
+    boolean existsBySpeciesName(String name);
 }

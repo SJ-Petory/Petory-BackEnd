@@ -31,6 +31,7 @@ public enum ErrorCode {
     PET_NOT_FOUND("반려동물을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     PET_MEMBER_UNMATCHED("자신의 반려동물만 접근이 가능합니다.", HttpStatus.BAD_REQUEST),
     SPECIES_NOT_FOUND("종을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    SPECIES_DUPLICATED("이미 존재하는 종 이름입니다.", HttpStatus.BAD_REQUEST),
     BREED_NOT_FOUND("세부 종을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     ALREADY_REGISTERED_MEMBER("이미 돌보미로 등록된 회원입니다.", HttpStatus.BAD_REQUEST),

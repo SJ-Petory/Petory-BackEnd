@@ -6,6 +6,7 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.member.type.Role;
 import com.sj.Petory.domain.pet.dto.*;
 import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
@@ -14,8 +15,10 @@ import com.sj.Petory.domain.pet.repository.BreedRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
+import com.sj.Petory.exception.AdminException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
+import com.sj.Petory.exception.PostException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -158,4 +161,26 @@ public class PetService {
 
         return new PageImpl<>(petResponseList, pageable, petResponseList.size());
     }
+
+    public Boolean registerSpecies(
+            final MemberAdapter memberAdapter, final CreateSpeciesRequest request) {
+
+        getAdminById(memberAdapter.getMemberId());
+
+        if (speciesRepository.existsBySpeciesName(request.getName())) {
+            throw new PetException(ErrorCode.SPECIES_DUPLICATED);
+        }
+
+        speciesRepository.save(Species.builder()
+                .speciesName(request.getName()).build());
+
+        return true;
+    }
+
+    private Member getAdminById(final long id) {
+
+        return memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
+                .orElseThrow(() -> new AdminException(ErrorCode.NOT_ADMIN_USER));
+    }
+
 }
