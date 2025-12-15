@@ -215,4 +215,19 @@ public class PetService {
                 .species(species)
                 .breedName(request.name()).build());
     }
+
+    @Transactional
+    public void deleteBreed(MemberAdapter memberAdapter, Long breedId) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Breed breed = breedRepository.findById(breedId)
+                .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND));
+
+        if (petRepository.existsByBreed(breedId)) {
+            throw new PetException(ErrorCode.BREED_IN_USE);
+        }
+
+        breedRepository.delete(breed);
+    }
 }

@@ -111,4 +111,14 @@ public class PetController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/breed/{breedId}")
+    public ResponseEntity<Void> deleteBreed(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("breedId") Long breedId) {
+
+        petService.deleteBreed(memberAdapter, breedId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
