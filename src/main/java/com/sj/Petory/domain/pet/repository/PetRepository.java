@@ -1,7 +1,9 @@
 package com.sj.Petory.domain.pet.repository;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
+import com.sj.Petory.domain.pet.entity.Species;
 import com.sj.Petory.domain.pet.type.PetStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +35,8 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             " from Pet p" +
             " where p.petId in :petIds")
     List<Long> findMemberIdsByPet(@Param("petIds")List<Long> petIds);
+
+    boolean existsBySpecies(Species species);
+
+    boolean existsByBreed(Long breedId);
 }

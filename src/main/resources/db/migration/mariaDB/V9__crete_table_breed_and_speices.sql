@@ -1,11 +1,11 @@
 CREATE TABLE `Species` (
-	`species_id`	BIGINT	NOT NULL,
+	`species_id`	BIGINT	NOT NULL AUTO_INCREMENT,
 	`species_name`	VARCHAR(50)	NOT NULL,
 	PRIMARY KEY (`species_id`)
 );
 
 CREATE TABLE `Breed` (
-	`breed_id`	BIGINT	NOT NULL,
+	`breed_id`	BIGINT	NOT NULL AUTO_INCREMENT,
 	`species_id`	BIGINT	NOT NULL,
 	`breed_name` VARCHAR(50)	NOT NULL,
 	PRIMARY KEY (`breed_id`, `species_id`),

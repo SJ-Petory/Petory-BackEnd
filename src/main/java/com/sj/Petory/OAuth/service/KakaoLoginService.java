@@ -83,8 +83,8 @@ public class KakaoLoginService {
         memberEsRepository.save(member.toDocument());
 
         return SignIn.Response.toResponse(
-                jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK")
-                , jwtUtils.generateToken(extraUserInfo.getEmail(), "RTK")
+                jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK", member.getRole().getKey())
+                , jwtUtils.generateToken(extraUserInfo.getEmail(), "RTK", member.getRole().getKey())
         );
     }
 

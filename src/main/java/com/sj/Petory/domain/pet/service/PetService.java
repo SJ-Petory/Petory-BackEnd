@@ -6,6 +6,7 @@ import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.dto.PetResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.member.type.Role;
 import com.sj.Petory.domain.pet.dto.*;
 import com.sj.Petory.domain.pet.entity.Breed;
 import com.sj.Petory.domain.pet.entity.Pet;
@@ -14,6 +15,7 @@ import com.sj.Petory.domain.pet.repository.BreedRepository;
 import com.sj.Petory.domain.pet.repository.PetRepository;
 import com.sj.Petory.domain.pet.repository.SpeciesRepository;
 import com.sj.Petory.domain.pet.type.PetStatus;
+import com.sj.Petory.exception.AdminException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
 import com.sj.Petory.exception.type.ErrorCode;
@@ -29,6 +31,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PetService {
 
     private final MemberRepository memberRepository;
@@ -38,9 +41,10 @@ public class PetService {
     private final CareGiverRepository careGiverRepository;
     private final AmazonS3Service amazonS3Service;
 
+    @Transactional
     public boolean registerPet(
-            final MemberAdapter memberAdapter,
-            final PetRegister.Request request) {
+            MemberAdapter memberAdapter,
+            PetRegister.Request request) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         Species species = speciesRepository.findBySpeciesId(
@@ -66,9 +70,9 @@ public class PetService {
 
     @Transactional
     public boolean petUpdate(
-            final MemberAdapter memberAdapter
-            , final long petId
-            , final UpdatePetRequest request) {
+            MemberAdapter memberAdapter
+            , long petId
+            , UpdatePetRequest request) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
@@ -91,7 +95,7 @@ public class PetService {
 
     @Transactional
     public boolean petDelete(
-            final MemberAdapter memberAdapter, final long petId) {
+            MemberAdapter memberAdapter, long petId) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
         Pet pet = getPetById(petId);
@@ -109,8 +113,8 @@ public class PetService {
     }
 
     public Page<ICarePetListResponse> getPetsICareFor(
-            final MemberAdapter memberAdapter
-            , final Pageable pageable) {
+            MemberAdapter memberAdapter
+            , Pageable pageable) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
@@ -121,7 +125,7 @@ public class PetService {
                 ));
     }
 
-    public Page<SpeciesListResponse> getSpeciesList(final Pageable pageable) {
+    public Page<SpeciesListResponse> getSpeciesList(Pageable pageable) {
 
         List<SpeciesListResponse> speciesList =
                 speciesRepository.findAll().stream()
@@ -131,7 +135,7 @@ public class PetService {
     }
 
     public Page<BreedListResponse> getBreedListForSpecies(
-            final Long speciesId, final Pageable pageable) {
+            Long speciesId, Pageable pageable) {
 
         List<BreedListResponse> breedList = breedRepository.findBySpecies(
                         speciesRepository.findById(speciesId)
@@ -143,7 +147,7 @@ public class PetService {
 
 
     public Page<PetResponse> getRegisterPetList(
-            final MemberAdapter memberAdapter, final Long memberId, final Pageable pageable) {
+            MemberAdapter memberAdapter, Long memberId, Pageable pageable) {
 
         getMemberByEmail(memberAdapter.getEmail());
 
@@ -157,5 +161,73 @@ public class PetService {
                 )).toList();
 
         return new PageImpl<>(petResponseList, pageable, petResponseList.size());
+    }
+
+    @Transactional
+    public void registerSpecies(
+            final MemberAdapter memberAdapter, CreateSpeciesRequest request) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        if (speciesRepository.existsBySpeciesName(request.name())) {
+            throw new PetException(ErrorCode.SPECIES_DUPLICATED);
+        }
+
+        speciesRepository.save(Species.builder()
+                .speciesName(request.name()).build());
+    }
+
+    private void checkAdminById(long id) {
+
+        memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
+                .orElseThrow(() -> new AdminException(ErrorCode.NOT_ADMIN_USER));
+    }
+
+    @Transactional
+    public void deleteSpecies(MemberAdapter memberAdapter, Long speciesId) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Species species = speciesRepository.findById(speciesId)
+                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
+
+        if (petRepository.existsBySpecies(species)) {
+            throw new PetException(ErrorCode.SPECIES_IN_USE);
+        }
+
+        speciesRepository.delete(species);
+    }
+
+    @Transactional
+    public void registerBreed(
+            final MemberAdapter memberAdapter, CreateBreedRequest request) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Species species = speciesRepository.findBySpeciesId(request.speciesId())
+                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
+
+        if (breedRepository.existsByBreedName(request.name())) {
+            throw new PetException(ErrorCode.BREED_DUPLICATED);
+        }
+
+        breedRepository.save(Breed.builder()
+                .species(species)
+                .breedName(request.name()).build());
+    }
+
+    @Transactional
+    public void deleteBreed(MemberAdapter memberAdapter, Long breedId) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Breed breed = breedRepository.findById(breedId)
+                .orElseThrow(() -> new PetException(ErrorCode.BREED_NOT_FOUND));
+
+        if (petRepository.existsByBreed(breedId)) {
+            throw new PetException(ErrorCode.BREED_IN_USE);
+        }
+
+        breedRepository.delete(breed);
     }
 }

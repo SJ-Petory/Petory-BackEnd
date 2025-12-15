@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -79,5 +80,45 @@ public class PetController {
 
         return ResponseEntity.ok(petService.getRegisterPetList(
                 memberAdapter, memberId, pageable));
+    }
+
+    @PostMapping("/species")
+    public ResponseEntity<Void> registerSpecies(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody CreateSpeciesRequest request) {
+
+        petService.registerSpecies(memberAdapter, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/species/{speciesId}")
+    public ResponseEntity<Void> deleteSpecies(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("speciesId") Long speciesId) {
+
+        petService.deleteSpecies(memberAdapter, speciesId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/breed")
+    public ResponseEntity<Void> registerBreed(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody CreateBreedRequest request) {
+
+        petService.registerBreed(memberAdapter, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/breed/{breedId}")
+    public ResponseEntity<Void> deleteBreed(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("breedId") Long breedId) {
+
+        petService.deleteBreed(memberAdapter, breedId);
+
+        return ResponseEntity.noContent().build();
     }
 }
