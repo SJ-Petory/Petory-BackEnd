@@ -43,8 +43,8 @@ public class PetService {
 
     @Transactional
     public boolean registerPet(
-            final MemberAdapter memberAdapter,
-            final PetRegister.Request request) {
+            MemberAdapter memberAdapter,
+            PetRegister.Request request) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
         Species species = speciesRepository.findBySpeciesId(
@@ -70,9 +70,9 @@ public class PetService {
 
     @Transactional
     public boolean petUpdate(
-            final MemberAdapter memberAdapter
-            , final long petId
-            , final UpdatePetRequest request) {
+            MemberAdapter memberAdapter
+            , long petId
+            , UpdatePetRequest request) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
@@ -95,7 +95,7 @@ public class PetService {
 
     @Transactional
     public boolean petDelete(
-            final MemberAdapter memberAdapter, final long petId) {
+            MemberAdapter memberAdapter, long petId) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
         Pet pet = getPetById(petId);
@@ -113,8 +113,8 @@ public class PetService {
     }
 
     public Page<ICarePetListResponse> getPetsICareFor(
-            final MemberAdapter memberAdapter
-            , final Pageable pageable) {
+            MemberAdapter memberAdapter
+            , Pageable pageable) {
 
         Member member = getMemberByEmail(memberAdapter.getEmail());
 
@@ -125,7 +125,7 @@ public class PetService {
                 ));
     }
 
-    public Page<SpeciesListResponse> getSpeciesList(final Pageable pageable) {
+    public Page<SpeciesListResponse> getSpeciesList(Pageable pageable) {
 
         List<SpeciesListResponse> speciesList =
                 speciesRepository.findAll().stream()
@@ -135,7 +135,7 @@ public class PetService {
     }
 
     public Page<BreedListResponse> getBreedListForSpecies(
-            final Long speciesId, final Pageable pageable) {
+            Long speciesId, Pageable pageable) {
 
         List<BreedListResponse> breedList = breedRepository.findBySpecies(
                         speciesRepository.findById(speciesId)
@@ -147,7 +147,7 @@ public class PetService {
 
 
     public Page<PetResponse> getRegisterPetList(
-            final MemberAdapter memberAdapter, final Long memberId, final Pageable pageable) {
+            MemberAdapter memberAdapter, Long memberId, Pageable pageable) {
 
         getMemberByEmail(memberAdapter.getEmail());
 
@@ -165,27 +165,26 @@ public class PetService {
 
     @Transactional
     public void registerSpecies(
-            final MemberAdapter memberAdapter, final CreateSpeciesRequest request) {
+            final MemberAdapter memberAdapter, CreateSpeciesRequest request) {
 
         checkAdminById(memberAdapter.getMemberId());
 
-        if (speciesRepository.existsBySpeciesName(request.getName())) {
+        if (speciesRepository.existsBySpeciesName(request.name())) {
             throw new PetException(ErrorCode.SPECIES_DUPLICATED);
         }
 
         speciesRepository.save(Species.builder()
-                .speciesName(request.getName()).build());
-
+                .speciesName(request.name()).build());
     }
 
-    private void checkAdminById(final long id) {
+    private void checkAdminById(long id) {
 
         memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
                 .orElseThrow(() -> new AdminException(ErrorCode.NOT_ADMIN_USER));
     }
 
     @Transactional
-    public void deleteSpecies(final MemberAdapter memberAdapter, final Long speciesId) {
+    public void deleteSpecies(MemberAdapter memberAdapter, Long speciesId) {
 
         checkAdminById(memberAdapter.getMemberId());
 
@@ -197,5 +196,23 @@ public class PetService {
         }
 
         speciesRepository.delete(species);
+    }
+
+    @Transactional
+    public void registerBreed(
+            final MemberAdapter memberAdapter, CreateBreedRequest request) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Species species = speciesRepository.findBySpeciesId(request.speciesId())
+                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
+
+        if (breedRepository.existsByBreedName(request.name())) {
+            throw new PetException(ErrorCode.BREED_DUPLICATED);
+        }
+
+        breedRepository.save(Breed.builder()
+                .species(species)
+                .breedName(request.name()).build());
     }
 }

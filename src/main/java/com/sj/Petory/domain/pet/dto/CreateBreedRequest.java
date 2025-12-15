@@ -1,8 +1,7 @@
 package com.sj.Petory.domain.pet.dto;
 
-import lombok.Getter;
-
-public record CreateSpeciesRequest(
+public record CreateBreedRequest(
+        Long speciesId,
         String name
 ) {
 }

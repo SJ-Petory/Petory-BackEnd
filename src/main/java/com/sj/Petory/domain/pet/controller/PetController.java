@@ -101,4 +101,14 @@ public class PetController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/breed")
+    public ResponseEntity<Void> registerBreed(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestBody CreateBreedRequest request) {
+
+        petService.registerBreed(memberAdapter, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
