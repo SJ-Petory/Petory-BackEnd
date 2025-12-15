@@ -18,7 +18,6 @@ import com.sj.Petory.domain.pet.type.PetStatus;
 import com.sj.Petory.exception.AdminException;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.exception.PetException;
-import com.sj.Petory.exception.PostException;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +31,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PetService {
 
     private final MemberRepository memberRepository;
@@ -41,6 +41,7 @@ public class PetService {
     private final CareGiverRepository careGiverRepository;
     private final AmazonS3Service amazonS3Service;
 
+    @Transactional
     public boolean registerPet(
             final MemberAdapter memberAdapter,
             final PetRegister.Request request) {
@@ -162,10 +163,11 @@ public class PetService {
         return new PageImpl<>(petResponseList, pageable, petResponseList.size());
     }
 
-    public Boolean registerSpecies(
+    @Transactional
+    public void registerSpecies(
             final MemberAdapter memberAdapter, final CreateSpeciesRequest request) {
 
-        getAdminById(memberAdapter.getMemberId());
+        checkAdminById(memberAdapter.getMemberId());
 
         if (speciesRepository.existsBySpeciesName(request.getName())) {
             throw new PetException(ErrorCode.SPECIES_DUPLICATED);
@@ -174,13 +176,26 @@ public class PetService {
         speciesRepository.save(Species.builder()
                 .speciesName(request.getName()).build());
 
-        return true;
     }
 
-    private Member getAdminById(final long id) {
+    private void checkAdminById(final long id) {
 
-        return memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
+        memberRepository.findByMemberIdAndRole(id, Role.ADMIN)
                 .orElseThrow(() -> new AdminException(ErrorCode.NOT_ADMIN_USER));
     }
 
+    @Transactional
+    public void deleteSpecies(final MemberAdapter memberAdapter, final Long speciesId) {
+
+        checkAdminById(memberAdapter.getMemberId());
+
+        Species species = speciesRepository.findById(speciesId)
+                .orElseThrow(() -> new PetException(ErrorCode.SPECIES_NOT_FOUND));
+
+        if (petRepository.existsBySpecies(species)) {
+            throw new PetException(ErrorCode.SPECIES_IN_USE);
+        }
+
+        speciesRepository.delete(species);
+    }
 }

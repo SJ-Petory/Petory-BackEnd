@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -82,11 +83,22 @@ public class PetController {
     }
 
     @PostMapping("/species")
-    public ResponseEntity<Boolean> registerSpecies(
+    public ResponseEntity<Void> registerSpecies(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @RequestBody CreateSpeciesRequest request) {
 
-        return ResponseEntity.ok(petService.registerSpecies(
-                memberAdapter, request));
+        petService.registerSpecies(memberAdapter, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/species/{speciesId}")
+    public ResponseEntity<Void> deleteSpecies(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @PathVariable("speciesId") Long speciesId) {
+
+        petService.deleteSpecies(memberAdapter, speciesId);
+
+        return ResponseEntity.noContent().build();
     }
 }
