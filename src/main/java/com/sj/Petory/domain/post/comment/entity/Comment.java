@@ -10,6 +10,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -17,6 +22,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @Getter
 @DynamicUpdate
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "comment")
 public class Comment {
 
@@ -40,6 +46,14 @@ public class Comment {
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
 
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column
+    private LocalDateTime updatedAt;
+
     public void softDelete() {
 
         this.status = CommentStatus.DELETED;
@@ -53,11 +67,12 @@ public class Comment {
     public PostCommentsResponse toDto() {
 
         return PostCommentsResponse.builder()
+                .commentId(this.getCommentId())
                 .memberId(this.member.getMemberId())
                 .memberName(this.member.getName())
                 .memberImage(this.member.getImage())
-                .content(this.content)
-                .createdAt(this.post.getCreatedAt())
+                .content(this.getContent())
+                .createdAt(this.getCreatedAt())
                 .build();
     }
 }
