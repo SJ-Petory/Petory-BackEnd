@@ -98,7 +98,8 @@ public class PostService {
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public List<PostListResponse> getPostList(Pageable pageable) {
+    public List<PostListResponse> getPostList(MemberAdapter memberAdapter, Pageable pageable) {
+        getMemberByEmail(memberAdapter.getEmail());
 
         return postRepository.findByStatus(PostStatus.ACTIVE, pageable).stream()
                 .map(post -> PostListResponse.builder()
@@ -201,7 +202,10 @@ public class PostService {
     }
 
     public PostSearchResponse searchPost(
-            final String keyword) throws IOException {
+            MemberAdapter memberAdapter
+            ,final String keyword) throws IOException {
+
+        getMemberByEmail(memberAdapter.getEmail());
 
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("posts")

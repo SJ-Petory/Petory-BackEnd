@@ -33,9 +33,11 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostListResponse>> getPostList(Pageable pageable) {
+    public ResponseEntity<List<PostListResponse>> getPostList(
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , Pageable pageable) {
 
-        return ResponseEntity.ok(postService.getPostList(pageable));
+        return ResponseEntity.ok(postService.getPostList(memberAdapter, pageable));
     }
 
     @PatchMapping(path = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,9 +63,10 @@ public class PostController {
 
     @GetMapping(params = "keyword")
     public ResponseEntity<PostSearchResponse> searchPost(
-            @RequestParam("keyword") String keyword) throws IOException {
+            @AuthenticationPrincipal MemberAdapter memberAdapter
+            , @RequestParam("keyword") String keyword) throws IOException {
 
         return ResponseEntity.ok(
-                postService.searchPost(keyword));
+                postService.searchPost(memberAdapter, keyword));
     }
 }
