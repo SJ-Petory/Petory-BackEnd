@@ -85,7 +85,7 @@ public class SympathyService {
     public List<PostSympathiesResponse> getSympathies(MemberAdapter memberAdapter, Long postId) {
         getMemberByEmail(memberAdapter.getEmail());
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
                 .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
 
         return post.getSympathyList().stream()
