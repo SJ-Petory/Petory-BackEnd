@@ -19,6 +19,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SympathyService {
@@ -74,14 +76,20 @@ public class SympathyService {
     public Boolean deleteSympathy(MemberAdapter memberAdapter, Long postId) {
         Member member = getMemberByEmail(memberAdapter.getEmail());
         Post post = getPostById(postId);
-        
+
         sympathyRepository.deleteByPostAndMember(post, member);
 
         return true;
     }
 
-    public PostSympathiesResponse getSympathies(MemberAdapter memberAdapter, Long postId) {
+    public List<PostSympathiesResponse> getSympathies(MemberAdapter memberAdapter, Long postId) {
+        getMemberByEmail(memberAdapter.getEmail());
 
-        return null;
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
+                .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+
+        return post.getSympathyList().stream()
+                .map(Sympathy::toDto)
+                .toList();
     }
 }

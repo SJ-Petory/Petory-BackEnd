@@ -4,6 +4,7 @@ import com.sj.Petory.domain.member.dto.PostResponse;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.dto.UpdatePostRequest;
+import com.sj.Petory.domain.post.sympathy.entity.Sympathy;
 import com.sj.Petory.domain.post.type.PostStatus;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
@@ -59,6 +60,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Sympathy> sympathyList = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false)

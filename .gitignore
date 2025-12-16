@@ -84,3 +84,4 @@ src/main/resources/db/migration/mysql/
 
 backup-config.sh
 restore-config.sh
+nginx.conf

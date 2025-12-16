@@ -3,6 +3,7 @@ package com.sj.Petory.domain.post.comment.sevice;
 import com.sj.Petory.domain.member.dto.MemberAdapter;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
+import com.sj.Petory.domain.post.comment.dto.PostCommentsResponse;
 import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.comment.dto.CommentRegisterRequest;
 import com.sj.Petory.domain.post.comment.type.CommentStatus;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -98,5 +100,16 @@ public class CommentService {
         comment.softDelete();
 
         return true;
+    }
+
+    public List<PostCommentsResponse> getComments(MemberAdapter memberAdapter, Long postId) {
+        getMemberByEmail(memberAdapter.getEmail());
+
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
+                .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
+
+        return post.getCommentList().stream()
+                .map(Comment::toDto)
+                .toList();
     }
 }

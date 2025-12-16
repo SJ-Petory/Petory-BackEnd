@@ -1,6 +1,7 @@
 package com.sj.Petory.domain.post.comment.entity;
 
 import com.sj.Petory.domain.member.entity.Member;
+import com.sj.Petory.domain.post.comment.dto.PostCommentsResponse;
 import com.sj.Petory.domain.post.comment.type.CommentStatus;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
@@ -47,5 +48,16 @@ public class Comment {
     public void updateContent(String content) {
 
         this.content = content;
+    }
+
+    public PostCommentsResponse toDto() {
+
+        return PostCommentsResponse.builder()
+                .memberId(this.member.getMemberId())
+                .memberName(this.member.getName())
+                .memberImage(this.member.getImage())
+                .content(this.content)
+                .createdAt(this.post.getCreatedAt())
+                .build();
     }
 }
