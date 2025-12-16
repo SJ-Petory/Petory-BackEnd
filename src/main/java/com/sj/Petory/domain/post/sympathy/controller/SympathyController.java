@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/community/sympathy")
@@ -28,11 +30,12 @@ public class SympathyController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostSympathiesResponse> getSympathies(
+    public ResponseEntity<List<PostSympathiesResponse>> getSympathies(
             @AuthenticationPrincipal MemberAdapter memberAdapter
             , @PathVariable("postId") Long postId) {
 
-        return ResponseEntity.ok(sympathyService.getSympathies(memberAdapter, postId));
+        return ResponseEntity.ok(sympathyService.getSympathies(
+                memberAdapter, postId));
     }
 
     @DeleteMapping("/{postId}")
