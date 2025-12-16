@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record PostCommentsResponse(
+        long commentId,
         long memberId,
         String memberName,
         String memberImage,
