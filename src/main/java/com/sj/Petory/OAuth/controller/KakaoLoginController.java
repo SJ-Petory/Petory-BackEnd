@@ -1,6 +1,7 @@
 package com.sj.Petory.OAuth.controller;
 
 import com.sj.Petory.OAuth.dto.ExtraUserInfo;
+import com.sj.Petory.OAuth.dto.KakaoAuthInfo;
 import com.sj.Petory.OAuth.service.KakaoLoginService;
 import com.sj.Petory.domain.member.dto.SignIn;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,19 +23,16 @@ public class KakaoLoginController {
             , HttpServletResponse response) throws IOException {
 
         System.out.println(code);
-        String accessTokenFromKakao = kakaoLoginService.getAccessTokenFromKakao(code);
-
-        String redirectUrl = "http://43.202.195.199/inputInfo?token=" + accessTokenFromKakao;
+        String redirectUrl = kakaoLoginService.getAccessTokenFromKakao(code);
 
         response.sendRedirect(redirectUrl);
     }
 
     @PostMapping("/oauth/kakao/extraInfo")
     public ResponseEntity<SignIn.Response> kakaoExtraInfo(
-            @RequestHeader("Authorization") String accessToken
-            , @RequestBody @Valid ExtraUserInfo extraUserInfo) {
+            @RequestBody @Valid ExtraUserInfo extraUserInfo) {
 
         return ResponseEntity.ok(
-                kakaoLoginService.kakaoExtraInfo(accessToken, extraUserInfo));
+                kakaoLoginService.kakaoExtraInfo(extraUserInfo));
     }
 }

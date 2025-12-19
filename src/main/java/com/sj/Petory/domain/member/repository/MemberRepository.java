@@ -21,4 +21,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllByStatus(MemberStatus memberStatus);
 
     Optional<Member> findByMemberIdAndRole(long id, Role role);
+
+    Optional<Member> findByProviderId(String providerId);
 }
