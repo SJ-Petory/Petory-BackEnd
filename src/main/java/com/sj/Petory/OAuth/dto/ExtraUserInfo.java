@@ -11,6 +11,9 @@ import lombok.*;
 public class ExtraUserInfo {
 
     @NotBlank
+    private String registerId;
+
+    @NotBlank
     private String email;
     @NotBlank
     private String phone;

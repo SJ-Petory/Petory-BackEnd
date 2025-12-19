@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoTokenResponse {
+public class TokenResponseFromKakao {
 
     @JsonProperty("token_type")
     public String tokenType;

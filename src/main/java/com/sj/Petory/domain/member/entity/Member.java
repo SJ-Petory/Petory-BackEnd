@@ -1,5 +1,6 @@
 package com.sj.Petory.domain.member.entity;
 
+import com.sj.Petory.OAuth.type.SocialType;
 import com.sj.Petory.common.es.MemberDocument;
 import com.sj.Petory.domain.friend.dto.MemberSearchResponse;
 import com.sj.Petory.domain.member.dto.PostMemberInfo;
@@ -48,6 +49,13 @@ public class Member {
 
     @Column(name = "phone")
     private String phone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private SocialType provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
 
     @Column(name = "image")
     private String image;
