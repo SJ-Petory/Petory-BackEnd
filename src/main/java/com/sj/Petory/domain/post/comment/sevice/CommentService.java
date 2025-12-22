@@ -109,6 +109,7 @@ public class CommentService {
                 .orElseThrow(() -> new PostException(ErrorCode.INVALID_POST));
 
         return post.getCommentList().stream()
+                .filter(cm -> cm.getStatus().equals(CommentStatus.ACTIVE))
                 .map(Comment::toDto)
                 .toList();
     }

@@ -10,10 +10,7 @@ import com.sj.Petory.domain.member.type.Role;
 import com.sj.Petory.domain.post.comment.entity.Comment;
 import com.sj.Petory.domain.post.entity.Post;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -52,8 +49,10 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
+    @Setter
     private SocialType provider;
 
+    @Setter
     @Column(name = "provider_id")
     private String providerId;
 
@@ -125,5 +124,10 @@ public class Member {
                 .image(this.getImage())
                 .name(this.getName())
                 .build();
+    }
+
+    public void updateProviderInfo(SocialType type, String id) {
+        setProvider(type);
+        setProviderId(id);
     }
 }

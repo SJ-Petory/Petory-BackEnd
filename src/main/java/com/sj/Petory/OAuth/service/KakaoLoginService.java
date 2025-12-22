@@ -3,14 +3,19 @@ package com.sj.Petory.OAuth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sj.Petory.OAuth.dto.*;
+import com.sj.Petory.OAuth.type.SocialType;
 import com.sj.Petory.common.es.MemberEsRepository;
 import com.sj.Petory.common.s3.AmazonS3Service;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.member.type.MemberStatus;
+import com.sj.Petory.domain.member.type.Role;
+import com.sj.Petory.exception.OAuthException;
+import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -34,6 +36,9 @@ public class KakaoLoginService {
     private final MemberEsRepository memberEsRepository;
     @Value("${kakao.client_id}")
     private String clientId;
+
+    @Value("${app.front-url}") // 설정 파일에서 주소 가져오기
+    private String frontUrl;
 
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
@@ -90,16 +95,17 @@ public class KakaoLoginService {
 
         if (newMember.isPresent()) { //이미 존재하면
             //로그인 완 토큰 발급
+            System.out.println("랄라 이미 가입");
             Member member = newMember.get();
             String accessToken = jwtUtils.generateToken(member.getEmail(), "ATK", member.getRole().getKey());
             String refreshToken = jwtUtils.generateToken(member.getEmail(), "RTK", member.getRole().getKey());
 
-            return UriComponentsBuilder.fromUriString("/mainPage")
+            return UriComponentsBuilder.fromUriString(frontUrl + "/mainPage")
                     .queryParam("accessToken", accessToken)
                     .queryParam("refreshToken", refreshToken)
                     .build().toUriString();
         } else { //존재하지 않으면 기존 회원과 연결 or 회원가입 로직
-                //을 할려면 추가 정보(이메일, 폰번호)가 있어야 한다
+            //을 할려면 추가 정보(이메일, 폰번호)가 있어야 한다
             String registerId = UUID.randomUUID().toString();
 
             UserInfoResponse userInfoResponse = WebClient.create(KAUTH_USER_URL_HOST).get()
@@ -130,41 +136,38 @@ public class KakaoLoginService {
                     30,
                     TimeUnit.MINUTES
             );
-            return UriComponentsBuilder.fromUriString("https://petory.site/inputInfo")
+            return UriComponentsBuilder.fromUriString(frontUrl + "/inputInfo")
                     .queryParam("registerId", registerId)
                     .build().toUriString();
         }
     }
 
+    @Transactional
     public SignIn.Response kakaoExtraInfo(
             final ExtraUserInfo extraUserInfo) {
 
+        //regester로 map에서 임시 저장된 데이터들 가져옴
+        //뭐머ㅜ 저장했냐면 식별자(sub), 이름, 이미지
+
         String key = extraUserInfo.getRegisterId();
+
         CachedKakaoInfo kakaoInfo = (CachedKakaoInfo) redisTemplate.opsForValue().get(key);
+
+        if (memberRepository.existsByProviderId(Objects.requireNonNull(kakaoInfo).getSub())) {
+            throw new OAuthException(ErrorCode.OAUTH_MEMBER_DUPLICATED);
+        }
 
         if (kakaoInfo == null) {
             throw new RuntimeException("유효시간이 만료되었거나 잘못된 요청입니다.");
         }
-        Optional<Member> existingMember = memberRepository.findByEmail(request.getEmail());
 
-        Member member;
-        if (existingMember.isPresent()) {
-            member = existingMember.get();
-            member.updateSocialId(kakaoInfo.getSub()); // 소셜 ID 연동
-        } else {
-            member = Member.builder()
-                    .email(request.getEmail())
-                    .phone(request.getPhone())
-                    .nickname(kakaoInfo.getNickname()) // Redis에 있던 닉네임 사용
-                    .socialId(kakaoInfo.getSub())      // Redis에 있던 Sub 사용
-                    .role(Role.USER)
-                    .build();
-            memberRepository.save(member);
-        }
+        Member member = memberRepository.save(findOrCreateMember(extraUserInfo, kakaoInfo));
+        member.updateProviderInfo(SocialType.KAKAO, kakaoInfo.getSub()); // 소셜 정보 업데이트
+
+        memberEsRepository.save(member.toDocument());
 
         // 3. 사용한 임시 데이터 삭제 (선택 사항 - TTL 있어서 굳이 안 해도 됨)
-        redisTemplate.delete(key);        Member member = memberRepository.save(findOrCreateMember(userInfoResponse, extraUserInfo));
-        memberEsRepository.save(member.toDocument());
+        redisTemplate.delete(key);
 
         return SignIn.Response.toResponse(
                 jwtUtils.generateToken(extraUserInfo.getEmail(), "ATK", member.getRole().getKey())
@@ -172,28 +175,21 @@ public class KakaoLoginService {
         );
     }
 
-    //findOrCreateMember()
-    //존재하면 -> 로그인 성공 ATK, RTK 발급
-    //존재하지 않으면 -> 회원 정보 저장
-    public Member findOrCreateMember(UserInfoResponse userInfoResponse, ExtraUserInfo extraUserInfo) {
+    public Member findOrCreateMember(ExtraUserInfo extraUserInfo, CachedKakaoInfo kakaoInfo) {
         return memberRepository.findByEmail(extraUserInfo.getEmail())
-                .orElseGet(() -> createMember(userInfoResponse, extraUserInfo));
+                .orElseGet(() -> createMember(extraUserInfo, kakaoInfo));
     }
 
-    private Member createMember(
-            final UserInfoResponse userInfoResponse
-            , final ExtraUserInfo extraUserInfo) {
-
-        UserInfoResponse.KakaoAcount.ProfileInfo profile
-                = userInfoResponse.getKakaoAcount().getProfile();
+    private Member createMember(ExtraUserInfo extraUserInfo, CachedKakaoInfo kakaoInfo) {
 
         return Member.builder()
-                .name(profile.getNickName())
                 .email(extraUserInfo.getEmail())
                 .phone(extraUserInfo.getPhone())
+                .name(kakaoInfo.getName()) // Redis에 있던 닉네임 사용
                 .image(amazonS3Service.uploadImageforKakao(
-                        profile.getProfileImageUrl()))
+                        kakaoInfo.getImage()))
                 .status(MemberStatus.ACTIVE)
+                .role(Role.USER)
                 .build();
     }
 }
