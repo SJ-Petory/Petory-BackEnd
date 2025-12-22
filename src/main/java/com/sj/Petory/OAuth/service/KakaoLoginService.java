@@ -11,6 +11,8 @@ import com.sj.Petory.domain.member.entity.Member;
 import com.sj.Petory.domain.member.repository.MemberRepository;
 import com.sj.Petory.domain.member.type.MemberStatus;
 import com.sj.Petory.domain.member.type.Role;
+import com.sj.Petory.exception.OAuthException;
+import com.sj.Petory.exception.type.ErrorCode;
 import com.sj.Petory.security.JwtUtils;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.transaction.Transactional;
@@ -23,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -37,6 +36,9 @@ public class KakaoLoginService {
     private final MemberEsRepository memberEsRepository;
     @Value("${kakao.client_id}")
     private String clientId;
+
+    @Value("${app.front-url}") // 설정 파일에서 주소 가져오기
+    private String frontUrl;
 
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
@@ -93,11 +95,12 @@ public class KakaoLoginService {
 
         if (newMember.isPresent()) { //이미 존재하면
             //로그인 완 토큰 발급
+            System.out.println("랄라 이미 가입");
             Member member = newMember.get();
             String accessToken = jwtUtils.generateToken(member.getEmail(), "ATK", member.getRole().getKey());
             String refreshToken = jwtUtils.generateToken(member.getEmail(), "RTK", member.getRole().getKey());
 
-            return UriComponentsBuilder.fromUriString("/mainPage")
+            return UriComponentsBuilder.fromUriString(frontUrl + "/mainPage")
                     .queryParam("accessToken", accessToken)
                     .queryParam("refreshToken", refreshToken)
                     .build().toUriString();
@@ -133,7 +136,7 @@ public class KakaoLoginService {
                     30,
                     TimeUnit.MINUTES
             );
-            return UriComponentsBuilder.fromUriString("https://petory.site/inputInfo")
+            return UriComponentsBuilder.fromUriString(frontUrl + "/inputInfo")
                     .queryParam("registerId", registerId)
                     .build().toUriString();
         }
@@ -147,7 +150,12 @@ public class KakaoLoginService {
         //뭐머ㅜ 저장했냐면 식별자(sub), 이름, 이미지
 
         String key = extraUserInfo.getRegisterId();
+
         CachedKakaoInfo kakaoInfo = (CachedKakaoInfo) redisTemplate.opsForValue().get(key);
+
+        if (memberRepository.existsByProviderId(Objects.requireNonNull(kakaoInfo).getSub())) {
+            throw new OAuthException(ErrorCode.OAUTH_MEMBER_DUPLICATED);
+        }
 
         if (kakaoInfo == null) {
             throw new RuntimeException("유효시간이 만료되었거나 잘못된 요청입니다.");

@@ -23,4 +23,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberIdAndRole(long id, Role role);
 
     Optional<Member> findByProviderId(String providerId);
+
+    boolean existsByProviderId(String sub);
 }
