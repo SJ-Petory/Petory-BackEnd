@@ -1,7 +1,6 @@
 package com.sj.Petory.OAuth.controller;
 
 import com.sj.Petory.OAuth.dto.ExtraUserInfo;
-import com.sj.Petory.OAuth.dto.KakaoAuthInfo;
 import com.sj.Petory.OAuth.service.KakaoLoginService;
 import com.sj.Petory.domain.member.dto.SignIn;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +34,12 @@ public class KakaoLoginController {
 
         return ResponseEntity.ok(
                 kakaoLoginService.kakaoExtraInfo(extraUserInfo));
+    }
+
+    @PostMapping("/oauth/token/issue")
+    public ResponseEntity<SignIn.Response> issueToken(@RequestBody Map<String, String> request) {
+
+        String code = request.get("code");
+        return ResponseEntity.ok(kakaoLoginService.issueToken(code));
     }
 }

@@ -40,8 +40,8 @@ public class KakaoLoginService {
     @Value("${app.front-url}") // 설정 파일에서 주소 가져오기
     private String frontUrl;
 
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
+    private final static String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
+    private final static String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
     private final MemberRepository memberRepository;
     private final JwtUtils jwtUtils;
@@ -68,6 +68,10 @@ public class KakaoLoginService {
                         .block();
 
 
+        if (tokenResponse == null) {
+            throw new RuntimeException("카카오 응답이 없습니다.");
+        }
+
         log.info(" [Kakao Service] Access Token ------> {}", tokenResponse.getAccessToken());
         log.info(" [Kakao Service] Refresh Token ------> {}", tokenResponse.getRefreshToken());
         //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
@@ -85,6 +89,8 @@ public class KakaoLoginService {
 
         // 2. Payload 값 추출
         ObjectMapper mapper = new ObjectMapper();
+
+        @SuppressWarnings("unchecked")
         Map<String, Object> claims = mapper.readValue(payloadJson, Map.class);
 
         String sub = (String) claims.get("sub");
@@ -93,20 +99,30 @@ public class KakaoLoginService {
 
         Optional<Member> newMember = memberRepository.findByProviderId(sub);
 
+        String registerId = UUID.randomUUID().toString();
+
         if (newMember.isPresent()) { //이미 존재하면
             //로그인 완 토큰 발급
-            System.out.println("랄라 이미 가입");
+
             Member member = newMember.get();
             String accessToken = jwtUtils.generateToken(member.getEmail(), "ATK", member.getRole().getKey());
             String refreshToken = jwtUtils.generateToken(member.getEmail(), "RTK", member.getRole().getKey());
 
+            TokenInfo tokenInfo = new TokenInfo(accessToken, refreshToken);
+
+            redisTemplate.opsForValue().set(
+                    registerId,
+                    tokenInfo,
+                    30,
+                    TimeUnit.MINUTES
+            );
+
             return UriComponentsBuilder.fromUriString(frontUrl + "/mainPage")
-                    .queryParam("accessToken", accessToken)
-                    .queryParam("refreshToken", refreshToken)
+                    .queryParam("code", registerId)
+                    .queryParam("status", "login")
                     .build().toUriString();
         } else { //존재하지 않으면 기존 회원과 연결 or 회원가입 로직
             //을 할려면 추가 정보(이메일, 폰번호)가 있어야 한다
-            String registerId = UUID.randomUUID().toString();
 
             UserInfoResponse userInfoResponse = WebClient.create(KAUTH_USER_URL_HOST).get()
                     .uri(uriBuilder -> uriBuilder
@@ -119,6 +135,10 @@ public class KakaoLoginService {
                     .retrieve()
                     .bodyToMono(UserInfoResponse.class)
                     .block();
+
+            if (userInfoResponse == null) {
+                throw new RuntimeException("카카오 유저 정보를 가져오지 못했습니다.");
+            }
 
             UserInfoResponse.KakaoAcount.ProfileInfo profile
                     = userInfoResponse.getKakaoAcount().getProfile();
@@ -138,6 +158,7 @@ public class KakaoLoginService {
             );
             return UriComponentsBuilder.fromUriString(frontUrl + "/inputInfo")
                     .queryParam("registerId", registerId)
+                    .queryParam("status", "register")
                     .build().toUriString();
         }
     }
@@ -153,12 +174,12 @@ public class KakaoLoginService {
 
         CachedKakaoInfo kakaoInfo = (CachedKakaoInfo) redisTemplate.opsForValue().get(key);
 
-        if (memberRepository.existsByProviderId(Objects.requireNonNull(kakaoInfo).getSub())) {
-            throw new OAuthException(ErrorCode.OAUTH_MEMBER_DUPLICATED);
+        if (kakaoInfo == null) {
+            throw new OAuthException(ErrorCode.INVALID_REGISTER_KEY);
         }
 
-        if (kakaoInfo == null) {
-            throw new RuntimeException("유효시간이 만료되었거나 잘못된 요청입니다.");
+        if (memberRepository.existsByProviderId(kakaoInfo.getSub())) {
+            throw new OAuthException(ErrorCode.OAUTH_MEMBER_DUPLICATED);
         }
 
         Member member = memberRepository.save(findOrCreateMember(extraUserInfo, kakaoInfo));
@@ -166,7 +187,6 @@ public class KakaoLoginService {
 
         memberEsRepository.save(member.toDocument());
 
-        // 3. 사용한 임시 데이터 삭제 (선택 사항 - TTL 있어서 굳이 안 해도 됨)
         redisTemplate.delete(key);
 
         return SignIn.Response.toResponse(
@@ -191,5 +211,26 @@ public class KakaoLoginService {
                 .status(MemberStatus.ACTIVE)
                 .role(Role.USER)
                 .build();
+    }
+
+    public SignIn.Response issueToken(String code) {
+
+        Object data = redisTemplate.opsForValue().get(code);
+
+        if (data == null) {
+            throw new OAuthException(ErrorCode.INVALID_CODE);
+        }
+
+        TokenInfo tokenInfo;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            tokenInfo = mapper.convertValue(data, TokenInfo.class);
+        } catch (IllegalArgumentException e) {
+            throw new OAuthException(ErrorCode.INVALID_OAUTH_DATA);
+        }
+
+        redisTemplate.delete(code);
+
+        return SignIn.Response.toResponse(tokenInfo.accessToken(), tokenInfo.refreshToken());
     }
 }

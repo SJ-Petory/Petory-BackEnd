@@ -76,7 +76,10 @@ public enum ErrorCode {
     SYMPATHY_NOT_FOUND("공감 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     NOT_ADMIN_USER("관리자만 접근 가능합니다.", HttpStatus.BAD_REQUEST),
-    OAUTH_MEMBER_DUPLICATED("동일한 식별자로 소셜로그인 한 계정이 있습니다.",HttpStatus.BAD_REQUEST);
+    OAUTH_MEMBER_DUPLICATED("동일한 식별자로 소셜로그인 한 계정이 있습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_CODE("유효시간이 만료되었거나 잘못된 요청입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_OAUTH_DATA("처리할 수 없는 데이터 입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_REGISTER_KEY("유효시간이 만료되었거나 잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
 
     private final String description;
     private final HttpStatus httpStatus;
