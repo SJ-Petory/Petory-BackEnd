@@ -55,7 +55,7 @@ public class SecurityConfig {
                                         , "/api/pets/species", "/api/pets/breed/**"
                                         , "/api/h2-console/**"
                                         , "/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                                .requestMatchers("/oauth/**").permitAll()
+                                .requestMatchers("/api/oauth/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/api/community/category").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/community/category").hasRole("ADMIN")

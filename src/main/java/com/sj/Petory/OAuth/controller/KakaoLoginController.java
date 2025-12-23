@@ -14,10 +14,11 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/oauth")
 public class KakaoLoginController {
     private final KakaoLoginService kakaoLoginService;
 
-    @GetMapping("/oauth/kakao/callback")//인가코드 발급
+    @GetMapping("/kakao/callback")//인가코드 발급
     public void callbackKakao(
             @RequestParam("code") String code
             , HttpServletResponse response) throws IOException {
@@ -28,7 +29,7 @@ public class KakaoLoginController {
         response.sendRedirect(redirectUrl);
     }
 
-    @PostMapping("/oauth/kakao/extraInfo")
+    @PostMapping("/kakao/extraInfo")
     public ResponseEntity<SignIn.Response> kakaoExtraInfo(
             @RequestBody @Valid ExtraUserInfo extraUserInfo) {
 
@@ -36,7 +37,7 @@ public class KakaoLoginController {
                 kakaoLoginService.kakaoExtraInfo(extraUserInfo));
     }
 
-    @PostMapping("/oauth/token/issue")
+    @PostMapping("/token/issue")
     public ResponseEntity<SignIn.Response> issueToken(@RequestBody Map<String, String> request) {
 
         String code = request.get("code");
