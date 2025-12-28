@@ -69,29 +69,20 @@ pipeline {
                     script {
                         echo "Deploy start ---"
 
-                        // 👇 [수정] 괄호 닫힘 오류 해결 완료!
-                        sshPublisher(publishers: [
-                            sshPublisherDesc(
-                                configName: 'AugustZer0Server',
-                                transfers: [
-                                    sshTransfer(
-                                        execCommand: """
-                                            cd /home/augustzer0/soni/petory
+                        // 1. .env 파일 생성 (젠킨스 작업 공간에 생성하여 docker compose가 읽도록 함)
+                        sh """
+                            echo "DB_USERNAME=${DB_USER}" > .env
+                            echo "DB_PASSWORD=${DB_PASS}" >> .env
+                            echo "AWS_ACCESS_KEY=${AWS_AK}" >> .env
+                            echo "AWS_SECRET_KEY=${AWS_SK}" >> .env
+                            echo "JWT_SECRET=${JWT_SECRET}" >> .env
+                            echo "KAKAO_CLIENT_ID=${KAKAO_ID}" >> .env
+                        """
 
-                                            echo "DB_USERNAME=${DB_USER}" > .env
-                                            echo "DB_PASSWORD=${DB_PASS}" >> .env
-                                            echo "AWS_ACCESS_KEY=${AWS_AK}" >> .env
-                                            echo "AWS_SECRET_KEY=${AWS_SK}" >> .env
-                                            echo "JWT_SECRET=${JWT_SECRET}" >> .env
-                                            echo "KAKAO_CLIENT_ID=${KAKAO_ID}" >> .env
-
-                                            docker compose pull petory-backend
-                                            docker compose up -d petory-backend
-                                        """
-                                    )
-                                ]
-                            )
-                        ])
+                        // 2. SSH 없이 젠킨스가 직접(로컬 도커 소켓을 통해) 명령 수행
+                        // 최신 이미지를 받고 컨테이너를 재시작합니다.
+                        sh "docker compose pull petory-backend"
+                        sh "docker compose up -d petory-backend"
                     }
                 }
             }
