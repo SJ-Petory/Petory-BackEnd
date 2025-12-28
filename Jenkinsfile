@@ -15,8 +15,7 @@ pipeline {
                     echo "Git Checkout start ---"
                     deleteDir()
 
-                    // 👇 [수정] 스크린샷에 있던 ID 'github-login'으로 맞췄습니다!
-                    withCredentials([usernamePassword(credentialsId: 'github-login', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    withCredentials([usernamePassword(credentialsId: 'soni-github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
 
                         echo "Cloning main repository..."
                         sh "git clone -b develop ${GITHUB_REPO} ."
@@ -98,7 +97,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             script {
