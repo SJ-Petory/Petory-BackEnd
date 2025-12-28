@@ -16,7 +16,7 @@ pipeline {
 
                     deleteDir()
 
-                    withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    withCredentials([usernamePassword(credentialsId: 'soni-github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
 
                     echo "Cloning main repository using local key..."
                     sh "git clone -b develop ${GITHUB_REPO} ."
@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     echo "Push Docker hub start ---"
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'soni-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USER --password-stdin"
                     }
                     //빌드 번호 태그된 버전 푸시
@@ -59,39 +59,33 @@ pipeline {
         stage("Deploy") {
                 steps {
                     withCredentials([
-                        string(credentialsId: 'db-config', variable: 'DB_CONFIG_FILE'),
-                        string(credentialsId: 'aws-s3-key', variable: 'AWS_KEY_FILE'),
-                        string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET_ENV'),
-                        string(credentialsId: 'kakao-client-id', variable: 'KAKAO_CLIENT_ID_ENV')
+                        usernamePassword(credentialsId: 'petory-db', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
+                        usernamePassword(credentialsId: 'soni-aws-key', usernameVariable: 'AWS_AK', passwordVariable: 'AWS_SK'),
+                        string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'soni-kakao-client-id', variable: 'KAKAO_ID')
                     ]) {
                     script {
-                        def db = readJSON text: DB_CONFIG_FILE
-                        def aws = readJSON text: AWS_KEY_FILE
+                        echo "Deploy start ---"
 
-                            sh """
-                                cd /home/ec2-user/petory
+                        sshPublisher(publishers: [
+                            sshPublisherDesc(
+                                configName: 'AugustZer0Server', // 젠킨스 시스템 설정에 등록한 서버 이름
+                                transfers: [
+                                    sshTransfer(
+                                        execCommand: """
+                            cd /home/augustzer0/soni/petory
 
-                                echo "IMAGE_TAG=${env.IMAGE_NAME}:latest" > .env
-                                echo "DB_HOST=${db.DB_HOST}" >> .env
-                                echo "DB_PORT=${db.DB_PORT}" >> .env
-                                echo "DB_NAME=${db.DB_NAME}" >> .env
-                                echo "DB_USERNAME=${db.DB_USERNAME}" >> .env
-                                echo "DB_PASSWORD=${db.DB_PASSWORD}" >> .env
-                                echo "AWS_ACCESS_KEY=${aws.ACK}" >> .env
-                                echo "AWS_SECRET_KEY=${aws.SCK}" >> .env
-                                echo "JWT_SECRET=${JWT_SECRET_ENV}" >> .env
-                                echo "KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID_ENV}" >> .env
+                            echo "DB_USERNAME=${DB_USER}" > .env
+                            echo "DB_PASSWORD=${DB_PASS}" >> .env
+                            echo "AWS_ACCESS_KEY=${AWS_AK}" >> .env
+                            echo "AWS_SECRET_KEY=${AWS_SK}" >> .env
+                            echo "JWT_SECRET=${JWT_SECRET}" >> .env
+                            echo "KAKAO_CLIENT_ID=${KAKAO_ID}" >> .env
 
-                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose pull
-                                IMAGE_TAG=${env.IMAGE_NAME}:latest docker compose up -d nginx petory-backend
-
-
-                                # docker pull ${env.IMAGE_NAME}:latest
-                                # docker compose up -d
-
-                            """
-
-                    }
+                            docker compose pull petory-backend
+                            docker compose up -d petory-backend
+                        """
+                      }
                 }
             }
         }
