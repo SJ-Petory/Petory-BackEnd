@@ -156,7 +156,7 @@ public class KakaoLoginService {
                     30,
                     TimeUnit.MINUTES
             );
-            return UriComponentsBuilder.fromUriString(frontUrl + "/inputInfo")
+            return UriComponentsBuilder.fromUriString(frontUrl + "/oauth/kakao/callback")
                     .queryParam("registerId", registerId)
                     .queryParam("status", "register")
                     .build().toUriString();
