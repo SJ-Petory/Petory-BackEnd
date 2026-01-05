@@ -73,7 +73,6 @@ public class KakaoLoginService {
         }
 
         String idToken = tokenResponse.getIdToken();
-        //토큰 파싱
         // 1. 토큰 디코딩
         String[] token = idToken.split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -93,8 +92,7 @@ public class KakaoLoginService {
 
         String registerId = UUID.randomUUID().toString();
 
-        if (newMember.isPresent()) { //이미 존재하면
-            //로그인 완 토큰 발급
+        if (newMember.isPresent()) {
 
             Member member = newMember.get();
             String accessToken = jwtUtils.generateToken(member.getEmail(), "ATK", member.getRole().getKey());
@@ -157,9 +155,6 @@ public class KakaoLoginService {
     @Transactional
     public SignIn.Response kakaoExtraInfo(
             final ExtraUserInfo extraUserInfo) {
-
-        //regester로 map에서 임시 저장된 데이터들 가져옴
-        //뭐머ㅜ 저장했냐면 식별자(sub), 이름, 이미지
 
         String key = extraUserInfo.getRegisterId();
 
