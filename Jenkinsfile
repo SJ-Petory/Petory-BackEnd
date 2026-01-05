@@ -58,18 +58,19 @@ pipeline {
             }
         }
 
-        stage("Deploy") {
+stage("Deploy") {
             steps {
                 withCredentials([
                     usernamePassword(credentialsId: 'petory-db', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
                     usernamePassword(credentialsId: 'soni-aws-key', usernameVariable: 'AWS_AK', passwordVariable: 'AWS_SK'),
                     string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
-                    string(credentialsId: 'soni-kakao-client-id', variable: 'KAKAO_ID')
+                    string(credentialsId: 'kakao-client-id', variable: 'KAKAO_ID')
                 ]) {
                     script {
                         echo "Deploy start ---"
 
-                        // 1. .env 파일 생성 (젠킨스 작업 공간에 생성하여 docker compose가 읽도록 함)
+                        // 1. 젠킨스 작업 공간에 .env 파일 생성
+                        // (이 파일은 빌드 때마다 새로 생성되어 최신 환경변수를 담습니다)
                         sh """
                             echo "DB_USERNAME=${DB_USER}" > .env
                             echo "DB_PASSWORD=${DB_PASS}" >> .env
@@ -77,18 +78,18 @@ pipeline {
                             echo "AWS_SECRET_KEY=${AWS_SK}" >> .env
                             echo "JWT_SECRET=${JWT_SECRET}" >> .env
                             echo "KAKAO_CLIENT_ID=${KAKAO_ID}" >> .env
+                            echo "IMAGE_TAG=${BUILD_NUMBER}" >> .env
                         """
-
-                        // 2. SSH 없이 젠킨스가 직접(로컬 도커 소켓을 통해) 명령 수행
-                        // 최신 이미지를 받고 컨테이너를 재시작합니다.
-                        sh "docker compose pull petory-backend"
-                        sh "docker compose up -d petory-backend"
+                        def composeDir = "/home/augustzer0/soni/petory/docker-compose.yml"
+                        sh """
+                            docker-compose -f ${composeDir} --env-file .env pull petory-backend
+                            docker-compose -f ${composeDir} --env-file .env up -d petory-backend
+                        """
                     }
                 }
             }
         }
     }
-
     post {
         always {
             script {
