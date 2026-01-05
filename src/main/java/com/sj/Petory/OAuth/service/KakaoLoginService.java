@@ -111,7 +111,7 @@ public class KakaoLoginService {
                     .queryParam("code", registerId)
                     .queryParam("status", "login")
                     .build().toUriString();
-        } else { //존재하지 않으면 기존 회원과 연결 or 회원가입 로직
+        } else {
 
             UserInfoResponse userInfoResponse = WebClient.create(KAUTH_USER_URL_HOST).get()
                     .uri(uriBuilder -> uriBuilder
