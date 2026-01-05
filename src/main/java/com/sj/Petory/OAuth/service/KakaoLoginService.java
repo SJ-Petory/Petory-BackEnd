@@ -72,20 +72,12 @@ public class KakaoLoginService {
             throw new RuntimeException("카카오 응답이 없습니다.");
         }
 
-        log.info(" [Kakao Service] Access Token ------> {}", tokenResponse.getAccessToken());
-        log.info(" [Kakao Service] Refresh Token ------> {}", tokenResponse.getRefreshToken());
-        //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
-        log.info(" [Kakao Service] Id Token ------> {}", tokenResponse.getIdToken());
-        log.info(" [Kakao Service] Scope ------> {}", tokenResponse.getScope());
-
         String idToken = tokenResponse.getIdToken();
         //토큰 파싱
         // 1. 토큰 디코딩
         String[] token = idToken.split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String payloadJson = new String(decoder.decode(token[1]));
-
-        System.out.println("디코딩 된 JSON : " + payloadJson);
 
         // 2. Payload 값 추출
         ObjectMapper mapper = new ObjectMapper();
@@ -122,7 +114,6 @@ public class KakaoLoginService {
                     .queryParam("status", "login")
                     .build().toUriString();
         } else { //존재하지 않으면 기존 회원과 연결 or 회원가입 로직
-            //을 할려면 추가 정보(이메일, 폰번호)가 있어야 한다
 
             UserInfoResponse userInfoResponse = WebClient.create(KAUTH_USER_URL_HOST).get()
                     .uri(uriBuilder -> uriBuilder
