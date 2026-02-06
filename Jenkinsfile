@@ -62,7 +62,7 @@ stage("Deploy") {
             steps {
                 withCredentials([
                     usernamePassword(credentialsId: 'petory-db', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
-                    usernamePassword(credentialsId: 'soni-s3-key', usernameVariable: 's3_AK', passwordVariable: 's3_SK'),
+                    usernamePassword(credentialsId: 'soni-s3-key', usernameVariable: 'MINIO_AK', passwordVariable: 'MINIO_SK'),
                     string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
                     string(credentialsId: 'kakao-client-id', variable: 'KAKAO_ID')
                 ]) {
