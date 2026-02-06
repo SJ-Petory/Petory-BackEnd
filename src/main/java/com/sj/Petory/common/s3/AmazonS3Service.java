@@ -35,6 +35,13 @@ public class AmazonS3Service {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName;
 
+    @Value("${cloud.aws.s3.public-url}")
+    private String publicUrl;
+
+    private String getPublicUrl(String fileName) {
+        return String.format("%s/%s/%s", publicUrl, bucketName, fileName);
+    }
+
     public String uploadImageforKakao(String imageUrl) {
 
         if (StringUtils.isEmpty(imageUrl)) {
@@ -49,7 +56,7 @@ public class AmazonS3Service {
 
             amazonS3.putObject(bucketName, randomFilename, inputStream, metaData);
 
-            return amazonS3.getUrl(bucketName, randomFilename).toString();
+            return getPublicUrl(randomFilename);
 
         } catch (Exception e) {
             throw new S3Exception(IMAGE_UPLOAD_FAIL);
@@ -86,7 +93,7 @@ public class AmazonS3Service {
 
         log.info("File upload Success : " + randomFilename);
 
-        return amazonS3.getUrl(bucketName, randomFilename).toString();
+        return getPublicUrl(randomFilename);
     }
 
     private String generateRandomFilename(String originName) {
@@ -119,7 +126,10 @@ public class AmazonS3Service {
 
     private String extractKeyFromUrl(String imageUrl) throws MalformedURLException {
         URL url = new URL(imageUrl);
-        return url.getPath().substring(1);
+        String path = url.getPath(); // /petory-image/uuid.jpg
+
+        // 경로에서 버킷 이름을 제외한 순수 파일명
+        return path.substring(path.lastIndexOf("/") + 1);
     }
 
     public String updateImage(String oldImageUrl, MultipartFile newImage) {
