@@ -62,7 +62,7 @@ stage("Deploy") {
             steps {
                 withCredentials([
                     usernamePassword(credentialsId: 'petory-db', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
-                    usernamePassword(credentialsId: 'soni-aws-key', usernameVariable: 'AWS_AK', passwordVariable: 'AWS_SK'),
+                    usernamePassword(credentialsId: 'soni-s3-key', usernameVariable: 's3_AK', passwordVariable: 's3_SK'),
                     string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
                     string(credentialsId: 'kakao-client-id', variable: 'KAKAO_ID')
                 ]) {
@@ -74,8 +74,8 @@ stage("Deploy") {
                         sh """
                             echo "DB_USERNAME=${DB_USER}" > .env
                             echo "DB_PASSWORD=${DB_PASS}" >> .env
-                            echo "AWS_ACCESS_KEY=${AWS_AK}" >> .env
-                            echo "AWS_SECRET_KEY=${AWS_SK}" >> .env
+                            echo "MINIO_ACCESS_KEY=${MINIO_AK}" >> .env
+                            echo "MINIO_SECRET_KEY=${MINIO_SK}" >> .env
                             echo "JWT_SECRET=${JWT_SECRET}" >> .env
                             echo "KAKAO_CLIENT_ID=${KAKAO_ID}" >> .env
                             echo "IMAGE_TAG=${BUILD_NUMBER}" >> .env
