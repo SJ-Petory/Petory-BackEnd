@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     INTERNAL_SERVER_ERROR("내부 서버 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    BAD_REQUEST("올바르지 않은 요청입니다.", HttpStatus.BAD_REQUEST),
 
     //Member
     EMAIL_DUPLICATED("중복된 이메일입니다.", HttpStatus.BAD_REQUEST),
