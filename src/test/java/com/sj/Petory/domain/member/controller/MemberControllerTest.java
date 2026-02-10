@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sj.Petory.config.SecurityConfig;
 import com.sj.Petory.domain.member.dto.SignIn;
 import com.sj.Petory.domain.member.dto.SignUp;
+import com.sj.Petory.domain.member.service.GuestService;
 import com.sj.Petory.domain.member.service.MemberService;
 import com.sj.Petory.exception.MemberException;
 import com.sj.Petory.security.JwtAuthenticationFilter;
@@ -49,6 +50,8 @@ class MemberControllerTest {
 
     @MockBean
     private MemberService memberService;
+    @MockBean
+    private GuestService guestService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -67,7 +70,7 @@ class MemberControllerTest {
                 .willReturn(true);
 
         //then
-        mockMvc.perform(post("/members")
+        mockMvc.perform(post("/api/members")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())

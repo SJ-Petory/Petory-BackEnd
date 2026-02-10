@@ -4,12 +4,15 @@ import com.sj.Petory.domain.member.controller.MemberController;
 import com.sj.Petory.exception.dto.ErrorResponse;
 import com.sj.Petory.exception.type.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 import static com.sj.Petory.exception.type.ErrorCode.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestControllerAdvice
 @Slf4j
@@ -31,6 +34,14 @@ public class GlobalExceptionHandler {
         log.warn("SSE 연결 타임 아웃");
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+
+
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(ErrorResponse.from(e, ErrorCode.BAD_REQUEST));
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(
             Exception e) {
